@@ -62,6 +62,42 @@ exports.handler = async (event, context) => {
     const credentialsCollection = db.collection('user_credentials');
     const votesCollection = db.collection('votes');
     const votersCollection = db.collection('voters');
+    const scheduleCollection = db.collection('election_schedule');
+
+    // Check if voting is currently allowed based on schedule
+    const schedule = await scheduleCollection.findOne({ _id: 'current_schedule' });
+    const now = new Date();
+
+    if (schedule) {
+      const startTime = new Date(schedule.startTime);
+      const endTime = schedule.endTime ? new Date(schedule.endTime) : null;
+
+      if (now < startTime) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Voting has not started yet. Please wait for the scheduled time.',
+            status: 'NOT_STARTED',
+            startTime: startTime
+          })
+        };
+      }
+
+      if (endTime && now > endTime) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Voting has ended.',
+            status: 'ENDED',
+            endTime: endTime
+          })
+        };
+      }
+    }
 
     // Validate credentials on server side
     const userCredential = await credentialsCollection.findOne({

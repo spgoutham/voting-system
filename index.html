@@ -4,7 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Class Elections 2025</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Add these styles for the countdown timer */
+        .election-status-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .election-status-banner.waiting {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .election-status-banner.open {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .election-status-banner.closed {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .status-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #status-message {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .countdown-display {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 70px;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .time-label {
+            display: block;
+            font-size: 0.8rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .voting-form.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .voting-form.disabled .submit-btn {
+            background: #ccc !important;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-timer {
+                gap: 10px;
+            }
+            
+            .time-unit {
+                min-width: 60px;
+                padding: 10px;
+            }
+            
+            .time-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
 </head>
 <body>
@@ -25,6 +121,33 @@
         <div id="vote-tab" class="tab-content active">
             <div class="voting-form">
                 <h2>Cast Your Cosmic Vote</h2>
+                
+                <!-- Election Status Banner -->
+                <div id="election-status-banner" class="election-status-banner">
+                    <div class="status-content">
+                        <div id="status-message">Checking election status...</div>
+                        <div id="countdown-display" class="countdown-display" style="display: none;">
+                            <div class="countdown-timer">
+                                <div class="time-unit">
+                                    <span id="days" class="time-value">00</span>
+                                    <span class="time-label">Days</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span id="hours" class="time-value">00</span>
+                                    <span class="time-label">Hours</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span id="minutes" class="time-value">00</span>
+                                    <span class="time-label">Minutes</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span id="seconds" class="time-value">00</span>
+                                    <span class="time-label">Seconds</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="leaderboard">
                     <h3>🌟 Current Leaders</h3>
@@ -75,8 +198,133 @@
         // Global variables
         let hasVoted = false;
         let currentCandidates = {};
+        let electionStatus = {};
+        let countdownInterval = null;
 
-        // Tab switching
+        // Load election status and handle countdown
+        async function loadElectionStatus() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-election-status');
+                electionStatus = response.data;
+                updateElectionStatusDisplay();
+                
+                // Clear any existing countdown interval
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                
+                // Start countdown if needed
+                if (electionStatus.status === 'SCHEDULED' && electionStatus.timeUntilStart > 0) {
+                    startCountdown();
+                } else if (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd) {
+                    startCountdownUntilEnd();
+                }
+                
+            } catch (error) {
+                console.error('Error loading election status:', error);
+                // Default to open if can't check status
+                electionStatus = {
+                    votingAllowed: true,
+                    status: 'OPEN',
+                    message: 'Voting is open (status check failed)'
+                };
+                updateElectionStatusDisplay();
+            }
+        }
+
+        // Update the election status display
+        function updateElectionStatusDisplay() {
+            const banner = document.getElementById('election-status-banner');
+            const statusMessage = document.getElementById('status-message');
+            const countdownDisplay = document.getElementById('countdown-display');
+            const votingForm = document.querySelector('.voting-form');
+            
+            // Update banner class based on status
+            banner.className = 'election-status-banner';
+            if (electionStatus.status === 'SCHEDULED') {
+                banner.classList.add('waiting');
+            } else if (electionStatus.status === 'OPEN') {
+                banner.classList.add('open');
+            } else if (electionStatus.status === 'CLOSED') {
+                banner.classList.add('closed');
+            }
+            
+            // Update status message
+            statusMessage.textContent = electionStatus.message;
+            
+            // Show/hide countdown
+            if (electionStatus.status === 'SCHEDULED' || (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd)) {
+                countdownDisplay.style.display = 'block';
+            } else {
+                countdownDisplay.style.display = 'none';
+            }
+            
+            // Enable/disable voting form
+            if (electionStatus.votingAllowed) {
+                votingForm.classList.remove('disabled');
+            } else {
+                votingForm.classList.add('disabled');
+            }
+        }
+
+        // Start countdown until voting starts
+        function startCountdown() {
+            const updateCountdown = () => {
+                if (electionStatus.timeUntilStart <= 0) {
+                    clearInterval(countdownInterval);
+                    loadElectionStatus(); // Refresh status
+                    return;
+                }
+                
+                const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                
+                // Update the time remaining
+                electionStatus.timeUntilStart -= 1000;
+            };
+            
+            updateCountdown(); // Initial call
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Start countdown until voting ends
+        function startCountdownUntilEnd() {
+            document.getElementById('status-message').textContent = 'Voting ends in:';
+            
+            const updateCountdown = () => {
+                if (electionStatus.timeUntilEnd <= 0) {
+                    clearInterval(countdownInterval);
+                    loadElectionStatus(); // Refresh status
+                    return;
+                }
+                
+                const totalSeconds = Math.floor(electionStatus.timeUntilEnd / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                
+                // Update the time remaining
+                electionStatus.timeUntilEnd -= 1000;
+            };
+            
+            updateCountdown(); // Initial call
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+        // Show tab function for tab navigation
         function showTab(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -92,7 +340,12 @@
             document.getElementById(tabName + '-tab').classList.add('active');
             
             // Add active class to clicked button
-            event.target.classList.add('active');
+            // Find the button by tabName
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.textContent.replace(/\s/g, '').toLowerCase().includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
 
             // Load results if results tab is selected
             if (tabName === 'results') {
@@ -173,6 +426,12 @@
             
             if (hasVoted) {
                 showMessage('You have already voted!', 'error');
+                return;
+            }
+
+            // Check if voting is currently allowed
+            if (!electionStatus.votingAllowed) {
+                showMessage('Voting is not currently allowed. ' + electionStatus.message, 'error');
                 return;
             }
 
@@ -370,7 +629,8 @@
 
         // Initialize on page load
         window.addEventListener('load', async () => {
-            await loadCandidates(); // Load candidates first
+            await loadElectionStatus(); // Load election status first
+            await loadCandidates(); // Load candidates
             loadResults();
             loadTopCandidates();
         });
@@ -381,6 +641,13 @@
                 loadResults();
             }
         }, 30000);
+
+        // Auto-refresh election status every 10 seconds
+        setInterval(() => {
+            if (document.getElementById('vote-tab').classList.contains('active')) {
+                loadElectionStatus();
+            }
+        }, 10000);
     </script>
 </body>
 </html>

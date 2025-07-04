@@ -319,6 +319,57 @@
             margin-top: 20px;
         }
 
+        /* Timer specific styles */
+        .timer-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .timer-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .timer-input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .credentials-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .credential-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+
+        .credential-item:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .credential-header {
+            background: #e9ecef;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+        }
+
         @media (max-width: 768px) {
             .add-candidate-form {
                 flex-direction: column;
@@ -334,6 +385,15 @@
                 flex-direction: column;
                 align-items: center;
             }
+
+            .timer-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .credential-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -341,7 +401,7 @@
     <div class="container">
         <div class="header">
             <h1>🔧 Admin Panel</h1>
-            <p>Manage Candidates & Election Settings</p>
+            <p>Manage Candidates, Timer & Election Settings</p>
         </div>
 
         <div class="warning-banner">
@@ -350,7 +410,9 @@
 
         <div class="admin-tabs">
             <button class="tab-btn active" onclick="showTab('candidates')">Manage Candidates</button>
+            <button class="tab-btn" onclick="showTab('timer')">Election Timer</button>
             <button class="tab-btn" onclick="showTab('statistics')">Election Stats</button>
+            <button class="tab-btn" onclick="showTab('credentials')">View Credentials</button>
             <button class="tab-btn" onclick="showTab('settings')">Settings</button>
         </div>
 
@@ -415,6 +477,66 @@
             </div>
         </div>
 
+        <!-- Timer Management Tab -->
+        <div id="timer-tab" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Election Timer Control</h2>
+            
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>⏰ Current Election Status</span>
+                </div>
+                <div class="position-content">
+                    <div id="current-status" class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="current-election-status">Loading...</div>
+                            <div class="stat-label">Election Status</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="time-remaining">--</div>
+                            <div class="stat-label">Time Remaining</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>🚀 Quick Timer Actions</span>
+                </div>
+                <div class="position-content">
+                    <div class="action-buttons">
+                        <button class="action-btn btn-success" onclick="startVotingNow()">▶️ Start Voting Now</button>
+                        <button class="action-btn btn-warning" onclick="setTimer(5)">⏱️ Start in 5 Minutes</button>
+                        <button class="action-btn btn-warning" onclick="setTimer(15)">⏱️ Start in 15 Minutes</button>
+                        <button class="action-btn btn-warning" onclick="setTimer(30)">⏱️ Start in 30 Minutes</button>
+                        <button class="action-btn btn-danger" onclick="stopVoting()">⏹️ Stop Voting</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>📅 Custom Schedule</span>
+                </div>
+                <div class="position-content">
+                    <div class="timer-controls">
+                        <div>
+                            <label for="custom-minutes" style="display: block; margin-bottom: 5px; font-weight: 600;">Start in X minutes:</label>
+                            <input type="number" id="custom-minutes" class="timer-input" min="1" max="1440" placeholder="Enter minutes">
+                        </div>
+                        <div>
+                            <label for="voting-duration" style="display: block; margin-bottom: 5px; font-weight: 600;">Voting duration (minutes):</label>
+                            <input type="number" id="voting-duration" class="timer-input" min="5" max="1440" placeholder="Optional">
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn-primary" onclick="setCustomTimer()">⏰ Set Custom Timer</button>
+                        <button class="action-btn btn-warning" onclick="clearSchedule()">🗑️ Clear Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Statistics Tab -->
         <div id="statistics-tab" class="tab-content">
             <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Election Statistics</h2>
@@ -430,7 +552,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="total-voters">0</div>
-                    <div class="stat-label">Registered Voters</div>
+                    <div class="stat-label">Voted Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="voter-turnout">0%</div>
+                    <div class="stat-label">Voter Turnout</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="election-status">ACTIVE</div>
@@ -441,6 +567,33 @@
             <div class="action-buttons">
                 <a href="index.html" class="action-btn btn-primary">🗳️ View Voting Page</a>
                 <button class="action-btn btn-warning" onclick="exportResults()">📊 Export Results</button>
+            </div>
+        </div>
+
+        <!-- Credentials Management Tab -->
+        <div id="credentials-tab" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Credentials</h2>
+            
+            <div class="stats-grid" id="credentials-summary">
+                <!-- Summary will be loaded here -->
+            </div>
+
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>👥 All User Credentials</span>
+                    <button class="action-btn btn-primary" onclick="loadCredentials()" style="padding: 5px 15px; font-size: 0.9rem;">🔄 Refresh</button>
+                </div>
+                <div class="position-content">
+                    <div id="credentials-list" class="credentials-container">
+                        <!-- Credentials will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-success" onclick="setupCredentials()">🔧 Setup New Credentials</button>
+                <button class="action-btn btn-danger" onclick="resetAllCredentials()">🗑️ Reset All Credentials</button>
+                <button class="action-btn btn-warning" onclick="exportCredentials()">📋 Export Credentials</button>
             </div>
         </div>
 
@@ -465,8 +618,9 @@
                             <ul style="color: #856404; line-height: 1.6;">
                                 <li>Reset All Votes will permanently delete all voting data</li>
                                 <li>Always backup data before making major changes</li>
-                                <li>Closing election will prevent new votes</li>
+                                <li>Use Timer tab to control voting schedule</li>
                                 <li>Changes to candidates during active voting may cause confusion</li>
+                                <li>Use Credentials tab to view and manage user access</li>
                             </ul>
                         </div>
                     </div>
@@ -497,6 +651,7 @@
             treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
         };
         let currentAction = '';
+        let electionStatusInterval = null;
 
         // Tab switching
         function showTab(tabName) {
@@ -513,6 +668,13 @@
 
             if (tabName === 'statistics') {
                 loadStatistics();
+            } else if (tabName === 'timer') {
+                loadElectionStatus();
+                startElectionStatusUpdates();
+            } else if (tabName === 'credentials') {
+                loadCredentials();
+            } else {
+                stopElectionStatusUpdates();
             }
         }
 
@@ -612,6 +774,7 @@
                 document.getElementById('total-candidates').textContent = stats.totalCandidates;
                 document.getElementById('total-votes').textContent = stats.totalVotes;
                 document.getElementById('total-voters').textContent = stats.totalVoters;
+                document.getElementById('voter-turnout').textContent = stats.voterTurnoutPercentage + '%';
                 document.getElementById('election-status').textContent = stats.electionStatus;
             } catch (error) {
                 console.error('Error loading statistics:', error);
@@ -620,6 +783,7 @@
                 document.getElementById('total-candidates').textContent = totalCandidates;
                 document.getElementById('total-votes').textContent = '0';
                 document.getElementById('total-voters').textContent = '0';
+                document.getElementById('voter-turnout').textContent = '0%';
                 document.getElementById('election-status').textContent = 'ERROR';
             }
         }
@@ -698,6 +862,271 @@
             showMessage('Results exported successfully!', 'success');
         }
 
+        // Election Timer Functions
+        async function loadElectionStatus() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-election-status');
+                const status = response.data;
+                
+                document.getElementById('current-election-status').textContent = status.status;
+                
+                if (status.timeUntilStart > 0) {
+                    const minutes = Math.floor(status.timeUntilStart / (1000 * 60));
+                    document.getElementById('time-remaining').textContent = minutes + ' min until start';
+                } else if (status.timeUntilEnd > 0) {
+                    const minutes = Math.floor(status.timeUntilEnd / (1000 * 60));
+                    document.getElementById('time-remaining').textContent = minutes + ' min until end';
+                } else {
+                    document.getElementById('time-remaining').textContent = '--';
+                }
+            } catch (error) {
+                console.error('Error loading election status:', error);
+                document.getElementById('current-election-status').textContent = 'ERROR';
+                document.getElementById('time-remaining').textContent = '--';
+            }
+        }
+
+        function startElectionStatusUpdates() {
+            loadElectionStatus();
+            electionStatusInterval = setInterval(loadElectionStatus, 5000); // Update every 5 seconds
+        }
+
+        function stopElectionStatusUpdates() {
+            if (electionStatusInterval) {
+                clearInterval(electionStatusInterval);
+                electionStatusInterval = null;
+            }
+        }
+
+        async function startVotingNow() {
+            try {
+                const response = await axios.post('/.netlify/functions/set-election-schedule', {
+                    action: 'startNow'
+                });
+                
+                if (response.data.success) {
+                    showMessage('Voting started immediately!', 'success');
+                    loadElectionStatus();
+                } else {
+                    showMessage(response.data.message || 'Error starting voting', 'error');
+                }
+            } catch (error) {
+                console.error('Error starting voting:', error);
+                showMessage('Error starting voting immediately', 'error');
+            }
+        }
+
+        async function setTimer(minutes) {
+            try {
+                const response = await axios.post('/.netlify/functions/set-election-schedule', {
+                    action: 'setTimer',
+                    durationMinutes: minutes
+                });
+                
+                if (response.data.success) {
+                    showMessage(`Voting will start in ${minutes} minutes!`, 'success');
+                    loadElectionStatus();
+                } else {
+                    showMessage(response.data.message || 'Error setting timer', 'error');
+                }
+            } catch (error) {
+                console.error('Error setting timer:', error);
+                showMessage('Error setting timer', 'error');
+            }
+        }
+
+        async function setCustomTimer() {
+            const minutes = document.getElementById('custom-minutes').value;
+            const duration = document.getElementById('voting-duration').value;
+            
+            if (!minutes || minutes < 1) {
+                showMessage('Please enter a valid number of minutes', 'error');
+                return;
+            }
+
+            try {
+                const now = new Date();
+                const startTime = new Date(now.getTime() + (minutes * 60 * 1000));
+                let endTime = null;
+                
+                if (duration && duration > 0) {
+                    endTime = new Date(startTime.getTime() + (duration * 60 * 1000));
+                }
+
+                const response = await axios.post('/.netlify/functions/set-election-schedule', {
+                    action: 'setSchedule',
+                    startTime: startTime.toISOString(),
+                    endTime: endTime ? endTime.toISOString() : null
+                });
+                
+                if (response.data.success) {
+                    showMessage(`Custom timer set! Voting starts in ${minutes} minutes${duration ? ` and runs for ${duration} minutes` : ''}`, 'success');
+                    loadElectionStatus();
+                    document.getElementById('custom-minutes').value = '';
+                    document.getElementById('voting-duration').value = '';
+                } else {
+                    showMessage(response.data.message || 'Error setting custom timer', 'error');
+                }
+            } catch (error) {
+                console.error('Error setting custom timer:', error);
+                showMessage('Error setting custom timer', 'error');
+            }
+        }
+
+        async function stopVoting() {
+            if (!confirm('Are you sure you want to stop voting immediately?')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/set-election-schedule', {
+                    action: 'stopVoting'
+                });
+                
+                if (response.data.success) {
+                    showMessage('Voting stopped immediately!', 'success');
+                    loadElectionStatus();
+                } else {
+                    showMessage(response.data.message || 'Error stopping voting', 'error');
+                }
+            } catch (error) {
+                console.error('Error stopping voting:', error);
+                showMessage('Error stopping voting', 'error');
+            }
+        }
+
+        async function clearSchedule() {
+            if (!confirm('Are you sure you want to clear the election schedule? This will make voting always available.')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/set-election-schedule', {
+                    action: 'clearSchedule'
+                });
+                
+                if (response.data.success) {
+                    showMessage('Election schedule cleared. Voting is now always available.', 'success');
+                    loadElectionStatus();
+                } else {
+                    showMessage(response.data.message || 'Error clearing schedule', 'error');
+                }
+            } catch (error) {
+                console.error('Error clearing schedule:', error);
+                showMessage('Error clearing schedule', 'error');
+            }
+        }
+
+        // Credentials Management Functions
+        async function loadCredentials() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-credentials');
+                const data = response.data;
+                
+                if (data.success) {
+                    displayCredentialsSummary(data.summary);
+                    displayCredentialsList(data.credentials);
+                } else {
+                    showMessage('Error loading credentials: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading credentials:', error);
+                showMessage('Error loading credentials', 'error');
+            }
+        }
+
+        function displayCredentialsSummary(summary) {
+            const container = document.getElementById('credentials-summary');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${summary.totalCredentials}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${summary.votedCredentials}</div>
+                    <div class="stat-label">Voted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${summary.pendingVotes}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${summary.voterTurnout}%</div>
+                    <div class="stat-label">Turnout</div>
+                </div>
+            `;
+        }
+
+        function displayCredentialsList(credentials) {
+            const container = document.getElementById('credentials-list');
+            let html = '<div class="credential-item credential-header">';
+            html += '<div>Reg Number</div><div>Password</div><div>Status</div><div>Voted At</div>';
+            html += '</div>';
+
+            credentials.forEach(cred => {
+                const status = cred.hasVoted ? '✅ Voted' : '⏳ Pending';
+                const votedAt = cred.votedAt ? new Date(cred.votedAt).toLocaleString() : '-';
+                
+                html += `
+                    <div class="credential-item ${cred.hasVoted ? 'voted' : 'pending'}">
+                        <div style="font-weight: bold;">${cred.regNumber}</div>
+                        <div>${cred.password}</div>
+                        <div>${status}</div>
+                        <div style="font-size: 0.9rem;">${votedAt}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function setupCredentials() {
+            if (!confirm('This will create new credentials for all valid registration numbers. Continue?')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/setup-credentials', {});
+                
+                if (response.data.success) {
+                    showMessage(response.data.message, 'success');
+                    loadCredentials();
+                } else {
+                    showMessage(response.data.message || 'Error setting up credentials', 'error');
+                }
+            } catch (error) {
+                console.error('Error setting up credentials:', error);
+                showMessage('Error setting up credentials', 'error');
+            }
+        }
+
+        async function resetAllCredentials() {
+            if (!confirm('⚠️ This will DELETE ALL existing credentials and votes! This action cannot be undone. Are you absolutely sure?')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/reset-credentials', {
+                    confirmReset: true
+                });
+                
+                if (response.data.success) {
+                    showMessage(response.data.message, 'success');
+                    loadCredentials();
+                    loadStatistics(); // Refresh stats as well
+                } else {
+                    showMessage(response.data.message || 'Error resetting credentials', 'error');
+                }
+            } catch (error) {
+                console.error('Error resetting credentials:', error);
+                showMessage('Error resetting credentials', 'error');
+            }
+        }
+
+        function exportCredentials() {
+            showMessage('Export credentials feature will download CSV with all user data', 'success');
+        }
+
         // Allow Enter key to add candidates
         document.addEventListener('DOMContentLoaded', function() {
             ['president', 'secretary', 'treasurer'].forEach(position => {
@@ -713,6 +1142,11 @@
         window.addEventListener('load', function() {
             loadCandidates();
             loadStatistics();
+        });
+
+        // Clean up intervals when page unloads
+        window.addEventListener('beforeunload', function() {
+            stopElectionStatusUpdates();
         });
 
         // Close modal when clicking outside

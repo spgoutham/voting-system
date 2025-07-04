@@ -8,7 +8,7 @@
     <!-- Professional Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Reset and Base Styles */
         * {
@@ -100,9 +100,9 @@
         }
 
         .header h1 {
-            font-family: 'Orbitron', monospace;
+            font-family: 'Poppins', sans-serif;
             font-size: 3rem;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 15px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #ff9ff3);
             background-size: 400% 400%;
@@ -111,7 +111,7 @@
             animation: gradientShift 3s ease-in-out infinite;
             position: relative;
             z-index: 1;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
@@ -217,7 +217,7 @@
         }
 
         .nominees-showcase h2 {
-            font-family: 'Orbitron', monospace;
+            font-family: 'Exo 2', sans-serif;
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 20px;
@@ -933,7 +933,7 @@
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
-                letter-spacing: 1px;
+                letter-spacing: 0.5px;
             }
 
             .nominees-grid {
@@ -1008,7 +1008,11 @@
             <p>Your vote shapes the universe!</p>
         </div>
 
-       
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
+            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
+            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
+        </div>
 
         <!-- Nominees Showcase Tab -->
         <div id="nominees-tab" class="tab-content active">
@@ -1032,11 +1036,7 @@
                 </div>
             </div>
         </div>
- <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
-            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
-            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
-        </div>
+
         <!-- Voting Tab -->
         <div id="vote-tab" class="tab-content">
             <div class="voting-form">

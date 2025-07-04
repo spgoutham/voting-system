@@ -409,15 +409,70 @@
         </div>
 
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="showTab('candidates')">Manage Candidates</button>
+            <button class="tab-btn active" onclick="showTab('nominees')">Manage Nominees</button>
+            <button class="tab-btn" onclick="showTab('candidates')">Manage Candidates</button>
             <button class="tab-btn" onclick="showTab('timer')">Election Timer</button>
             <button class="tab-btn" onclick="showTab('statistics')">Election Stats</button>
             <button class="tab-btn" onclick="showTab('credentials')">View Credentials</button>
             <button class="tab-btn" onclick="showTab('settings')">Settings</button>
         </div>
 
+        <!-- Nominees Management Tab -->
+        <div id="nominees-tab" class="tab-content active">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Nominees Management</h2>
+            
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div class="position-manager">
+                    <div class="position-header">
+                        <span>🌟 Current Nominees</span>
+                        <span id="nominees-count">0 nominees</span>
+                    </div>
+                    <div class="position-content">
+                        <div class="candidate-list" id="nominees-list">
+                            <!-- Nominees will be loaded here -->
+                        </div>
+                        <div class="add-candidate-form">
+                            <input type="text" class="add-input" id="nominee-name-input" placeholder="Enter nominee name">
+                            <select class="add-input" id="nominee-tag-select" style="flex: 0.5;">
+                                <option value="Nominee">Nominee</option>
+                                <option value="Popular">Popular</option>
+                                <option value="Rising Star">Rising Star</option>
+                                <option value="Contender">Contender</option>
+                                <option value="New Face">New Face</option>
+                            </select>
+                            <button class="add-btn" onclick="addNominee()">Add Nominee</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="position-manager">
+                    <div class="position-header">
+                        <span>🚀 Quick Actions</span>
+                    </div>
+                    <div class="position-content">
+                        <div class="action-buttons">
+                            <button class="action-btn btn-success" onclick="copyFromCandidates()">📋 Copy from Candidates</button>
+                            <button class="action-btn btn-primary" onclick="saveNominees()">💾 Save Changes</button>
+                            <button class="action-btn btn-warning" onclick="loadNominees()">🔄 Reload</button>
+                            <button class="action-btn btn-danger" onclick="clearAllNominees()">🗑️ Clear All</button>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding: 20px; background: #e8f5e8; border-radius: 10px; border-left: 4px solid #27ae60;">
+                            <h4 style="color: #27ae60; margin-bottom: 10px;">💡 Pro Tips:</h4>
+                            <ul style="color: #2c3e50; line-height: 1.6;">
+                                <li>Add nominees first to build excitement before revealing positions</li>
+                                <li>Use different tags to categorize nominees (Popular, Rising Star, etc.)</li>
+                                <li>Copy from candidates to quickly sync with actual voting candidates</li>
+                                <li>Students will see nominees on the main page without knowing positions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Candidates Management Tab -->
-        <div id="candidates-tab" class="tab-content active">
+        <div id="candidates-tab" class="tab-content">
             <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Candidate Management</h2>
             
             <!-- President Section -->
@@ -650,6 +705,7 @@
             secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
             treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
         };
+        let nominees = [];
         let currentAction = '';
         let electionStatusInterval = null;
 
@@ -673,6 +729,8 @@
                 startElectionStatusUpdates();
             } else if (tabName === 'credentials') {
                 loadCredentials();
+            } else if (tabName === 'nominees') {
+                loadNominees();
             } else {
                 stopElectionStatusUpdates();
             }
@@ -1127,8 +1185,214 @@
             showMessage('Export credentials feature will download CSV with all user data', 'success');
         }
 
-        // Allow Enter key to add candidates
+        // Nominees Management Functions
+        async function loadNominees() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-nominees');
+                const data = response.data;
+                
+                if (data.success) {
+                    nominees = data.nominees || [];
+                    displayNominees();
+                    showMessage('Nominees loaded successfully!', 'success');
+                } else {
+                    showMessage('Error loading nominees', 'error');
+                    nominees = [];
+                    displayNominees();
+                }
+            } catch (error) {
+                console.error('Error loading nominees:', error);
+                showMessage('Error loading nominees. Starting with empty list.', 'error');
+                nominees = [];
+                displayNominees();
+            }
+        }
+
+        function displayNominees() {
+            const listElement = document.getElementById('nominees-list');
+            const countElement = document.getElementById('nominees-count');
+            
+            listElement.innerHTML = '';
+            
+            if (nominees.length === 0) {
+                listElement.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7; font-style: italic;">No nominees added yet. Add some names to build excitement!</div>';
+            } else {
+                nominees.forEach((nominee, index) => {
+                    const nomineeDiv = document.createElement('div');
+                    nomineeDiv.className = 'candidate-item';
+                    nomineeDiv.innerHTML = `
+                        <div>
+                            <span class="candidate-name">${nominee.name}</span>
+                            <span style="margin-left: 10px; padding: 4px 8px; background: #3498db; color: white; border-radius: 10px; font-size: 0.8rem;">${nominee.tag || 'Nominee'}</span>
+                        </div>
+                        <button class="remove-btn" onclick="removeNominee(${index})">
+                            Remove
+                        </button>
+                    `;
+                    listElement.appendChild(nomineeDiv);
+                });
+            }
+
+            countElement.textContent = `${nominees.length} nominees`;
+        }
+
+        async function addNominee() {
+            const nameInput = document.getElementById('nominee-name-input');
+            const tagSelect = document.getElementById('nominee-tag-select');
+            const nomineeName = nameInput.value.trim();
+            const nomineeTag = tagSelect.value;
+
+            if (!nomineeName) {
+                showMessage('Please enter a nominee name.', 'error');
+                return;
+            }
+
+            if (nominees.some(n => n.name.toLowerCase() === nomineeName.toLowerCase())) {
+                showMessage('Nominee already exists.', 'error');
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/manage-nominees', {
+                    action: 'add',
+                    nominee: {
+                        name: nomineeName,
+                        tag: nomineeTag
+                    }
+                });
+
+                if (response.data.success) {
+                    nominees = response.data.nominees;
+                    displayNominees();
+                    nameInput.value = '';
+                    tagSelect.value = 'Nominee';
+                    showMessage(`${nomineeName} added to nominees!`, 'success');
+                } else {
+                    showMessage(response.data.message || 'Error adding nominee', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding nominee:', error);
+                showMessage('Error adding nominee. Please try again.', 'error');
+            }
+        }
+
+        async function removeNominee(index) {
+            const nominee = nominees[index];
+            if (!nominee) return;
+
+            try {
+                const response = await axios.post('/.netlify/functions/manage-nominees', {
+                    action: 'remove',
+                    nominee: {
+                        name: nominee.name
+                    }
+                });
+
+                if (response.data.success) {
+                    nominees = response.data.nominees;
+                    displayNominees();
+                    showMessage(`${nominee.name} removed from nominees.`, 'success');
+                } else {
+                    showMessage(response.data.message || 'Error removing nominee', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing nominee:', error);
+                showMessage('Error removing nominee. Please try again.', 'error');
+            }
+        }
+
+        async function saveNominees() {
+            try {
+                const response = await axios.post('/.netlify/functions/manage-nominees', {
+                    action: 'setBulk',
+                    nominees: nominees
+                });
+
+                if (response.data.success) {
+                    showMessage('All nominees saved successfully!', 'success');
+                } else {
+                    showMessage(response.data.message || 'Error saving nominees', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving nominees:', error);
+                showMessage('Error saving nominees. Please try again.', 'error');
+            }
+        }
+
+        async function clearAllNominees() {
+            if (!confirm('Are you sure you want to clear all nominees? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/manage-nominees', {
+                    action: 'clear'
+                });
+
+                if (response.data.success) {
+                    nominees = [];
+                    displayNominees();
+                    showMessage('All nominees cleared.', 'success');
+                } else {
+                    showMessage(response.data.message || 'Error clearing nominees', 'error');
+                }
+            } catch (error) {
+                console.error('Error clearing nominees:', error);
+                showMessage('Error clearing nominees. Please try again.', 'error');
+            }
+        }
+
+        async function copyFromCandidates() {
+            if (!confirm('This will replace current nominees with all candidates from the voting system. Continue?')) {
+                return;
+            }
+
+            try {
+                // First get current candidates
+                const candidatesResponse = await axios.get('/.netlify/functions/get-candidates');
+                const candidatesData = candidatesResponse.data;
+
+                // Extract all unique names
+                const allNames = [];
+                Object.values(candidatesData).forEach(positionCandidates => {
+                    allNames.push(...positionCandidates);
+                });
+
+                // Remove duplicates and create nominee objects
+                const uniqueNominees = [...new Set(allNames)].map(name => ({
+                    name: name,
+                    tag: 'Nominee'
+                }));
+
+                // Set nominees in bulk
+                const response = await axios.post('/.netlify/functions/manage-nominees', {
+                    action: 'setBulk',
+                    nominees: uniqueNominees
+                });
+
+                if (response.data.success) {
+                    nominees = response.data.nominees;
+                    displayNominees();
+                    showMessage(`${nominees.length} nominees copied from candidates!`, 'success');
+                } else {
+                    showMessage(response.data.message || 'Error copying from candidates', 'error');
+                }
+            } catch (error) {
+                console.error('Error copying from candidates:', error);
+                showMessage('Error copying from candidates. Please try again.', 'error');
+            }
+        }
+
+        // Allow Enter key to add nominees and candidates
         document.addEventListener('DOMContentLoaded', function() {
+            // Add enter key support for nominee input
+            document.getElementById('nominee-name-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addNominee();
+                }
+            });
+
+            // Add enter key support for candidate inputs
             ['president', 'secretary', 'treasurer'].forEach(position => {
                 document.getElementById(position + '-input').addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
@@ -1140,6 +1404,7 @@
 
         // Initialize on page load
         window.addEventListener('load', function() {
+            loadNominees(); // Load nominees first (default tab)
             loadCandidates();
             loadStatistics();
         });

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Elections 2025</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 15px 30px;
+            margin: 0 10px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .voting-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .position-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .position-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .candidate-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .candidate-option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .candidate-option input[type="radio"] {
+            margin-right: 15px;
+            scale: 1.2;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .position-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .position-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .candidate-result {
+            background: rgba(255,255,255,0.2);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .candidate-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .vote-count {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .vote-bar {
+            background: rgba(255,255,255,0.3);
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .vote-progress {
+            background: rgba(255,255,255,0.8);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗳️ Class Elections 2025</h1>
+            <p>Your vote, your voice, your future!</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('vote')">Cast Vote</button>
+            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
+        </div>
+
+        <!-- Voting Tab -->
+        <div id="vote-tab" class="tab-content active">
+            <div class="voting-form">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Cast Your Vote</h2>
+                
+                <form id="voting-form">
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerNumber">Register Number:</label>
+                        <input type="text" id="registerNumber" name="registerNumber" required>
+                    </div>
+
+                    <div class="position-section">
+                        <h3 class="position-title">🏆 President</h3>
+                        <div class="candidate-option">
+                            <input type="radio" name="president" value="Alice Johnson" required>
+                            <label>Alice Johnson</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="president" value="Bob Smith" required>
+                            <label>Bob Smith</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="president" value="Carol Davis" required>
+                            <label>Carol Davis</label>
+                        </div>
+                    </div>
+
+                    <div class="position-section">
+                        <h3 class="position-title">📝 Secretary</h3>
+                        <div class="candidate-option">
+                            <input type="radio" name="secretary" value="David Wilson" required>
+                            <label>David Wilson</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="secretary" value="Emma Brown" required>
+                            <label>Emma Brown</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="secretary" value="Frank Miller" required>
+                            <label>Frank Miller</label>
+                        </div>
+                    </div>
+
+                    <div class="position-section">
+                        <h3 class="position-title">💰 Treasurer</h3>
+                        <div class="candidate-option">
+                            <input type="radio" name="treasurer" value="Grace Lee" required>
+                            <label>Grace Lee</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="treasurer" value="Henry Clark" required>
+                            <label>Henry Clark</label>
+                        </div>
+                        <div class="candidate-option">
+                            <input type="radio" name="treasurer" value="Ivy Taylor" required>
+                            <label>Ivy Taylor</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Vote</button>
+                </form>
+
+                <div id="vote-message"></div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div id="results-tab" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Live Election Results</h2>
+            <div id="results-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading results...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let hasVoted = false;
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Load results if results tab is selected
+            if (tabName === 'results') {
+                loadResults();
+            }
+        }
+
+        // Form submission
+        document.getElementById('voting-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (hasVoted) {
+                showMessage('You have already voted!', 'error');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const voteData = {
+                email: formData.get('email'),
+                registerNumber: formData.get('registerNumber'),
+                votes: {
+                    president: formData.get('president'),
+                    secretary: formData.get('secretary'),
+                    treasurer: formData.get('treasurer')
+                }
+            };
+
+            // Disable submit button
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const response = await axios.post('/.netlify/functions/submit-vote', voteData);
+                
+                if (response.data.success) {
+                    showMessage('Vote submitted successfully! Thank you for voting.', 'success');
+                    hasVoted = true;
+                    document.getElementById('voting-form').reset();
+                    submitBtn.textContent = 'Vote Submitted';
+                } else {
+                    showMessage(response.data.message || 'Error submitting vote', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Vote';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error submitting vote. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Vote';
+            }
+        });
+
+        // Load results
+        async function loadResults() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-results');
+                const results = response.data;
+                
+                displayResults(results);
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('results-container').innerHTML = 
+                    '<div class="message error">Error loading results. Please try again.</div>';
+            }
+        }
+
+        // Display results
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            
+            const positions = ['president', 'secretary', 'treasurer'];
+            const positionTitles = {
+                president: '🏆 President',
+                secretary: '📝 Secretary', 
+                treasurer: '💰 Treasurer'
+            };
+
+            const colors = [
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+            ];
+
+            let html = '<div class="results-grid">';
+
+            positions.forEach((position, index) => {
+                const positionResults = results[position] || {};
+                const totalVotes = Object.values(positionResults).reduce((sum, count) => sum + count, 0);
+                
+                html += `
+                    <div class="position-card" style="background: ${colors[index]}">
+                        <h3>${positionTitles[position]}</h3>
+                        <p style="margin-bottom: 20px; opacity: 0.9;">Total Votes: ${totalVotes}</p>
+                `;
+
+                // Sort candidates by vote count
+                const sortedCandidates = Object.entries(positionResults)
+                    .sort(([,a], [,b]) => b - a);
+
+                sortedCandidates.forEach(([candidate, votes]) => {
+                    const percentage = totalVotes > 0 ? (votes / totalVotes * 100) : 0;
+                    html += `
+                        <div class="candidate-result">
+                            <div class="candidate-name">${candidate}</div>
+                            <div class="vote-count">${votes} votes</div>
+                            <div class="vote-bar">
+                                <div class="vote-progress" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('vote-message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Check if user has already voted on page load
+        window.addEventListener('load', async () => {
+            // Load initial results
+            loadResults();
+            
+            // Check voting status if needed
+            // This could be implemented to check against a session or local storage
+        });
+
+        // Auto-refresh results every 30 seconds when on results tab
+        setInterval(() => {
+            if (document.getElementById('results-tab').classList.contains('active')) {
+                loadResults();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

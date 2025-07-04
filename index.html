@@ -3,297 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Elections 2025</title>
+    <title>Galactic Class Elections 2025</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .tab-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            padding: 15px 30px;
-            margin: 0 10px;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .tab-btn.active {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .tab-content {
-            display: none;
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(20px);
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .voting-form {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .position-section {
-            margin-bottom: 30px;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-        }
-
-        .position-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-
-        .candidate-option {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            margin: 10px 0;
-            background: white;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .candidate-option:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        .candidate-option input[type="radio"] {
-            margin-right: 15px;
-            scale: 1.2;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-        }
-
-        .position-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 30px;
-            border-radius: 20px;
-            color: white;
-            text-align: center;
-        }
-
-        .position-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-        }
-
-        .candidate-result {
-            background: rgba(255,255,255,0.2);
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .candidate-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .vote-count {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .vote-bar {
-            background: rgba(255,255,255,0.3);
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .vote-progress {
-            background: rgba(255,255,255,0.8);
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .tab-btn {
-                padding: 12px 20px;
-                font-size: 1rem;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
-            
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
     <div class="container">
         <div class="header">
-            <h1>🗳️ Class Elections 2025</h1>
-            <p>Your vote, your voice, your future!</p>
+            <h1>🚀 Galactic Class Elections 2025</h1>
+            <p>Your vote shapes the universe!</p>
         </div>
 
         <div class="nav-tabs">
@@ -304,68 +24,99 @@
         <!-- Voting Tab -->
         <div id="vote-tab" class="tab-content active">
             <div class="voting-form">
-                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Cast Your Vote</h2>
+                <h2>Cast Your Cosmic Vote</h2>
+                
+                <div class="leaderboard">
+                    <h3>🌟 Current Leaders</h3>
+                    <div class="leaderboard-container" id="top-candidates">
+                        <!-- Top candidates will be loaded here -->
+                    </div>
+                </div>
                 
                 <form id="voting-form">
                     <div class="form-group">
-                        <label for="email">Email Address:</label>
+                        <label for="email">Stellar Email:</label>
                         <input type="email" id="email" name="email" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="registerNumber">Register Number:</label>
+                        <label for="registerNumber">Astronaut ID:</label>
                         <input type="text" id="registerNumber" name="registerNumber" required>
                     </div>
 
                     <div class="position-section">
-                        <h3 class="position-title">🏆 President</h3>
+                        <h3 class="position-title">👑 Galactic President</h3>
                         <div class="candidate-option">
                             <input type="radio" name="president" value="Alice Johnson" required>
-                            <label>Alice Johnson</label>
+                            <label>
+                                <span class="candidate-name">Alice Johnson</span>
+                                <span class="candidate-tag popular">Popular</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="president" value="Bob Smith" required>
-                            <label>Bob Smith</label>
+                            <label>
+                                <span class="candidate-name">Bob Smith</span>
+                                <span class="candidate-tag rising">Rising</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="president" value="Carol Davis" required>
-                            <label>Carol Davis</label>
+                            <label>
+                                <span class="candidate-name">Carol Davis</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="position-section">
-                        <h3 class="position-title">📝 Secretary</h3>
+                        <h3 class="position-title">📜 Cosmic Secretary</h3>
                         <div class="candidate-option">
                             <input type="radio" name="secretary" value="David Wilson" required>
-                            <label>David Wilson</label>
+                            <label>
+                                <span class="candidate-name">David Wilson</span>
+                                <span class="candidate-tag popular">Popular</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="secretary" value="Emma Brown" required>
-                            <label>Emma Brown</label>
+                            <label>
+                                <span class="candidate-name">Emma Brown</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="secretary" value="Frank Miller" required>
-                            <label>Frank Miller</label>
+                            <label>
+                                <span class="candidate-name">Frank Miller</span>
+                                <span class="candidate-tag new">New</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="position-section">
-                        <h3 class="position-title">💰 Treasurer</h3>
+                        <h3 class="position-title">💎 Nebula Treasurer</h3>
                         <div class="candidate-option">
                             <input type="radio" name="treasurer" value="Grace Lee" required>
-                            <label>Grace Lee</label>
+                            <label>
+                                <span class="candidate-name">Grace Lee</span>
+                                <span class="candidate-tag popular">Popular</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="treasurer" value="Henry Clark" required>
-                            <label>Henry Clark</label>
+                            <label>
+                                <span class="candidate-name">Henry Clark</span>
+                            </label>
                         </div>
                         <div class="candidate-option">
                             <input type="radio" name="treasurer" value="Ivy Taylor" required>
-                            <label>Ivy Taylor</label>
+                            <label>
+                                <span class="candidate-name">Ivy Taylor</span>
+                                <span class="candidate-tag rising">Rising</span>
+                            </label>
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn">Submit Vote</button>
+                    <button type="submit" class="submit-btn">Launch Vote</button>
                 </form>
 
                 <div id="vote-message"></div>
@@ -374,11 +125,11 @@
 
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Live Election Results</h2>
+            <h2>Live Galactic Results</h2>
             <div id="results-container">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Loading results...</p>
+                    <p>Scanning the cosmos for results...</p>
                 </div>
             </div>
         </div>
@@ -409,6 +160,8 @@
             // Load results if results tab is selected
             if (tabName === 'results') {
                 loadResults();
+            } else if (tabName === 'vote') {
+                loadTopCandidates();
             }
         }
 
@@ -435,28 +188,89 @@
             // Disable submit button
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = 'Launching...';
 
             try {
                 const response = await axios.post('/.netlify/functions/submit-vote', voteData);
                 
                 if (response.data.success) {
-                    showMessage('Vote submitted successfully! Thank you for voting.', 'success');
+                    showMessage('Vote successfully launched into the cosmos! Thank you for voting.', 'success');
                     hasVoted = true;
                     document.getElementById('voting-form').reset();
-                    submitBtn.textContent = 'Vote Submitted';
+                    submitBtn.textContent = 'Vote Launched';
+                    loadTopCandidates();
                 } else {
-                    showMessage(response.data.message || 'Error submitting vote', 'error');
+                    showMessage(response.data.message || 'Error launching vote', 'error');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Vote';
+                    submitBtn.textContent = 'Launch Vote';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Error submitting vote. Please try again.', 'error');
+                showMessage('Error launching vote. Please try again.', 'error');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Vote';
+                submitBtn.textContent = 'Launch Vote';
             }
         });
+
+        // Load top candidates for leaderboard
+        async function loadTopCandidates() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-results');
+                const results = response.data;
+                displayTopCandidates(results);
+            } catch (error) {
+                console.error('Error loading top candidates:', error);
+            }
+        }
+
+        // Display top candidates in leaderboard
+        function displayTopCandidates(results) {
+            const container = document.getElementById('top-candidates');
+            const positions = ['president', 'secretary', 'treasurer'];
+            
+            let topCandidates = [];
+            
+            positions.forEach(position => {
+                const positionResults = results[position] || {};
+                const candidates = Object.entries(positionResults)
+                    .map(([name, votes]) => ({ name, votes, position }));
+                
+                topCandidates = topCandidates.concat(candidates);
+            });
+            
+            // Sort by votes descending and take top 3
+            topCandidates.sort((a, b) => b.votes - a.votes);
+            const top3 = topCandidates.slice(0, 3);
+            
+            let html = '';
+            
+            if (top3.length > 0) {
+                html = '<div class="leaders">';
+                top3.forEach((candidate, index) => {
+                    const positionName = {
+                        president: 'President',
+                        secretary: 'Secretary',
+                        treasurer: 'Treasurer'
+                    }[candidate.position];
+                    
+                    html += `
+                        <div class="leader-card" style="animation-delay: ${index * 0.2}s">
+                            <div class="leader-rank">${index + 1}</div>
+                            <div class="leader-info">
+                                <div class="leader-name">${candidate.name}</div>
+                                <div class="leader-position">${positionName}</div>
+                            </div>
+                            <div class="leader-votes">${candidate.votes} votes</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html = '<p class="no-leaders">No votes yet. Be the first to vote!</p>';
+            }
+            
+            container.innerHTML = html;
+        }
 
         // Load results
         async function loadResults() {
@@ -468,7 +282,7 @@
             } catch (error) {
                 console.error('Error loading results:', error);
                 document.getElementById('results-container').innerHTML = 
-                    '<div class="message error">Error loading results. Please try again.</div>';
+                    '<div class="message error">Error scanning the cosmos for results. Please try again.</div>';
             }
         }
 
@@ -478,15 +292,15 @@
             
             const positions = ['president', 'secretary', 'treasurer'];
             const positionTitles = {
-                president: '🏆 President',
-                secretary: '📝 Secretary', 
-                treasurer: '💰 Treasurer'
+                president: '👑 Galactic President',
+                secretary: '📜 Cosmic Secretary', 
+                treasurer: '💎 Nebula Treasurer'
             };
 
             const colors = [
-                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+                'linear-gradient(135deg, rgba(106,17,203,0.8) 0%, rgba(37,117,252,0.8) 100%)',
+                'linear-gradient(135deg, rgba(252,74,26,0.8) 0%, rgba(247,183,51,0.8) 100%)',
+                'linear-gradient(135deg, rgba(33,147,176,0.8) 0%, rgba(109,213,237,0.8) 100%)'
             ];
 
             let html = '<div class="results-grid">';
@@ -498,7 +312,7 @@
                 html += `
                     <div class="position-card" style="background: ${colors[index]}">
                         <h3>${positionTitles[position]}</h3>
-                        <p style="margin-bottom: 20px; opacity: 0.9;">Total Votes: ${totalVotes}</p>
+                        <p class="total-votes">Total Votes: ${totalVotes}</p>
                 `;
 
                 // Sort candidates by vote count
@@ -514,6 +328,7 @@
                             <div class="vote-bar">
                                 <div class="vote-progress" style="width: ${percentage}%"></div>
                             </div>
+                            <div class="vote-percentage">${percentage.toFixed(1)}%</div>
                         </div>
                     `;
                 });
@@ -535,13 +350,10 @@
             }, 5000);
         }
 
-        // Check if user has already voted on page load
+        // Initialize on page load
         window.addEventListener('load', async () => {
-            // Load initial results
             loadResults();
-            
-            // Check voting status if needed
-            // This could be implemented to check against a session or local storage
+            loadTopCandidates();
         });
 
         // Auto-refresh results every 30 seconds when on results tab

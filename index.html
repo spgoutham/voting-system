@@ -217,25 +217,49 @@
 
         .nominees-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
             margin-bottom: 30px;
+            padding: 20px;
         }
 
-        /* ENHANCED NOMINEE CARD WITH CINEMATIC EFFECTS */
+        /* ENHANCED NOMINEE CARD WITH CINEMATIC STAR SHAPE */
         .nominee-card {
             background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
+            padding: 40px 25px;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(15px);
             transition: all 0.4s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             cursor: pointer;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            /* Create a perfect 5-pointed star shape */
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+            /* Add star glow effect */
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.3),
+                0 0 40px rgba(255, 215, 0, 0.1),
+                inset 0 0 20px rgba(255,255,255,0.1);
         }
 
-        /* Cosmic shimmer effect */
+        /* Cosmic shimmer effect for star */
         .nominee-card::before {
             content: '';
             position: absolute;
@@ -245,42 +269,77 @@
             height: 200%;
             background: conic-gradient(
                 transparent,
-                rgba(255, 107, 107, 0.3),
-                rgba(78, 205, 196, 0.3),
-                rgba(255, 215, 0, 0.3),
-                rgba(255, 159, 243, 0.3),
+                rgba(255, 107, 107, 0.4),
+                rgba(78, 205, 196, 0.4),
+                rgba(255, 215, 0, 0.6),
+                rgba(255, 159, 243, 0.4),
                 transparent
             );
-            animation: rotate-shimmer 8s linear infinite;
+            animation: rotate-shimmer 6s linear infinite;
             opacity: 0;
             transition: opacity 0.3s ease;
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
         }
 
         .nominee-card:hover::before {
             opacity: 1;
         }
 
-        /* Particle trail effect */
+        /* Star pulse effect */
         .nominee-card::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.3), 
-                rgba(255, 215, 0, 0.5),
-                rgba(255,255,255,0.3), 
-                transparent
+            background: radial-gradient(
+                circle at center,
+                rgba(255, 215, 0, 0.3) 0%,
+                rgba(255, 215, 0, 0.1) 50%,
+                transparent 100%
             );
-            animation: cosmic-sweep 3s ease-in-out infinite;
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+            animation: star-pulse 4s ease-in-out infinite;
+            opacity: 0;
         }
 
         @keyframes rotate-shimmer {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @keyframes star-pulse {
+            0%, 100% { 
+                opacity: 0; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.1);
+            }
         }
 
         @keyframes cosmic-sweep {
@@ -290,24 +349,32 @@
         }
 
         .nominee-card:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-10px) scale(1.05);
             box-shadow: 
-                0 20px 40px rgba(0,0,0,0.3),
-                0 0 30px rgba(255, 215, 0, 0.4),
-                inset 0 0 20px rgba(255,255,255,0.1);
-            border-color: rgba(255, 215, 0, 0.6);
+                0 25px 50px rgba(0,0,0,0.4),
+                0 0 40px rgba(255, 215, 0, 0.6),
+                0 0 80px rgba(255, 215, 0, 0.3),
+                inset 0 0 30px rgba(255,255,255,0.2);
+            border-color: rgba(255, 215, 0, 0.8);
+        }
+
+        .nominee-card:hover::after {
+            opacity: 1;
+            animation: star-pulse 2s ease-in-out infinite;
         }
 
         /* CINEMATIC NOMINEE NAME WITH TWINKLING STARS */
         .nominee-name {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #fff;
             position: relative;
             z-index: 2;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             animation: gentle-glow 2s ease-in-out infinite alternate;
+            max-width: 140px;
+            line-height: 1.2;
         }
 
         /* Star sparkle effects around nominee names */
@@ -382,10 +449,12 @@
             opacity: 0;
         }
 
-        .sparkle-particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .sparkle-particle:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
-        .sparkle-particle:nth-child(3) { top: 30%; left: 70%; animation-delay: 2s; }
-        .sparkle-particle:nth-child(4) { top: 80%; left: 20%; animation-delay: 3s; }
+        /* Position sparkles at star points and center */
+        .sparkle-particle:nth-child(1) { top: 5%; left: 50%; animation-delay: 0s; transform: translateX(-50%); }
+        .sparkle-particle:nth-child(2) { top: 45%; left: 85%; animation-delay: 1s; }
+        .sparkle-particle:nth-child(3) { top: 45%; left: 15%; animation-delay: 2s; }
+        .sparkle-particle:nth-child(4) { top: 75%; left: 30%; animation-delay: 3s; }
+        .sparkle-particle:nth-child(5) { top: 75%; left: 70%; animation-delay: 1.5s; }
 
         @keyframes sparkle-dance {
             0%, 100% { 
@@ -883,8 +952,19 @@
             }
 
             .nominees-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 30px;
+                padding: 15px;
+            }
+
+            .nominee-card {
+                min-height: 180px;
+                padding: 35px 20px;
+            }
+
+            .nominee-name {
+                font-size: 1.1rem;
+                max-width: 120px;
             }
 
             .countdown-timer {
@@ -936,6 +1016,17 @@
 
             .nominees-grid {
                 grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .nominee-card {
+                min-height: 160px;
+                padding: 30px 15px;
+            }
+
+            .nominee-name {
+                font-size: 1rem;
+                max-width: 100px;
             }
 
             .position-section {
@@ -1162,6 +1253,7 @@
                         <div class="sparkle-particle">✧</div>
                         <div class="sparkle-particle">⋆</div>
                         <div class="sparkle-particle">✦</div>
+                        <div class="sparkle-particle">✧</div>
                         <div class="nominee-name">${nominee.name}</div>
                         <div class="nominee-tag">${nominee.tag || 'Nominee'}</div>
                     </div>

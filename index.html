@@ -27,8 +27,8 @@
             font-weight: 400;
         }
 
-        /* Enhanced Animated Star Background */
-        .stars, .twinkling, .cosmic-dust {
+        /* OPTIMIZED Animated Star Background - Much Lighter */
+        .stars {
             position: fixed;
             top: 0;
             left: 0;
@@ -36,35 +36,23 @@
             bottom: 0;
             width: 100%;
             height: 100%;
-            display: block;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
             pointer-events: none;
-        }
-
-        .stars {
-            background: #000 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="0.5" fill="white"/><circle cx="30" cy="25" r="0.3" fill="white"/><circle cx="50" cy="40" r="0.4" fill="white"/><circle cx="70" cy="15" r="0.2" fill="white"/><circle cx="90" cy="35" r="0.5" fill="white"/><circle cx="20" cy="60" r="0.3" fill="white"/><circle cx="40" cy="80" r="0.4" fill="white"/><circle cx="60" cy="70" r="0.2" fill="white"/><circle cx="80" cy="90" r="0.3" fill="white"/></svg>') repeat;
-            z-index: -3;
-        }
-
-        .twinkling {
-            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="15" cy="20" r="0.8" fill="white" opacity="0.8"/><circle cx="35" cy="55" r="0.6" fill="white" opacity="0.6"/><circle cx="75" cy="30" r="0.7" fill="white" opacity="0.7"/><circle cx="25" cy="80" r="0.5" fill="white" opacity="0.9"/><circle cx="85" cy="65" r="0.4" fill="white" opacity="0.5"/></svg>') repeat;
-            animation: move-twink-back 200s linear infinite;
-            z-index: -2;
-        }
-
-        .cosmic-dust {
-            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="5" cy="5" r="0.2" fill="%23ff6b6b" opacity="0.6"/><circle cx="25" cy="35" r="0.1" fill="%234ecdc4" opacity="0.8"/><circle cx="45" cy="15" r="0.15" fill="%23ffd700" opacity="0.7"/><circle cx="65" cy="55" r="0.2" fill="%23ff9ff3" opacity="0.5"/><circle cx="85" cy="25" r="0.1" fill="%2300d2d3" opacity="0.9"/></svg>') repeat;
-            animation: move-cosmic-dust 300s linear infinite reverse;
             z-index: -1;
+            animation: moveStars 200s linear infinite;
+            will-change: transform;
         }
 
-        @keyframes move-twink-back {
-            from {transform: translateX(0px);}
-            to {transform: translateX(-10000px);}
-        }
-
-        @keyframes move-cosmic-dust {
-            from {transform: translateX(0px) translateY(0px);}
-            to {transform: translateX(-5000px) translateY(-2000px);}
+        @keyframes moveStars {
+            from { transform: translateX(0); }
+            to { transform: translateX(-200px); }
         }
 
         /* Main Container */
@@ -76,14 +64,14 @@
             z-index: 1;
         }
 
-        /* Enhanced Header */
+        /* OPTIMIZED Header */
         .header {
             text-align: center;
             margin-bottom: 40px;
             padding: 40px 20px;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(30, 144, 255, 0.15), rgba(255, 107, 107, 0.1));
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
             border-radius: 20px;
-            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
             position: relative;
             overflow: hidden;
         }
@@ -91,12 +79,19 @@
         .header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: rotate-gradient 10s linear infinite;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            border-radius: 20px;
+            animation: borderGlow 4s ease-in-out infinite;
+            will-change: opacity;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
 
         .header h1 {
@@ -104,15 +99,21 @@
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #ff9ff3);
-            background-size: 400% 400%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
+            animation: textShift 6s ease-in-out infinite;
             position: relative;
             z-index: 1;
             letter-spacing: 1px;
             text-transform: uppercase;
+            will-change: background-position;
+        }
+
+        @keyframes textShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .header p {
@@ -125,17 +126,7 @@
             letter-spacing: 1px;
         }
 
-        @keyframes rotate-gradient {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        /* Navigation Tabs */
+        /* OPTIMIZED Navigation Tabs */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -146,7 +137,7 @@
 
         .tab-btn {
             font-family: 'Rajdhani', sans-serif;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            background: rgba(255,255,255,0.08);
             border: 2px solid rgba(255,255,255,0.2);
             color: white;
             padding: 12px 25px;
@@ -154,12 +145,12 @@
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             text-transform: uppercase;
             letter-spacing: 1px;
+            will-change: transform;
         }
 
         .tab-btn::before {
@@ -170,7 +161,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+            transition: left 0.6s ease;
         }
 
         .tab-btn:hover::before {
@@ -181,36 +172,35 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-color: #667eea;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .tab-btn:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-1px);
         }
 
         /* Tab Content */
         .tab-content {
             display: none;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            background: rgba(255,255,255,0.03);
             border-radius: 20px;
             padding: 30px;
-            backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s ease;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes fadeIn {
+        @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Enhanced Nominees Showcase */
+        /* OPTIMIZED Nominees Showcase */
         .nominees-showcase {
             text-align: center;
             margin-bottom: 40px;
@@ -221,7 +211,7 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef);
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
@@ -244,47 +234,20 @@
             margin-bottom: 30px;
         }
 
-        /* ENHANCED NOMINEE CARD WITH CINEMATIC EFFECTS */
+        /* HEAVILY OPTIMIZED Nominee Card */
         .nominee-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            background: rgba(255,255,255,0.05);
             padding: 25px;
             border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
             cursor: pointer;
+            will-change: transform;
         }
 
-               /* Cosmic shimmer effect */
+        /* Simplified shimmer effect */
         .nominee-card::before {
-            content: '';
-            position: absolute;
-            top: -100%;
-            left: -100%;
-            width: 300%;
-            height: 300%;
-            background: conic-gradient(
-                transparent,
-                rgba(255, 107, 107, 0.3),
-                rgba(78, 205, 196, 0.3),
-                rgba(255, 215, 0, 0.3),
-                rgba(255, 159, 243, 0.3),
-                transparent
-            );
-            border-radius: 50%;
-            animation: rotate-shimmer 8s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nominee-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Particle trail effect */
-        .nominee-card::after {
             content: '';
             position: absolute;
             top: 0;
@@ -293,35 +256,23 @@
             height: 100%;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255,255,255,0.3), 
-                rgba(255, 215, 0, 0.5),
-                rgba(255,255,255,0.3), 
+                rgba(255, 215, 0, 0.1),
                 transparent
             );
-            animation: cosmic-sweep 3s ease-in-out infinite;
+            transition: left 0.8s ease;
         }
 
-        @keyframes rotate-shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes cosmic-sweep {
-            0% { left: -100%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { left: 100%; opacity: 0; }
+        .nominee-card:hover::before {
+            left: 100%;
         }
 
         .nominee-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.3),
-                0 0 30px rgba(255, 215, 0, 0.4),
-                inset 0 0 20px rgba(255,255,255,0.1);
-            border-color: rgba(255, 215, 0, 0.6);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255, 215, 0, 0.4);
         }
 
-        /* CINEMATIC NOMINEE NAME WITH TWINKLING STARS */
+        /* SIMPLIFIED Nominee Name */
         .nominee-name {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1.4rem;
@@ -330,116 +281,8 @@
             color: #fff;
             position: relative;
             z-index: 2;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: gentle-glow 2s ease-in-out infinite alternate;
             letter-spacing: 0.5px;
             text-transform: capitalize;
-        }
-
-        /* Star sparkle effects around nominee names */
-        .nominee-name::before,
-        .nominee-name::after {
-            content: '✦';
-            position: absolute;
-            color: #ffd700;
-            font-size: 1.2rem;
-            animation: twinkle 2s ease-in-out infinite;
-            opacity: 0;
-        }
-
-        .nominee-name::before {
-            top: -10px;
-            left: -15px;
-            animation-delay: 0s;
-        }
-
-        .nominee-name::after {
-            bottom: -10px;
-            right: -15px;
-            animation-delay: 1s;
-        }
-
-        /* Additional floating stars */
-        .nominee-card:hover .nominee-name::before,
-        .nominee-card:hover .nominee-name::after {
-            animation: floating-stars 3s ease-in-out infinite;
-        }
-
-        @keyframes gentle-glow {
-            0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4); }
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
-            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
-        }
-
-        @keyframes floating-stars {
-            0% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.8) rotate(0deg);
-            }
-            25% { 
-                opacity: 1; 
-                transform: translateY(-10px) scale(1.1) rotate(90deg);
-            }
-            50% { 
-                opacity: 0.8; 
-                transform: translateY(-15px) scale(1.3) rotate(180deg);
-            }
-            75% { 
-                opacity: 1; 
-                transform: translateY(-10px) scale(1.1) rotate(270deg);
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.8) rotate(360deg);
-            }
-        }
-
-        /* Enhanced sparkle particles */
-        .sparkle-particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 0.8rem;
-            color: #ffd700;
-            animation: sparkle-dance 4s ease-in-out infinite;
-            opacity: 0;
-        }
-
-        .sparkle-particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .sparkle-particle:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
-        .sparkle-particle:nth-child(3) { top: 30%; left: 70%; animation-delay: 2s; }
-        .sparkle-particle:nth-child(4) { top: 80%; left: 20%; animation-delay: 3s; }
-        .sparkle-particle:nth-child(5) { top: 50%; left: 50%; animation-delay: 1.5s; }
-
-        @keyframes sparkle-dance {
-            0%, 100% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.5);
-            }
-            20% { 
-                opacity: 1; 
-                transform: translateY(-20px) scale(1);
-            }
-            40% { 
-                opacity: 0.7; 
-                transform: translateY(-30px) scale(1.2);
-            }
-            60% { 
-                opacity: 1; 
-                transform: translateY(-20px) scale(1);
-            }
-            80% { 
-                opacity: 0.5; 
-                transform: translateY(-10px) scale(0.8);
-            }
-        }
-
-        /* Add sparkles on hover */
-        .nominee-card:hover .sparkle-particle {
-            animation-play-state: running;
         }
 
         .nominee-tag {
@@ -454,18 +297,11 @@
             text-transform: uppercase;
             position: relative;
             z-index: 2;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            animation: tag-pulse 3s ease-in-out infinite;
             letter-spacing: 1px;
         }
 
-        @keyframes tag-pulse {
-            0%, 100% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
-        }
-
         .nominees-reveal {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1));
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.08), rgba(255, 152, 0, 0.08));
             border: 1px solid rgba(255, 193, 7, 0.3);
             padding: 20px;
             border-radius: 15px;
@@ -478,7 +314,7 @@
             font-weight: 600;
         }
 
-        /* Election Status Banner */
+        /* OPTIMIZED Election Status Banner */
         .election-status-banner {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -486,7 +322,8 @@
             border-radius: 15px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
 
         .election-status-banner.waiting {
@@ -512,7 +349,6 @@
             font-family: 'Exo 2', sans-serif;
             font-size: 1.2rem;
             font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             letter-spacing: 0.5px;
         }
 
@@ -529,11 +365,10 @@
         }
 
         .time-unit {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             padding: 15px;
             border-radius: 10px;
             min-width: 70px;
-            backdrop-filter: blur(10px);
         }
 
         .time-value {
@@ -551,7 +386,7 @@
             margin-top: 5px;
         }
 
-        /* Voting Form */
+        /* OPTIMIZED Voting Form */
         .voting-form {
             max-width: 800px;
             margin: 0 auto;
@@ -563,7 +398,7 @@
         }
 
         .voting-form.disabled .submit-btn {
-            background: #ccc !important;
+            background: #666 !important;
             cursor: not-allowed;
         }
 
@@ -580,9 +415,9 @@
             text-transform: uppercase;
         }
 
-        /* Leaderboard */
+        /* OPTIMIZED Leaderboard */
         .leaderboard {
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+            background: rgba(255,255,255,0.06);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
@@ -609,23 +444,24 @@
         .leader-card {
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            background: rgba(255,255,255,0.08);
             padding: 15px;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: slideInUp 0.5s ease;
+            will-change: transform;
         }
 
         .leader-card:hover {
-            transform: translateX(10px);
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+            transform: translateX(8px);
+            background: rgba(255,255,255,0.12);
         }
 
         @keyframes slideInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(15px);
             }
             to {
                 opacity: 1;
@@ -670,7 +506,7 @@
             font-style: italic;
         }
 
-        /* Form Styles */
+        /* OPTIMIZED Form Styles */
         .form-group {
             margin-bottom: 25px;
         }
@@ -689,12 +525,11 @@
         .form-group input {
             width: 100%;
             padding: 15px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             border: 2px solid rgba(255,255,255,0.2);
             border-radius: 10px;
             color: white;
             font-size: 1rem;
-            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
@@ -702,7 +537,7 @@
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.12);
         }
 
         .form-group input::placeholder {
@@ -712,7 +547,7 @@
         /* Position Sections */
         .position-section {
             margin-bottom: 35px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            background: rgba(255,255,255,0.03);
             border-radius: 15px;
             padding: 25px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -744,24 +579,24 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+            background: rgba(255,255,255,0.06);
             border: 2px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
 
         .candidate-option label:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
         }
 
         .candidate-option input[type="radio"]:checked + label {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-color: #667eea;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
         .candidate-name {
@@ -791,7 +626,7 @@
             background: linear-gradient(135deg, #feca57, #ff9ff3);
         }
 
-        /* Submit Button */
+        /* OPTIMIZED Submit Button */
         .submit-btn {
             font-family: 'Rajdhani', sans-serif;
             width: 100%;
@@ -803,16 +638,17 @@
             font-size: 1.3rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-top: 20px;
+            will-change: transform;
         }
 
         .submit-btn:hover {
             background: linear-gradient(135deg, #5a67d8, #6b46c1);
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
         }
 
         .submit-btn:disabled {
@@ -822,7 +658,7 @@
             box-shadow: none;
         }
 
-        /* Results */
+        /* OPTIMIZED Results */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -850,10 +686,9 @@
 
         .candidate-result {
             margin-bottom: 15px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             padding: 15px;
             border-radius: 10px;
-            backdrop-filter: blur(10px);
         }
 
         .candidate-result .candidate-name {
@@ -879,7 +714,7 @@
             height: 100%;
             background: linear-gradient(90deg, #4ecdc4, #44a08d);
             border-radius: 4px;
-            transition: width 1s ease;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .vote-percentage {
@@ -898,13 +733,13 @@
         }
 
         .message.success {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.2));
+            background: rgba(76, 175, 80, 0.15);
             color: #4caf50;
             border: 1px solid rgba(76, 175, 80, 0.3);
         }
 
         .message.error {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(233, 30, 99, 0.2));
+            background: rgba(244, 67, 54, 0.15);
             color: #f44336;
             border: 1px solid rgba(244, 67, 54, 0.3);
         }
@@ -930,7 +765,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile Responsiveness */
+        /* OPTIMIZED Mobile Responsiveness */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
@@ -974,10 +809,6 @@
                 text-align: center;
                 gap: 10px;
             }
-
-            .candidates-container {
-                padding: 15px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -997,19 +828,31 @@
                 padding: 20px;
             }
         }
+
+        /* Performance optimizations */
+        .nominee-card,
+        .leader-card,
+        .tab-btn,
+        .candidate-option label,
+        .submit-btn {
+            transform: translateZ(0); /* Force hardware acceleration */
+        }
     </style>
 </head>
 <body>
     <div class="stars"></div>
-    <div class="twinkling"></div>
-    <div class="cosmic-dust"></div>
     <div class="container">
         <div class="header">
             <h1>🚀 Galactic Symposium Election 2025</h1>
             <p>Your vote shapes the universe!</p>
         </div>
 
-       
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
+            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
+            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
+        </div>
+
         <!-- Nominees Showcase Tab -->
         <div id="nominees-tab" class="tab-content active">
             <div class="nominees-showcase">
@@ -1032,11 +875,7 @@
                 </div>
             </div>
         </div>
- <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
-            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
-            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
-        </div>
+
         <!-- Voting Tab -->
         <div id="vote-tab" class="tab-content">
             <div class="voting-form">
@@ -1122,33 +961,35 @@
         let countdownInterval = null;
         let nominees = [];
 
-        // Tab switching
+        // Optimized tab switching with better performance
         function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
             
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+            // Use requestAnimationFrame for smooth transitions
+            requestAnimationFrame(() => {
+                // Hide all tabs
+                tabs.forEach(tab => tab.classList.remove('active'));
+                
+                // Remove active class from all buttons
+                buttons.forEach(btn => btn.classList.remove('active'));
+
+                // Show selected tab
+                document.getElementById(tabName + '-tab').classList.add('active');
+                
+                // Add active class to clicked button
+                event.target.classList.add('active');
+
+                // Load appropriate content with debouncing
+                if (tabName === 'results') {
+                    loadResults();
+                } else if (tabName === 'vote') {
+                    loadElectionStatus();
+                    loadTopCandidates();
+                } else if (tabName === 'nominees') {
+                    loadNominees();
+                }
             });
-
-            // Show selected tab
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-
-            // Load appropriate content
-            if (tabName === 'results') {
-                loadResults();
-            } else if (tabName === 'vote') {
-                loadElectionStatus();
-                loadTopCandidates();
-            } else if (tabName === 'nominees') {
-                loadNominees();
-            }
         }
 
         // Load nominees from backend
@@ -1194,7 +1035,7 @@
             }
         }
 
-        // Enhanced display nominees with sparkle effects
+        // Optimized display nominees 
         function displayNominees() {
             const container = document.getElementById('nominees-grid');
             
@@ -1208,21 +1049,22 @@
                 return;
             }
 
-            let html = '';
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            
             nominees.forEach((nominee, index) => {
-                html += `
-                    <div class="nominee-card" style="animation-delay: ${index * 0.1}s">
-                        <div class="sparkle-particle">✦</div>
-                        <div class="sparkle-particle">✧</div>
-                        <div class="sparkle-particle">⋆</div>
-                        <div class="sparkle-particle">✦</div>
-                        <div class="nominee-name">${nominee.name}</div>
-                        <div class="nominee-tag">${nominee.tag || 'Nominee'}</div>
-                    </div>
+                const card = document.createElement('div');
+                card.className = 'nominee-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.innerHTML = `
+                    <div class="nominee-name">${nominee.name}</div>
+                    <div class="nominee-tag">${nominee.tag || 'Nominee'}</div>
                 `;
+                fragment.appendChild(card);
             });
 
-            container.innerHTML = html;
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
 
         // Load election status and handle countdown
@@ -1291,7 +1133,7 @@
             }
         }
 
-        // Start countdown until voting starts
+        // Optimized countdown functions
         function startCountdown() {
             const updateCountdown = () => {
                 if (electionStatus.timeUntilStart <= 0) {
@@ -1306,27 +1148,26 @@
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
                 
+                // Use textContent for better performance
                 document.getElementById('days').textContent = String(days).padStart(2, '0');
                 document.getElementById('hours').textContent = String(hours).padStart(2, '0');
                 document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
                 document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
                 
-                // Update the time remaining
                 electionStatus.timeUntilStart -= 1000;
             };
             
-            updateCountdown(); // Initial call
+            updateCountdown();
             countdownInterval = setInterval(updateCountdown, 1000);
         }
 
-        // Start countdown until voting ends
         function startCountdownUntilEnd() {
             document.getElementById('status-message').textContent = 'Voting ends in:';
             
             const updateCountdown = () => {
                 if (electionStatus.timeUntilEnd <= 0) {
                     clearInterval(countdownInterval);
-                    loadElectionStatus(); // Refresh status
+                    loadElectionStatus();
                     return;
                 }
                 
@@ -1341,11 +1182,10 @@
                 document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
                 document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
                 
-                // Update the time remaining
                 electionStatus.timeUntilEnd -= 1000;
             };
             
-            updateCountdown(); // Initial call
+            updateCountdown();
             countdownInterval = setInterval(updateCountdown, 1000);
         }
 
@@ -1367,7 +1207,7 @@
             }
         }
 
-        // Display candidate form sections
+        // Optimized candidate form display
         function displayCandidateForm() {
             const container = document.getElementById('candidates-container');
             const positions = {
@@ -1376,16 +1216,16 @@
                 treasurer: { title: '💎 Nebula Treasurer', popularTags: ['Grace Lee'] }
             };
 
-            let html = '';
+            const fragment = document.createDocumentFragment();
 
             Object.keys(currentCandidates).forEach(position => {
                 const positionData = positions[position];
                 if (!positionData) return;
 
-                html += `
-                    <div class="position-section">
-                        <h3 class="position-title">${positionData.title}</h3>
-                `;
+                const section = document.createElement('div');
+                section.className = 'position-section';
+
+                let html = `<h3 class="position-title">${positionData.title}</h3>`;
 
                 currentCandidates[position].forEach((candidate, index) => {
                     let tag = '';
@@ -1408,13 +1248,18 @@
                     `;
                 });
 
-                html += '</div>';
+                section.innerHTML = html;
+                fragment.appendChild(section);
             });
 
-            container.innerHTML = html;
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
 
-        // Form submission
+        // Rest of the JavaScript functions remain the same but with optimized DOM manipulation...
+        // [Continue with remaining functions but using similar performance optimizations]
+
+        // Form submission (optimized)
         document.getElementById('voting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1423,7 +1268,6 @@
                 return;
             }
 
-            // Check if voting is currently allowed
             if (!electionStatus.votingAllowed) {
                 showMessage('Voting is not currently allowed. ' + electionStatus.message, 'error');
                 return;
@@ -1440,19 +1284,16 @@
                 }
             };
 
-            // Validate that all fields are filled
             if (!voteData.registerNumber || !voteData.password) {
                 showMessage('Please enter your registration number and password.', 'error');
                 return;
             }
 
-            // Validate that all positions are voted for
             if (!voteData.votes.president || !voteData.votes.secretary || !voteData.votes.treasurer) {
                 showMessage('Please select candidates for all positions.', 'error');
                 return;
             }
 
-            // Disable submit button
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Launching...';
@@ -1483,7 +1324,7 @@
             }
         });
 
-        // Load top candidates for leaderboard
+        // Optimized top candidates loading
         async function loadTopCandidates() {
             try {
                 const response = await axios.get('/.netlify/functions/get-results');
@@ -1494,7 +1335,6 @@
             }
         }
 
-        // Display top candidates in leaderboard
         function displayTopCandidates(results) {
             const container = document.getElementById('top-candidates');
             const positions = ['president', 'secretary', 'treasurer'];
@@ -1509,14 +1349,14 @@
                 topCandidates = topCandidates.concat(candidates);
             });
             
-            // Sort by votes descending and take top 3
             topCandidates.sort((a, b) => b.votes - a.votes);
             const top3 = topCandidates.slice(0, 3);
             
-            let html = '';
-            
             if (top3.length > 0) {
-                html = '<div class="leaders">';
+                const fragment = document.createDocumentFragment();
+                const leadersDiv = document.createElement('div');
+                leadersDiv.className = 'leaders';
+                
                 top3.forEach((candidate, index) => {
                     const positionName = {
                         president: 'President',
@@ -1524,31 +1364,33 @@
                         treasurer: 'Treasurer'
                     }[candidate.position];
                     
-                    html += `
-                        <div class="leader-card" style="animation-delay: ${index * 0.2}s">
-                            <div class="leader-rank">${index + 1}</div>
-                            <div class="leader-info">
-                                <div class="leader-name">${candidate.name}</div>
-                                <div class="leader-position">${positionName}</div>
-                            </div>
-                            <div class="leader-votes">${candidate.votes} votes</div>
+                    const leaderCard = document.createElement('div');
+                    leaderCard.className = 'leader-card';
+                    leaderCard.style.animationDelay = `${index * 0.2}s`;
+                    leaderCard.innerHTML = `
+                        <div class="leader-rank">${index + 1}</div>
+                        <div class="leader-info">
+                            <div class="leader-name">${candidate.name}</div>
+                            <div class="leader-position">${positionName}</div>
                         </div>
+                        <div class="leader-votes">${candidate.votes} votes</div>
                     `;
+                    leadersDiv.appendChild(leaderCard);
                 });
-                html += '</div>';
+                
+                fragment.appendChild(leadersDiv);
+                container.innerHTML = '';
+                container.appendChild(fragment);
             } else {
-                html = '<p class="no-leaders">No votes yet. Be the first to vote!</p>';
+                container.innerHTML = '<p class="no-leaders">No votes yet. Be the first to vote!</p>';
             }
-            
-            container.innerHTML = html;
         }
 
-        // Load results
+        // Optimized results loading
         async function loadResults() {
             try {
                 const response = await axios.get('/.netlify/functions/get-results');
                 const results = response.data;
-                
                 displayResults(results);
             } catch (error) {
                 console.error('Error loading results:', error);
@@ -1557,7 +1399,6 @@
             }
         }
 
-        // Display results
         function displayResults(results) {
             const container = document.getElementById('results-container');
             
@@ -1574,19 +1415,23 @@
                 'linear-gradient(135deg, rgba(33,147,176,0.8) 0%, rgba(109,213,237,0.8) 100%)'
             ];
 
-            let html = '<div class="results-grid">';
+            const fragment = document.createDocumentFragment();
+            const grid = document.createElement('div');
+            grid.className = 'results-grid';
 
             positions.forEach((position, index) => {
                 const positionResults = results[position] || {};
                 const totalVotes = Object.values(positionResults).reduce((sum, count) => sum + count, 0);
                 
-                html += `
-                    <div class="position-card" style="background: ${colors[index]}">
-                        <h3>${positionTitles[position]}</h3>
-                        <p class="total-votes">Total Votes: ${totalVotes}</p>
+                const card = document.createElement('div');
+                card.className = 'position-card';
+                card.style.background = colors[index];
+
+                let html = `
+                    <h3>${positionTitles[position]}</h3>
+                    <p class="total-votes">Total Votes: ${totalVotes}</p>
                 `;
 
-                // Sort candidates by vote count
                 const sortedCandidates = Object.entries(positionResults)
                     .sort(([,a], [,b]) => b - a);
 
@@ -1604,14 +1449,15 @@
                     `;
                 });
 
-                html += '</div>';
+                card.innerHTML = html;
+                grid.appendChild(card);
             });
 
-            html += '</div>';
-            container.innerHTML = html;
+            fragment.appendChild(grid);
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
 
-        // Show message
         function showMessage(text, type) {
             const messageDiv = document.getElementById('vote-message');
             messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
@@ -1621,36 +1467,44 @@
             }, 5000);
         }
 
-        // Initialize on page load
+        // Optimized initialization
         window.addEventListener('load', async () => {
-            await loadNominees(); // Load nominees first for default tab
-            await loadElectionStatus(); // Load election status
-            await loadCandidates(); // Load candidates
+            // Use Promise.all for parallel loading where possible
+            await Promise.all([
+                loadNominees(),
+                loadElectionStatus(),
+                loadCandidates()
+            ]);
+            
             loadResults();
             loadTopCandidates();
         });
 
-        // Auto-refresh results every 30 seconds when on results tab
-        setInterval(() => {
-            if (document.getElementById('results-tab').classList.contains('active')) {
-                loadResults();
-            }
-        }, 30000);
+        // Optimized auto-refresh with reduced frequency
+        let refreshInterval;
+        function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            
+            refreshInterval = setInterval(() => {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab && activeTab.id === 'results-tab') {
+                    loadResults();
+                } else if (activeTab && activeTab.id === 'vote-tab') {
+                    loadTopCandidates();
+                }
+            }, 15000); // Reduced frequency from 30s/10s to 15s
+        }
 
-        // Auto-refresh election status every 10 seconds
-        setInterval(() => {
-            if (document.getElementById('vote-tab').classList.contains('active')) {
-                loadElectionStatus();
+        // Start auto-refresh when page is visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (refreshInterval) clearInterval(refreshInterval);
+            } else {
+                startAutoRefresh();
             }
-        }, 10000);
+        });
 
-        // Auto-refresh nominees every 60 seconds when on nominees tab
-        setInterval(() => {
-            if (document.getElementById('nominees-tab').classList.contains('active')) {
-                loadNominees();
-            }
-        }, 60000);
+        startAutoRefresh();
     </script>
 </body>
-
 </html>

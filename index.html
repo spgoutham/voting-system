@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Class Elections 2025</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <!-- Professional Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Reset and Base Styles */
         * {
@@ -14,12 +18,13 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a0a;
             color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            font-weight: 400;
         }
 
         /* Enhanced Animated Star Background */
@@ -95,7 +100,9 @@
         }
 
         .header h1 {
+            font-family: 'Orbitron', monospace;
             font-size: 3rem;
+            font-weight: 900;
             margin-bottom: 15px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #ff9ff3);
             background-size: 400% 400%;
@@ -104,13 +111,18 @@
             animation: gradientShift 3s ease-in-out infinite;
             position: relative;
             z-index: 1;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .header p {
+            font-family: 'Exo 2', sans-serif;
             font-size: 1.2rem;
+            font-weight: 300;
             opacity: 0.9;
             position: relative;
             z-index: 1;
+            letter-spacing: 1px;
         }
 
         @keyframes rotate-gradient {
@@ -133,18 +145,21 @@
         }
 
         .tab-btn {
+            font-family: 'Rajdhani', sans-serif;
             background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
             border: 2px solid rgba(255,255,255,0.2);
             color: white;
             padding: 12px 25px;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .tab-btn::before {
@@ -202,17 +217,24 @@
         }
 
         .nominees-showcase h2 {
+            font-family: 'Orbitron', monospace;
             font-size: 2.5rem;
+            font-weight: 700;
             margin-bottom: 20px;
             background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .nominees-subtitle {
+            font-family: 'Exo 2', sans-serif;
             font-size: 1.1rem;
+            font-weight: 300;
             opacity: 0.8;
             margin-bottom: 30px;
+            letter-spacing: 0.5px;
         }
 
         .nominees-grid {
@@ -300,6 +322,7 @@
 
         /* CINEMATIC NOMINEE NAME WITH TWINKLING STARS */
         .nominee-name {
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 15px;
@@ -308,6 +331,8 @@
             z-index: 2;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             animation: gentle-glow 2s ease-in-out infinite alternate;
+            letter-spacing: 0.5px;
+            text-transform: capitalize;
         }
 
         /* Star sparkle effects around nominee names */
@@ -417,6 +442,7 @@
         }
 
         .nominee-tag {
+            font-family: 'Rajdhani', sans-serif;
             display: inline-block;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -429,6 +455,7 @@
             z-index: 2;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             animation: tag-pulse 3s ease-in-out infinite;
+            letter-spacing: 1px;
         }
 
         @keyframes tag-pulse {
@@ -481,9 +508,11 @@
         }
 
         #status-message {
+            font-family: 'Exo 2', sans-serif;
             font-size: 1.2rem;
             font-weight: 600;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
         }
 
         .countdown-display {
@@ -538,12 +567,16 @@
         }
 
         .voting-form h2 {
+            font-family: 'Orbitron', monospace;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.2rem;
+            font-weight: 700;
             background: linear-gradient(45deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         /* Leaderboard */
@@ -556,10 +589,14 @@
         }
 
         .leaderboard h3 {
+            font-family: 'Space Grotesk', sans-serif;
             text-align: center;
             margin-bottom: 20px;
             font-size: 1.5rem;
+            font-weight: 700;
             color: #ffd700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .leaders {
@@ -608,13 +645,17 @@
         }
 
         .leader-name {
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 600;
             font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
         .leader-position {
+            font-family: 'Exo 2', sans-serif;
             font-size: 0.9rem;
             opacity: 0.8;
+            font-weight: 300;
         }
 
         .leader-votes {
@@ -634,10 +675,14 @@
         }
 
         .form-group label {
+            font-family: 'Rajdhani', sans-serif;
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #fff;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .form-group input {
@@ -673,12 +718,16 @@
         }
 
         .position-title {
+            font-family: 'Orbitron', monospace;
             font-size: 1.4rem;
+            font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
             background: linear-gradient(45deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .candidate-option {
@@ -715,8 +764,10 @@
         }
 
         .candidate-name {
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 600;
             font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
         .candidate-tag {
@@ -741,18 +792,19 @@
 
         /* Submit Button */
         .submit-btn {
+            font-family: 'Rajdhani', sans-serif;
             width: 100%;
             padding: 18px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             border-radius: 15px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin-top: 20px;
         }
 
@@ -881,6 +933,7 @@
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
+                letter-spacing: 1px;
             }
 
             .nominees-grid {
@@ -1051,7 +1104,7 @@
 
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
-            <h2 style="text-align: center; margin-bottom: 30px; font-size: 2.2rem; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Live Galactic Results</h2>
+            <h2 style="font-family: 'Orbitron', monospace; text-align: center; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-transform: uppercase;">Live Galactic Results</h2>
             <div id="results-container">
                 <div class="loading">
                     <div class="spinner"></div>

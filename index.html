@@ -35,13 +35,13 @@
                 
                 <form id="voting-form">
                     <div class="form-group">
-                        <label for="email">Stellar Email:</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="registerNumber">Registration Number:</label>
+                        <input type="text" id="registerNumber" name="registerNumber" placeholder="Enter your registration number" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="registerNumber">Astronaut ID:</label>
-                        <input type="text" id="registerNumber" name="registerNumber" required>
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
                     </div>
 
                     <div id="candidates-container">
@@ -178,14 +178,20 @@
 
             const formData = new FormData(e.target);
             const voteData = {
-                email: formData.get('email'),
                 registerNumber: formData.get('registerNumber'),
+                password: formData.get('password'),
                 votes: {
                     president: formData.get('president'),
                     secretary: formData.get('secretary'),
                     treasurer: formData.get('treasurer')
                 }
             };
+
+            // Validate that all fields are filled
+            if (!voteData.registerNumber || !voteData.password) {
+                showMessage('Please enter your registration number and password.', 'error');
+                return;
+            }
 
             // Validate that all positions are voted for
             if (!voteData.votes.president || !voteData.votes.secretary || !voteData.votes.treasurer) {
@@ -214,7 +220,11 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Error launching vote. Please try again.', 'error');
+                let errorMessage = 'Error launching vote. Please try again.';
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                showMessage(errorMessage, 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Launch Vote';
             }

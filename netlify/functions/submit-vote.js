@@ -34,24 +34,14 @@ exports.handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { email, registerNumber, votes } = JSON.parse(event.body);
+    const { registerNumber, password, votes } = JSON.parse(event.body);
 
     // Validate input
-    if (!email || !registerNumber || !votes) {
+    if (!registerNumber || !password || !votes) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, message: 'Missing required fields' })
-      };
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ success: false, message: 'Invalid email format' })
+        body: JSON.stringify({ success: false, message: 'Registration number, password, and votes are required' })
       };
     }
 
@@ -69,32 +59,107 @@ exports.handler = async (event, context) => {
     await client.connect();
     
     const db = client.db(DB_NAME);
-    const votersCollection = db.collection('voters');
+    const credentialsCollection = db.collection('user_credentials');
     const votesCollection = db.collection('votes');
+    const votersCollection = db.collection('voters');
 
-    // Check if user has already voted (by email or register number)
-    const existingVoter = await votersCollection.findOne({
-      $or: [
-        { email: email.toLowerCase() },
-        { registerNumber: registerNumber.toUpperCase() }
-      ]
+    // Validate credentials on server side
+    const userCredential = await credentialsCollection.findOne({
+      regNumber: registerNumber.toString(),
+      password: password,
+      isActive: true
     });
 
-    if (existingVoter) {
+    if (!userCredential) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'Invalid registration number or password' 
+        })
+      };
+    }
+
+    // Check if user has already voted
+    if (userCredential.hasVoted) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, message: 'You have already voted!' })
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'You have already voted!' 
+        })
       };
+    }
+
+    // Double-check in voters collection as well
+    const existingVoter = await votersCollection.findOne({
+      registerNumber: registerNumber.toString()
+    });
+
+    if (existingVoter) {
+      // Update credential to reflect voted status if inconsistent
+      await credentialsCollection.updateOne(
+        { regNumber: registerNumber.toString() },
+        { $set: { hasVoted: true, votedAt: existingVoter.votedAt } }
+      );
+      
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          message: 'You have already voted!' 
+        })
+      };
+    }
+
+    // Get current candidates to validate votes
+    const candidatesCollection = db.collection('candidates');
+    const candidatesData = await candidatesCollection.findOne({ _id: 'current_candidates' });
+    
+    const defaultCandidates = {
+      president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+      secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
+      treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+    };
+
+    const currentCandidates = candidatesData ? candidatesData.candidates : defaultCandidates;
+
+    // Validate that voted candidates exist in current candidate list
+    const positions = ['president', 'secretary', 'treasurer'];
+    for (const position of positions) {
+      if (!currentCandidates[position] || !currentCandidates[position].includes(votes[position])) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: `Invalid candidate selected for ${position}: ${votes[position]}` 
+          })
+        };
+      }
     }
 
     // Record voter to prevent duplicate voting
     await votersCollection.insertOne({
-      email: email.toLowerCase(),
-      registerNumber: registerNumber.toUpperCase(),
+      registerNumber: registerNumber.toString(),
       votedAt: new Date(),
       ipAddress: event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || 'unknown'
     });
+
+    // Update user credential to mark as voted
+    await credentialsCollection.updateOne(
+      { regNumber: registerNumber.toString() },
+      { 
+        $set: { 
+          hasVoted: true, 
+          votedAt: new Date(),
+          lastVoteIP: event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || 'unknown'
+        }
+      }
+    );
 
     // Submit votes for each position
     const votePromises = Object.entries(votes).map(([position, candidate]) => {
@@ -102,7 +167,8 @@ exports.handler = async (event, context) => {
         { position: position, candidate: candidate },
         { 
           $inc: { count: 1 },
-          $setOnInsert: { position: position, candidate: candidate }
+          $setOnInsert: { position: position, candidate: candidate, createdAt: new Date() },
+          $set: { lastUpdated: new Date() }
         },
         { upsert: true }
       );
@@ -115,7 +181,8 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({ 
         success: true, 
-        message: 'Vote submitted successfully!' 
+        message: 'Vote submitted successfully!',
+        regNumber: registerNumber
       })
     };
 

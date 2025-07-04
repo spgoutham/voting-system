@@ -38,12 +38,19 @@ exports.handler = async (event, context) => {
     await client.connect();
     
     const db = client.db(DB_NAME);
+    const credentialsCollection = db.collection('user_credentials');
     const votersCollection = db.collection('voters');
     const votesCollection = db.collection('votes');
     const candidatesCollection = db.collection('candidates');
 
-    // Get total number of voters who have voted
-    const totalVoters = await votersCollection.countDocuments({});
+    // Get total number of registered voters (from credentials)
+    const totalRegisteredVoters = await credentialsCollection.countDocuments({ isActive: true });
+
+    // Get total number of voters who have actually voted
+    const totalVotersWhoVoted = await credentialsCollection.countDocuments({ 
+      isActive: true, 
+      hasVoted: true 
+    });
 
     // Get total votes cast (sum of all vote counts)
     const allVotes = await votesCollection.find({}).toArray();
@@ -61,13 +68,17 @@ exports.handler = async (event, context) => {
     }
 
     // Get most recent vote time
-    const lastVoter = await votersCollection.findOne(
-      {}, 
+    const lastVoter = await credentialsCollection.findOne(
+      { hasVoted: true }, 
       { sort: { votedAt: -1 } }
     );
     const lastVoteTime = lastVoter ? lastVoter.votedAt : null;
 
-    // Calculate some additional stats
+    // Calculate additional stats
+    const voterTurnoutPercentage = totalRegisteredVoters > 0 
+      ? ((totalVotersWhoVoted / totalRegisteredVoters) * 100).toFixed(1) 
+      : 0;
+    
     const avgVotesPerCandidate = totalCandidates > 0 ? (totalVotes / totalCandidates).toFixed(1) : 0;
     
     // Get vote distribution by position
@@ -79,22 +90,49 @@ exports.handler = async (event, context) => {
       votesByPosition[vote.position] += vote.count || 0;
     });
 
-    // Election status (simple logic - could be enhanced)
+    // Election status (enhanced logic)
     let electionStatus = 'ACTIVE';
     if (totalVotes === 0) {
       electionStatus = 'NOT_STARTED';
-    } else if (totalVoters > 100) { // Example threshold
+    } else if (totalVotersWhoVoted === totalRegisteredVoters) {
+      electionStatus = 'COMPLETED';
+    } else if (voterTurnoutPercentage >= 80) {
       electionStatus = 'HIGH_TURNOUT';
+    } else if (voterTurnoutPercentage >= 50) {
+      electionStatus = 'GOOD_TURNOUT';
+    } else {
+      electionStatus = 'LOW_TURNOUT';
     }
 
+    // Get breakdown by registration number ranges for additional insights
+    const range1Voters = await credentialsCollection.countDocuments({
+      regNumber: { $regex: '^14222224300[1-9]$|^142222243[0-4][0-9]$|^142222243058$' },
+      hasVoted: true,
+      isActive: true
+    });
+    
+    const range2Voters = await credentialsCollection.countDocuments({
+      regNumber: { $regex: '^14222224330[1-6]$' },
+      hasVoted: true,
+      isActive: true
+    });
+
     const stats = {
-      totalVoters,
+      totalVoters: totalVotersWhoVoted,
       totalVotes,
       totalCandidates,
+      totalRegisteredVoters,
+      voterTurnoutPercentage,
       lastVoteTime,
       avgVotesPerCandidate,
       votesByPosition,
       electionStatus,
+      voterBreakdown: {
+        range1Voted: range1Voters,
+        range2Voted: range2Voters,
+        totalVoted: totalVotersWhoVoted,
+        totalRegistered: totalRegisteredVoters
+      },
       timestamp: new Date()
     };
 
@@ -113,10 +151,18 @@ exports.handler = async (event, context) => {
         totalVoters: 0,
         totalVotes: 0,
         totalCandidates: 0,
+        totalRegisteredVoters: 0,
+        voterTurnoutPercentage: 0,
         lastVoteTime: null,
         avgVotesPerCandidate: 0,
         votesByPosition: {},
         electionStatus: 'ERROR',
+        voterBreakdown: {
+          range1Voted: 0,
+          range2Voted: 0,
+          totalVoted: 0,
+          totalRegistered: 0
+        },
         timestamp: new Date()
       })
     };

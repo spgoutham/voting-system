@@ -257,14 +257,14 @@
             cursor: pointer;
         }
 
-        /* Cosmic shimmer effect */
+               /* Cosmic shimmer effect */
         .nominee-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
             background: conic-gradient(
                 transparent,
                 rgba(255, 107, 107, 0.3),
@@ -273,6 +273,7 @@
                 rgba(255, 159, 243, 0.3),
                 transparent
             );
+            border-radius: 50%;
             animation: rotate-shimmer 8s linear infinite;
             opacity: 0;
             transition: opacity 0.3s ease;

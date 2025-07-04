@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Class Elections</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .admin-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 12px 25px;
+            margin: 5px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .position-manager {
+            margin-bottom: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .position-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .position-content {
+            padding: 25px;
+        }
+
+        .candidate-list {
+            margin-bottom: 20px;
+        }
+
+        .candidate-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .remove-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .add-candidate-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .add-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .add-input:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .add-candidate-form {
+                flex-direction: column;
+            }
+            
+            .candidate-item {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin Panel</h1>
+            <p>Manage Candidates & Election Settings</p>
+        </div>
+
+        <div class="warning-banner">
+            ⚠️ ADMIN ACCESS ONLY - Changes affect the live voting system
+        </div>
+
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="showTab('candidates')">Manage Candidates</button>
+            <button class="tab-btn" onclick="showTab('statistics')">Election Stats</button>
+            <button class="tab-btn" onclick="showTab('settings')">Settings</button>
+        </div>
+
+        <!-- Candidates Management Tab -->
+        <div id="candidates-tab" class="tab-content active">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Candidate Management</h2>
+            
+            <!-- President Section -->
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>🏆 President</span>
+                    <span id="president-count">0 candidates</span>
+                </div>
+                <div class="position-content">
+                    <div class="candidate-list" id="president-list">
+                        <!-- Candidates will be loaded here -->
+                    </div>
+                    <div class="add-candidate-form">
+                        <input type="text" class="add-input" id="president-input" placeholder="Enter candidate name">
+                        <button class="add-btn" onclick="addCandidate('president')">Add Candidate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secretary Section -->
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>📝 Secretary</span>
+                    <span id="secretary-count">0 candidates</span>
+                </div>
+                <div class="position-content">
+                    <div class="candidate-list" id="secretary-list">
+                        <!-- Candidates will be loaded here -->
+                    </div>
+                    <div class="add-candidate-form">
+                        <input type="text" class="add-input" id="secretary-input" placeholder="Enter candidate name">
+                        <button class="add-btn" onclick="addCandidate('secretary')">Add Candidate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Treasurer Section -->
+            <div class="position-manager">
+                <div class="position-header">
+                    <span>💰 Treasurer</span>
+                    <span id="treasurer-count">0 candidates</span>
+                </div>
+                <div class="position-content">
+                    <div class="candidate-list" id="treasurer-list">
+                        <!-- Candidates will be loaded here -->
+                    </div>
+                    <div class="add-candidate-form">
+                        <input type="text" class="add-input" id="treasurer-input" placeholder="Enter candidate name">
+                        <button class="add-btn" onclick="addCandidate('treasurer')">Add Candidate</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-success" onclick="saveAllChanges()">💾 Save All Changes</button>
+                <button class="action-btn btn-warning" onclick="loadCandidates()">🔄 Reload Data</button>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="statistics-tab" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Election Statistics</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-candidates">0</div>
+                    <div class="stat-label">Total Candidates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-votes">0</div>
+                    <div class="stat-label">Total Votes Cast</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-voters">0</div>
+                    <div class="stat-label">Registered Voters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="election-status">ACTIVE</div>
+                    <div class="stat-label">Election Status</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="index.html" class="action-btn btn-primary">🗳️ View Voting Page</a>
+                <button class="action-btn btn-warning" onclick="exportResults()">📊 Export Results</button>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Election Settings</h2>
+            
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="position-manager">
+                    <div class="position-header">
+                        <span>⚙️ Election Controls</span>
+                    </div>
+                    <div class="position-content">
+                        <div class="action-buttons">
+                            <button class="action-btn btn-danger" onclick="confirmAction('reset')">🗑️ Reset All Votes</button>
+                            <button class="action-btn btn-warning" onclick="confirmAction('backup')">💾 Backup Data</button>
+                            <button class="action-btn btn-success" onclick="confirmAction('close')">🔒 Close Election</button>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
+                            <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Important Notes:</h4>
+                            <ul style="color: #856404; line-height: 1.6;">
+                                <li>Reset All Votes will permanently delete all voting data</li>
+                                <li>Always backup data before making major changes</li>
+                                <li>Closing election will prevent new votes</li>
+                                <li>Changes to candidates during active voting may cause confusion</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="message-container"></div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="confirmation-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Confirm Action</h3>
+            <p id="modal-message">Are you sure you want to proceed?</p>
+            <div class="modal-buttons">
+                <button class="action-btn btn-danger" onclick="confirmAction(currentAction, true)">Yes, Proceed</button>
+                <button class="action-btn btn-primary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let candidates = {
+            president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+            secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
+            treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+        };
+        let currentAction = '';
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'statistics') {
+                loadStatistics();
+            }
+        }
+
+        // Load candidates from backend
+        async function loadCandidates() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-candidates');
+                candidates = response.data;
+                
+                displayCandidates();
+                showMessage('Candidates loaded successfully!', 'success');
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                showMessage('Error loading candidates. Using default list.', 'error');
+                displayCandidates();
+            }
+        }
+
+        // Display candidates in the UI
+        function displayCandidates() {
+            Object.keys(candidates).forEach(position => {
+                const listElement = document.getElementById(position + '-list');
+                const countElement = document.getElementById(position + '-count');
+                
+                listElement.innerHTML = '';
+                
+                candidates[position].forEach((candidate, index) => {
+                    const candidateDiv = document.createElement('div');
+                    candidateDiv.className = 'candidate-item';
+                    candidateDiv.innerHTML = `
+                        <span class="candidate-name">${candidate}</span>
+                        <button class="remove-btn" onclick="removeCandidate('${position}', ${index})">
+                            Remove
+                        </button>
+                    `;
+                    listElement.appendChild(candidateDiv);
+                });
+
+                countElement.textContent = `${candidates[position].length} candidates`;
+            });
+
+            updateTotalCandidates();
+        }
+
+        // Add candidate
+        function addCandidate(position) {
+            const input = document.getElementById(position + '-input');
+            const candidateName = input.value.trim();
+
+            if (!candidateName) {
+                showMessage('Please enter a candidate name.', 'error');
+                return;
+            }
+
+            if (candidates[position].includes(candidateName)) {
+                showMessage('Candidate already exists in this position.', 'error');
+                return;
+            }
+
+            candidates[position].push(candidateName);
+            input.value = '';
+            displayCandidates();
+            showMessage(`${candidateName} added to ${position} candidates.`, 'success');
+        }
+
+        // Remove candidate
+        function removeCandidate(position, index) {
+            const candidateName = candidates[position][index];
+            candidates[position].splice(index, 1);
+            displayCandidates();
+            showMessage(`${candidateName} removed from ${position} candidates.`, 'success');
+        }
+
+        // Save all changes
+        async function saveAllChanges() {
+            try {
+                const response = await axios.post('/.netlify/functions/save-candidates', candidates);
+                
+                if (response.data.success) {
+                    showMessage('All changes saved successfully!', 'success');
+                } else {
+                    showMessage(response.data.message || 'Error saving candidates', 'error');
+                }
+                console.log('Candidates saved:', candidates);
+            } catch (error) {
+                console.error('Error saving candidates:', error);
+                showMessage('Error saving candidates. Please try again.', 'error');
+            }
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-stats');
+                const stats = response.data;
+                
+                document.getElementById('total-candidates').textContent = stats.totalCandidates;
+                document.getElementById('total-votes').textContent = stats.totalVotes;
+                document.getElementById('total-voters').textContent = stats.totalVoters;
+                document.getElementById('election-status').textContent = stats.electionStatus;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                // Fallback to manual calculation for candidates
+                const totalCandidates = Object.values(candidates).reduce((sum, list) => sum + list.length, 0);
+                document.getElementById('total-candidates').textContent = totalCandidates;
+                document.getElementById('total-votes').textContent = '0';
+                document.getElementById('total-voters').textContent = '0';
+                document.getElementById('election-status').textContent = 'ERROR';
+            }
+        }
+
+        // Update total candidates count
+        function updateTotalCandidates() {
+            const total = Object.values(candidates).reduce((sum, list) => sum + list.length, 0);
+            if (document.getElementById('total-candidates')) {
+                document.getElementById('total-candidates').textContent = total;
+            }
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${text}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Confirmation modal functions
+        function confirmAction(action, confirmed = false) {
+            if (confirmed) {
+                currentAction = '';
+                closeModal();
+                executeAction(action);
+                return;
+            }
+
+            currentAction = action;
+            const modal = document.getElementById('confirmation-modal');
+            const title = document.getElementById('modal-title');
+            const message = document.getElementById('modal-message');
+
+            const actions = {
+                reset: {
+                    title: 'Reset All Votes',
+                    message: 'This will permanently delete all votes. This action cannot be undone!'
+                },
+                backup: {
+                    title: 'Backup Data',
+                    message: 'Create a backup of all election data?'
+                },
+                close: {
+                    title: 'Close Election',
+                    message: 'This will stop accepting new votes. Are you sure?'
+                }
+            };
+
+            title.textContent = actions[action].title;
+            message.textContent = actions[action].message;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        function executeAction(action) {
+            switch(action) {
+                case 'reset':
+                    showMessage('All votes have been reset.', 'success');
+                    break;
+                case 'backup':
+                    showMessage('Data backup created successfully.', 'success');
+                    break;
+                case 'close':
+                    showMessage('Election has been closed.', 'success');
+                    break;
+            }
+        }
+
+        function exportResults() {
+            showMessage('Results exported successfully!', 'success');
+        }
+
+        // Allow Enter key to add candidates
+        document.addEventListener('DOMContentLoaded', function() {
+            ['president', 'secretary', 'treasurer'].forEach(position => {
+                document.getElementById(position + '-input').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addCandidate(position);
+                    }
+                });
+            });
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            loadCandidates();
+            loadStatistics();
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('confirmation-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

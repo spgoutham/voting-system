@@ -1,0 +1,26 @@
+{
+  "name": "class-voting-system",
+  "version": "1.0.0",
+  "description": "Class voting system with Netlify functions and MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "keywords": [
+    "voting",
+    "elections",
+    "mongodb",
+    "netlify",
+    "serverless"
+  ],
+  "author": "Class Election Committee",
+  "license": "MIT"
+}

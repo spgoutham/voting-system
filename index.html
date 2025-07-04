@@ -44,75 +44,11 @@
                         <input type="text" id="registerNumber" name="registerNumber" required>
                     </div>
 
-                    <div class="position-section">
-                        <h3 class="position-title">👑 Galactic President</h3>
-                        <div class="candidate-option">
-                            <input type="radio" name="president" value="Alice Johnson" required>
-                            <label>
-                                <span class="candidate-name">Alice Johnson</span>
-                                <span class="candidate-tag popular">Popular</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="president" value="Bob Smith" required>
-                            <label>
-                                <span class="candidate-name">Bob Smith</span>
-                                <span class="candidate-tag rising">Rising</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="president" value="Carol Davis" required>
-                            <label>
-                                <span class="candidate-name">Carol Davis</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="position-section">
-                        <h3 class="position-title">📜 Cosmic Secretary</h3>
-                        <div class="candidate-option">
-                            <input type="radio" name="secretary" value="David Wilson" required>
-                            <label>
-                                <span class="candidate-name">David Wilson</span>
-                                <span class="candidate-tag popular">Popular</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="secretary" value="Emma Brown" required>
-                            <label>
-                                <span class="candidate-name">Emma Brown</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="secretary" value="Frank Miller" required>
-                            <label>
-                                <span class="candidate-name">Frank Miller</span>
-                                <span class="candidate-tag new">New</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="position-section">
-                        <h3 class="position-title">💎 Nebula Treasurer</h3>
-                        <div class="candidate-option">
-                            <input type="radio" name="treasurer" value="Grace Lee" required>
-                            <label>
-                                <span class="candidate-name">Grace Lee</span>
-                                <span class="candidate-tag popular">Popular</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="treasurer" value="Henry Clark" required>
-                            <label>
-                                <span class="candidate-name">Henry Clark</span>
-                            </label>
-                        </div>
-                        <div class="candidate-option">
-                            <input type="radio" name="treasurer" value="Ivy Taylor" required>
-                            <label>
-                                <span class="candidate-name">Ivy Taylor</span>
-                                <span class="candidate-tag rising">Rising</span>
-                            </label>
+                    <div id="candidates-container">
+                        <!-- Candidate sections will be loaded dynamically -->
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading galactic candidates...</p>
                         </div>
                     </div>
 
@@ -138,6 +74,7 @@
     <script>
         // Global variables
         let hasVoted = false;
+        let currentCandidates = {};
 
         // Tab switching
         function showTab(tabName) {
@@ -165,6 +102,71 @@
             }
         }
 
+        // Load candidates from backend
+        async function loadCandidates() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-candidates');
+                currentCandidates = response.data;
+                displayCandidateForm();
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                // Fallback to default candidates
+                currentCandidates = {
+                    president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+                    secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
+                    treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+                };
+                displayCandidateForm();
+            }
+        }
+
+        // Display candidate form sections
+        function displayCandidateForm() {
+            const container = document.getElementById('candidates-container');
+            const positions = {
+                president: { title: '👑 Galactic President', popularTags: ['Alice Johnson', 'Bob Smith'] },
+                secretary: { title: '📜 Cosmic Secretary', popularTags: ['David Wilson'] },
+                treasurer: { title: '💎 Nebula Treasurer', popularTags: ['Grace Lee'] }
+            };
+
+            let html = '';
+
+            Object.keys(currentCandidates).forEach(position => {
+                const positionData = positions[position];
+                if (!positionData) return;
+
+                html += `
+                    <div class="position-section">
+                        <h3 class="position-title">${positionData.title}</h3>
+                `;
+
+                currentCandidates[position].forEach((candidate, index) => {
+                    let tag = '';
+                    if (positionData.popularTags.includes(candidate)) {
+                        tag = '<span class="candidate-tag popular">Popular</span>';
+                    } else if (index === 1) {
+                        tag = '<span class="candidate-tag rising">Rising</span>';
+                    } else if (index === currentCandidates[position].length - 1) {
+                        tag = '<span class="candidate-tag new">New</span>';
+                    }
+
+                    html += `
+                        <div class="candidate-option">
+                            <input type="radio" name="${position}" value="${candidate}" required>
+                            <label>
+                                <span class="candidate-name">${candidate}</span>
+                                ${tag}
+                            </label>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
         // Form submission
         document.getElementById('voting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -184,6 +186,12 @@
                     treasurer: formData.get('treasurer')
                 }
             };
+
+            // Validate that all positions are voted for
+            if (!voteData.votes.president || !voteData.votes.secretary || !voteData.votes.treasurer) {
+                showMessage('Please select candidates for all positions.', 'error');
+                return;
+            }
 
             // Disable submit button
             const submitBtn = document.querySelector('.submit-btn');
@@ -352,6 +360,7 @@
 
         // Initialize on page load
         window.addEventListener('load', async () => {
+            await loadCandidates(); // Load candidates first
             loadResults();
             loadTopCandidates();
         });

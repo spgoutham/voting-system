@@ -39,6 +39,19 @@ exports.handler = async (event, context) => {
     
     const db = client.db(DB_NAME);
     const votesCollection = db.collection('votes');
+    const candidatesCollection = db.collection('candidates');
+
+    // Get current candidates from database
+    const candidatesData = await candidatesCollection.findOne({ _id: 'current_candidates' });
+    
+    // Default candidates if none found in database
+    const defaultCandidates = {
+      president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+      secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
+      treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+    };
+
+    const candidates = candidatesData ? candidatesData.candidates : defaultCandidates;
 
     // Get all votes
     const allVotes = await votesCollection.find({}).toArray();
@@ -50,14 +63,7 @@ exports.handler = async (event, context) => {
       treasurer: {}
     };
 
-    // Initialize candidates with 0 votes
-    const candidates = {
-      president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
-      secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
-      treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
-    };
-
-    // Initialize all candidates with 0 votes
+    // Initialize all candidates with 0 votes (using current candidates from database)
     Object.keys(candidates).forEach(position => {
       candidates[position].forEach(candidate => {
         results[position][candidate] = 0;

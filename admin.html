@@ -370,6 +370,32 @@
             border-bottom: 2px solid #ddd;
         }
 
+        /* NEW: Extend timer section */
+        .extend-timer-section {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 154, 158, 0.3);
+        }
+
+        .extend-timer-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* NEW: Winner announcement section */
+        .winner-announcement-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             .add-candidate-form {
                 flex-direction: column;
@@ -393,6 +419,10 @@
             .credential-item {
                 grid-template-columns: 1fr;
                 text-align: center;
+            }
+
+            .extend-timer-controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -554,6 +584,18 @@
                 </div>
             </div>
 
+            <!-- NEW: Extend Current Voting Session -->
+            <div id="extend-voting-section" class="extend-timer-section" style="display: none;">
+                <div class="position-header" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4); margin-bottom: 15px; border-radius: 10px;">
+                    <span>⏰ Extend Current Voting Session</span>
+                </div>
+                <div class="extend-timer-controls">
+                    <label style="font-weight: 600; color: #e55a4f;">Add Minutes:</label>
+                    <input type="number" id="extend-minutes" class="timer-input" min="1" max="120" placeholder="Enter minutes" style="width: 150px;">
+                    <button class="action-btn btn-warning" onclick="extendVotingTime()">🕒 Extend Voting</button>
+                </div>
+            </div>
+
             <div class="position-manager">
                 <div class="position-header">
                     <span>🚀 Quick Timer Actions</span>
@@ -587,6 +629,23 @@
                     <div class="action-buttons">
                         <button class="action-btn btn-primary" onclick="setCustomTimer()">⏰ Set Custom Timer</button>
                         <button class="action-btn btn-warning" onclick="clearSchedule()">🗑️ Clear Schedule</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Winner Announcement Section -->
+            <div class="winner-announcement-section">
+                <div class="position-header" style="background: transparent; padding: 10px 0;">
+                    <span>🏆 Winner Announcement Control</span>
+                </div>
+                <div class="timer-controls">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: white;">Announcement in X minutes:</label>
+                        <input type="number" id="announcement-minutes" class="timer-input" min="1" max="60" placeholder="Enter minutes">
+                    </div>
+                    <div style="display: flex; align-items: end; gap: 10px;">
+                        <button class="action-btn btn-success" onclick="setWinnerAnnouncement()">🎉 Set Announcement Timer</button>
+                        <button class="action-btn btn-warning" onclick="announceWinnersNow()">📢 Announce Now</button>
                     </div>
                 </div>
             </div>
@@ -928,6 +987,14 @@
                 
                 document.getElementById('current-election-status').textContent = status.status;
                 
+                // Show extend section only when voting is active
+                const extendSection = document.getElementById('extend-voting-section');
+                if (status.status === 'OPEN') {
+                    extendSection.style.display = 'block';
+                } else {
+                    extendSection.style.display = 'none';
+                }
+                
                 if (status.timeUntilStart > 0) {
                     const minutes = Math.floor(status.timeUntilStart / (1000 * 60));
                     document.getElementById('time-remaining').textContent = minutes + ' min until start';
@@ -953,6 +1020,33 @@
             if (electionStatusInterval) {
                 clearInterval(electionStatusInterval);
                 electionStatusInterval = null;
+            }
+        }
+
+        // NEW: Extend voting time function
+        async function extendVotingTime() {
+            const minutes = document.getElementById('extend-minutes').value;
+            
+            if (!minutes || minutes < 1) {
+                showMessage('Please enter a valid number of minutes to extend', 'error');
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/extend-voting-time', {
+                    additionalMinutes: parseInt(minutes)
+                });
+                
+                if (response.data.success) {
+                    showMessage(`Voting time extended by ${minutes} minutes!`, 'success');
+                    document.getElementById('extend-minutes').value = '';
+                    loadElectionStatus();
+                } else {
+                    showMessage(response.data.message || 'Error extending voting time', 'error');
+                }
+            } catch (error) {
+                console.error('Error extending voting time:', error);
+                showMessage('Error extending voting time', 'error');
             }
         }
 
@@ -1072,6 +1166,54 @@
             } catch (error) {
                 console.error('Error clearing schedule:', error);
                 showMessage('Error clearing schedule', 'error');
+            }
+        }
+
+        // NEW: Winner announcement functions
+        async function setWinnerAnnouncement() {
+            const minutes = document.getElementById('announcement-minutes').value;
+            
+            if (!minutes || minutes < 1) {
+                showMessage('Please enter a valid number of minutes for announcement', 'error');
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/set-winner-announcement', {
+                    action: 'setTimer',
+                    minutes: parseInt(minutes)
+                });
+                
+                if (response.data.success) {
+                    showMessage(`Winner announcement set for ${minutes} minutes!`, 'success');
+                    document.getElementById('announcement-minutes').value = '';
+                } else {
+                    showMessage(response.data.message || 'Error setting announcement timer', 'error');
+                }
+            } catch (error) {
+                console.error('Error setting announcement timer:', error);
+                showMessage('Error setting announcement timer', 'error');
+            }
+        }
+
+        async function announceWinnersNow() {
+            if (!confirm('Are you sure you want to announce winners immediately?')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/set-winner-announcement', {
+                    action: 'announceNow'
+                });
+                
+                if (response.data.success) {
+                    showMessage('Winners announced immediately!', 'success');
+                } else {
+                    showMessage(response.data.message || 'Error announcing winners', 'error');
+                }
+            } catch (error) {
+                console.error('Error announcing winners:', error);
+                showMessage('Error announcing winners', 'error');
             }
         }
 

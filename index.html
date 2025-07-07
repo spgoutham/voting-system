@@ -257,7 +257,7 @@
             cursor: pointer;
         }
 
-               /* Cosmic shimmer effect */
+        /* Cosmic shimmer effect */
         .nominee-card::before {
             content: '';
             position: absolute;
@@ -493,12 +493,22 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
+        .election-status-banner.pre-voting {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3436;
+        }
+
         .election-status-banner.open {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
         .election-status-banner.closed {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .election-status-banner.announcement {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: #2d3436;
         }
 
         .status-content {
@@ -562,6 +572,22 @@
             pointer-events: none;
         }
 
+        .voting-form.pre-voting {
+            /* Allow credential entry but disable voting */
+        }
+
+        .voting-form.pre-voting .candidates-container {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .voting-form.pre-voting .submit-btn {
+            background: #ffc107 !important;
+            color: #2d3436 !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .voting-form.disabled .submit-btn {
             background: #ccc !important;
             cursor: not-allowed;
@@ -578,96 +604,6 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
             text-transform: uppercase;
-        }
-
-        /* Leaderboard */
-        .leaderboard {
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .leaderboard h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffd700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .leaders {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .leader-card {
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
-            animation: slideInUp 0.5s ease;
-        }
-
-        .leader-card:hover {
-            transform: translateX(10px);
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .leader-rank {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffd700;
-            margin-right: 15px;
-            min-width: 30px;
-        }
-
-        .leader-info {
-            flex: 1;
-        }
-
-        .leader-name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-        }
-
-        .leader-position {
-            font-family: 'Exo 2', sans-serif;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 300;
-        }
-
-        .leader-votes {
-            font-weight: 700;
-            color: #4ecdc4;
-        }
-
-        .no-leaders {
-            text-align: center;
-            opacity: 0.7;
-            font-style: italic;
         }
 
         /* Form Styles */
@@ -707,6 +643,34 @@
 
         .form-group input::placeholder {
             color: rgba(255,255,255,0.5);
+        }
+
+        /* Credential validation status */
+        .credential-status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .credential-status.valid {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .credential-status.invalid {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .credential-status.checking {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         /* Position Sections */
@@ -750,6 +714,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            user-select: none;
+            position: relative;
         }
 
         .candidate-option label:hover {
@@ -809,7 +775,7 @@
             margin-top: 20px;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background: linear-gradient(135deg, #5a67d8, #6b46c1);
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
@@ -820,6 +786,92 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        /* Winner Announcement */
+        .winner-announcement {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            margin: 30px 0;
+        }
+
+        .winner-announcement h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .winners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.1));
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            animation: winnerGlow 2s ease-in-out infinite alternate;
+        }
+
+        .winner-card::before {
+            content: '👑';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            animation: crown-spin 3s linear infinite;
+        }
+
+        @keyframes winnerGlow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        @keyframes crown-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .winner-position {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ff8c00;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .winner-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .winner-votes {
+            font-size: 1rem;
+            color: #fff;
+            opacity: 0.9;
         }
 
         /* Results */
@@ -888,6 +940,31 @@
             color: #4ecdc4;
         }
 
+        /* Results Access Denied */
+        .results-denied {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 159, 243, 0.1));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .results-denied h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .results-denied p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
         /* Messages */
         .message {
             padding: 15px;
@@ -907,6 +984,12 @@
             background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(233, 30, 99, 0.2));
             color: #f44336;
             border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .message.warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         /* Loading */
@@ -969,14 +1052,12 @@
                 grid-template-columns: 1fr;
             }
 
-            .leader-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-
             .candidates-container {
                 padding: 15px;
+            }
+
+            .winners-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1009,6 +1090,11 @@
             <p>Your vote shapes the universe!</p>
         </div>
 
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
+            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
+            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
+        </div>
        
         <!-- Nominees Showcase Tab -->
         <div id="nominees-tab" class="tab-content active">
@@ -1032,11 +1118,7 @@
                 </div>
             </div>
         </div>
- <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('nominees')">Meet Nominees</button>
-            <button class="tab-btn" onclick="showTab('vote')">Cast Vote</button>
-            <button class="tab-btn" onclick="showTab('results')">Live Results</button>
-        </div>
+
         <!-- Voting Tab -->
         <div id="vote-tab" class="tab-content">
             <div class="voting-form">
@@ -1069,13 +1151,6 @@
                     </div>
                 </div>
                 
-                <div class="leaderboard">
-                    <h3>🌟 Current Leaders</h3>
-                    <div class="leaderboard-container" id="top-candidates">
-                        <!-- Top candidates will be loaded here -->
-                    </div>
-                </div>
-                
                 <form id="voting-form">
                     <div class="form-group">
                         <label for="registerNumber">Registration Number:</label>
@@ -1085,9 +1160,10 @@
                     <div class="form-group">
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <div id="credential-status" class="credential-status" style="display: none;"></div>
                     </div>
 
-                    <div id="candidates-container">
+                    <div id="candidates-container" class="candidates-container">
                         <!-- Candidate sections will be loaded dynamically -->
                         <div class="loading">
                             <div class="spinner"></div>
@@ -1095,7 +1171,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn">Launch Vote</button>
+                    <button type="submit" class="submit-btn" id="submit-btn">Launch Vote</button>
                 </form>
 
                 <div id="vote-message"></div>
@@ -1105,6 +1181,13 @@
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
             <h2 style="font-family: 'Orbitron', monospace; text-align: center; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-transform: uppercase;">Live Galactic Results</h2>
+            
+            <!-- Winner Announcement Display -->
+            <div id="winner-announcement" style="display: none;">
+                <!-- Winner announcement will be shown here -->
+            </div>
+
+            <!-- Results Container -->
             <div id="results-container">
                 <div class="loading">
                     <div class="spinner"></div>
@@ -1119,8 +1202,12 @@
         let hasVoted = false;
         let currentCandidates = {};
         let electionStatus = {};
+        let announcementStatus = {};
         let countdownInterval = null;
+        let announcementCountdownInterval = null;
         let nominees = [];
+        let credentialsValidated = false;
+        let preVotingMode = false;
 
         // Tab switching
         function showTab(tabName) {
@@ -1142,10 +1229,9 @@
 
             // Load appropriate content
             if (tabName === 'results') {
-                loadResults();
+                loadWinnerAnnouncement();
             } else if (tabName === 'vote') {
                 loadElectionStatus();
-                loadTopCandidates();
             } else if (tabName === 'nominees') {
                 loadNominees();
             }
@@ -1239,6 +1325,9 @@
                 
                 // Start countdown if needed
                 if (electionStatus.status === 'SCHEDULED' && electionStatus.timeUntilStart > 0) {
+                    if (electionStatus.timeUntilStart <= 60000) { // 1 minute or less
+                        enablePreVotingMode();
+                    }
                     startCountdown();
                 } else if (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd) {
                     startCountdownUntilEnd();
@@ -1256,6 +1345,22 @@
             }
         }
 
+        // Add real-time credential validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const regNumberInput = document.getElementById('registerNumber');
+            const passwordInput = document.getElementById('password');
+            
+            // Debounce validation to avoid too many API calls
+            let validationTimeout;
+            const debouncedValidation = () => {
+                clearTimeout(validationTimeout);
+                validationTimeout = setTimeout(validateCredentials, 500);
+            };
+            
+            regNumberInput.addEventListener('input', debouncedValidation);
+            passwordInput.addEventListener('input', debouncedValidation);
+        });
+
         // Update the election status display
         function updateElectionStatusDisplay() {
             const banner = document.getElementById('election-status-banner');
@@ -1267,28 +1372,41 @@
             banner.className = 'election-status-banner';
             if (electionStatus.status === 'SCHEDULED') {
                 banner.classList.add('waiting');
+            } else if (electionStatus.status === 'PRE_VOTING' || electionStatus.isPreVotingTime) {
+                banner.classList.add('pre-voting');
+                preVotingMode = true;
             } else if (electionStatus.status === 'OPEN') {
                 banner.classList.add('open');
+                preVotingMode = false;
             } else if (electionStatus.status === 'CLOSED') {
                 banner.classList.add('closed');
+                preVotingMode = false;
             }
             
             // Update status message
             statusMessage.textContent = electionStatus.message;
             
             // Show/hide countdown
-            if (electionStatus.status === 'SCHEDULED' || (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd)) {
+            if (electionStatus.status === 'SCHEDULED' || electionStatus.status === 'PRE_VOTING' || (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd)) {
                 countdownDisplay.style.display = 'block';
             } else {
                 countdownDisplay.style.display = 'none';
             }
             
             // Enable/disable voting form
-            if (electionStatus.votingAllowed) {
+            if (electionStatus.preVotingAllowed || electionStatus.votingAllowed) {
                 votingForm.classList.remove('disabled');
+                if (electionStatus.status === 'PRE_VOTING' || electionStatus.isPreVotingTime) {
+                    votingForm.classList.add('pre-voting');
+                } else {
+                    votingForm.classList.remove('pre-voting');
+                }
             } else {
                 votingForm.classList.add('disabled');
+                votingForm.classList.remove('pre-voting');
             }
+            
+            updateSubmitButton();
         }
 
         // Start countdown until voting starts
@@ -1349,6 +1467,96 @@
             countdownInterval = setInterval(updateCountdown, 1000);
         }
 
+        // Validate credentials in real-time
+        async function validateCredentials() {
+            const regNumber = document.getElementById('registerNumber').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const statusDiv = document.getElementById('credential-status');
+            
+            if (!regNumber || !password) {
+                statusDiv.style.display = 'none';
+                credentialsValidated = false;
+                updateSubmitButton();
+                return;
+            }
+
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'credential-status checking';
+            statusDiv.textContent = 'Checking credentials...';
+
+            try {
+                // Real validation against the backend
+                const response = await axios.post('/.netlify/functions/validate-credentials', {
+                    registerNumber: regNumber,
+                    password: password
+                });
+
+                if (response.data.success && response.data.valid) {
+                    if (response.data.alreadyVoted) {
+                        statusDiv.className = 'credential-status invalid';
+                        statusDiv.textContent = '❌ You have already voted!';
+                        credentialsValidated = false;
+                    } else if (response.data.canVote) {
+                        statusDiv.className = 'credential-status valid';
+                        statusDiv.textContent = '✅ Credentials validated - Ready to launch!';
+                        credentialsValidated = true;
+                    } else {
+                        statusDiv.className = 'credential-status invalid';
+                        statusDiv.textContent = '❌ Cannot vote at this time';
+                        credentialsValidated = false;
+                    }
+                } else {
+                    statusDiv.className = 'credential-status invalid';
+                    statusDiv.textContent = '❌ Invalid registration number or password';
+                    credentialsValidated = false;
+                }
+            } catch (error) {
+                console.error('Error validating credentials:', error);
+                // Fallback to format validation
+                const isValidFormat = /^142222243\d{3}$/.test(regNumber) && password.length >= 6;
+                
+                if (isValidFormat) {
+                    statusDiv.className = 'credential-status valid';
+                    statusDiv.textContent = '✅ Credentials format valid - Ready to launch!';
+                    credentialsValidated = true;
+                } else {
+                    statusDiv.className = 'credential-status invalid';
+                    statusDiv.textContent = '❌ Invalid format: Check registration number and password';
+                    credentialsValidated = false;
+                }
+            }
+            
+            updateSubmitButton();
+        }
+
+        // Update submit button state
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (preVotingMode) {
+                if (credentialsValidated) {
+                    submitBtn.textContent = 'Ready to Vote - Waiting for Window';
+                    submitBtn.style.background = 'linear-gradient(135deg, #ffc107, #ff8c00)';
+                    submitBtn.style.color = '#2d3436';
+                } else {
+                    submitBtn.textContent = 'Enter Valid Credentials';
+                    submitBtn.style.background = '#ccc';
+                }
+            } else if (electionStatus.votingAllowed) {
+                if (credentialsValidated) {
+                    submitBtn.textContent = 'Launch Vote';
+                    submitBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                    submitBtn.style.color = 'white';
+                } else {
+                    submitBtn.textContent = 'Enter Valid Credentials';
+                    submitBtn.style.background = '#ccc';
+                }
+            } else {
+                submitBtn.textContent = 'Voting Not Available';
+                submitBtn.style.background = '#ccc';
+            }
+        }
+
         // Load candidates from backend
         async function loadCandidates() {
             try {
@@ -1399,8 +1607,8 @@
 
                     html += `
                         <div class="candidate-option">
-                            <input type="radio" name="${position}" value="${candidate}" required>
-                            <label>
+                            <input type="radio" id="${position}_${index}" name="${position}" value="${candidate}" required>
+                            <label for="${position}_${index}">
                                 <span class="candidate-name">${candidate}</span>
                                 ${tag}
                             </label>
@@ -1414,6 +1622,174 @@
             container.innerHTML = html;
         }
 
+        // Load winner announcement status
+        async function loadWinnerAnnouncement() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-winner-announcement');
+                announcementStatus = response.data;
+                updateAnnouncementDisplay();
+                
+                // Clear any existing announcement countdown interval
+                if (announcementCountdownInterval) {
+                    clearInterval(announcementCountdownInterval);
+                }
+                
+                // Start countdown if needed
+                if (announcementStatus.status === 'SCHEDULED' && announcementStatus.timeUntilAnnouncement > 0) {
+                    startAnnouncementCountdown();
+                } else if (announcementStatus.isAnnounced && announcementStatus.winners) {
+                    displayWinners();
+                } else if (announcementStatus.canViewResults) {
+                    loadResults();
+                } else {
+                    displayResultsAccessDenied();
+                }
+                
+            } catch (error) {
+                console.error('Error loading winner announcement:', error);
+                // Default to allowing results if can't check status
+                loadResults();
+            }
+        }
+
+        // Update announcement display
+        function updateAnnouncementDisplay() {
+            const announcementDiv = document.getElementById('winner-announcement');
+            const resultsContainer = document.getElementById('results-container');
+            
+            if (announcementStatus.status === 'SCHEDULED' && !announcementStatus.isAnnounced) {
+                // Show countdown to announcement
+                announcementDiv.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                
+                announcementDiv.innerHTML = `
+                    <div class="election-status-banner announcement">
+                        <div class="status-content">
+                            <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;">
+                                🎉 Winner Announcement Coming Soon! 🎉
+                            </div>
+                            <div class="countdown-display">
+                                <div class="countdown-timer">
+                                    <div class="time-unit">
+                                        <span id="announce-days" class="time-value">00</span>
+                                        <span class="time-label">Days</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="announce-hours" class="time-value">00</span>
+                                        <span class="time-label">Hours</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="announce-minutes" class="time-value">00</span>
+                                        <span class="time-label">Minutes</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span id="announce-seconds" class="time-value">00</span>
+                                        <span class="time-label">Seconds</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (announcementStatus.isAnnounced && announcementStatus.winners) {
+                // Show winners
+                announcementDiv.style.display = 'block';
+                resultsContainer.style.display = 'block';
+                displayWinners();
+            } else if (announcementStatus.canViewResults) {
+                // Show regular results
+                announcementDiv.style.display = 'none';
+                resultsContainer.style.display = 'block';
+            } else {
+                // Access denied
+                announcementDiv.style.display = 'none';
+                resultsContainer.style.display = 'block';
+            }
+        }
+
+        // Start countdown to announcement
+        function startAnnouncementCountdown() {
+            const updateCountdown = () => {
+                if (announcementStatus.timeUntilAnnouncement <= 0) {
+                    clearInterval(announcementCountdownInterval);
+                    loadWinnerAnnouncement(); // Refresh status
+                    return;
+                }
+                
+                const totalSeconds = Math.floor(announcementStatus.timeUntilAnnouncement / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                const daysEl = document.getElementById('announce-days');
+                const hoursEl = document.getElementById('announce-hours');
+                const minutesEl = document.getElementById('announce-minutes');
+                const secondsEl = document.getElementById('announce-seconds');
+                
+                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                
+                // Update the time remaining
+                announcementStatus.timeUntilAnnouncement -= 1000;
+            };
+            
+            updateCountdown(); // Initial call
+            announcementCountdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Display winners with effects
+        function displayWinners() {
+            const announcementDiv = document.getElementById('winner-announcement');
+            const winners = announcementStatus.winners.winners;
+            
+            let winnersHtml = `
+                <div class="winner-announcement">
+                    <h2>🏆 GALACTIC CHAMPIONS REVEALED! 🏆</h2>
+                    <div class="winners-grid">
+            `;
+
+            Object.entries(winners).forEach(([position, winner]) => {
+                const positionTitles = {
+                    president: 'Galactic President',
+                    secretary: 'Cosmic Secretary',
+                    treasurer: 'Nebula Treasurer'
+                };
+
+                winnersHtml += `
+                    <div class="winner-card">
+                        <div class="winner-position">${positionTitles[position]}</div>
+                        <div class="winner-name">${winner.name}</div>
+                        <div class="winner-votes">${winner.votes} votes</div>
+                    </div>
+                `;
+            });
+
+            winnersHtml += `
+                    </div>
+                    <div style="margin-top: 30px; font-size: 1.1rem; opacity: 0.9;">
+                        🌟 Congratulations to our new galactic leaders! 🌟
+                    </div>
+                </div>
+            `;
+
+            announcementDiv.innerHTML = winnersHtml;
+        }
+
+        // Display access denied message
+        function displayResultsAccessDenied() {
+            const container = document.getElementById('results-container');
+            container.innerHTML = `
+                <div class="results-denied">
+                    <h2>🔒 Results Sealed</h2>
+                    <p>The cosmic ballot box is sealed until the official winner announcement.</p>
+                    <p>Stay tuned for the grand reveal! ✨</p>
+                </div>
+            `;
+        }
+
         // Form submission
         document.getElementById('voting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1423,9 +1799,21 @@
                 return;
             }
 
+            // Check if in pre-voting mode
+            if (preVotingMode || electionStatus.status === 'PRE_VOTING' || electionStatus.isPreVotingTime) {
+                showMessage('Voting window has not opened yet. Your credentials are ready!', 'warning');
+                return;
+            }
+
             // Check if voting is currently allowed
             if (!electionStatus.votingAllowed) {
                 showMessage('Voting is not currently allowed. ' + electionStatus.message, 'error');
+                return;
+            }
+
+            // Check if credentials are validated
+            if (!credentialsValidated) {
+                showMessage('Please enter valid credentials first.', 'error');
                 return;
             }
 
@@ -1465,11 +1853,14 @@
                     hasVoted = true;
                     document.getElementById('voting-form').reset();
                     submitBtn.textContent = 'Vote Launched';
-                    loadTopCandidates();
+                    
+                    // Clear credential status
+                    document.getElementById('credential-status').style.display = 'none';
+                    credentialsValidated = false;
                 } else {
                     showMessage(response.data.message || 'Error launching vote', 'error');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Launch Vote';
+                    updateSubmitButton();
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1479,69 +1870,9 @@
                 }
                 showMessage(errorMessage, 'error');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Launch Vote';
+                updateSubmitButton();
             }
         });
-
-        // Load top candidates for leaderboard
-        async function loadTopCandidates() {
-            try {
-                const response = await axios.get('/.netlify/functions/get-results');
-                const results = response.data;
-                displayTopCandidates(results);
-            } catch (error) {
-                console.error('Error loading top candidates:', error);
-            }
-        }
-
-        // Display top candidates in leaderboard
-        function displayTopCandidates(results) {
-            const container = document.getElementById('top-candidates');
-            const positions = ['president', 'secretary', 'treasurer'];
-            
-            let topCandidates = [];
-            
-            positions.forEach(position => {
-                const positionResults = results[position] || {};
-                const candidates = Object.entries(positionResults)
-                    .map(([name, votes]) => ({ name, votes, position }));
-                
-                topCandidates = topCandidates.concat(candidates);
-            });
-            
-            // Sort by votes descending and take top 3
-            topCandidates.sort((a, b) => b.votes - a.votes);
-            const top3 = topCandidates.slice(0, 3);
-            
-            let html = '';
-            
-            if (top3.length > 0) {
-                html = '<div class="leaders">';
-                top3.forEach((candidate, index) => {
-                    const positionName = {
-                        president: 'President',
-                        secretary: 'Secretary',
-                        treasurer: 'Treasurer'
-                    }[candidate.position];
-                    
-                    html += `
-                        <div class="leader-card" style="animation-delay: ${index * 0.2}s">
-                            <div class="leader-rank">${index + 1}</div>
-                            <div class="leader-info">
-                                <div class="leader-name">${candidate.name}</div>
-                                <div class="leader-position">${positionName}</div>
-                            </div>
-                            <div class="leader-votes">${candidate.votes} votes</div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            } else {
-                html = '<p class="no-leaders">No votes yet. Be the first to vote!</p>';
-            }
-            
-            container.innerHTML = html;
-        }
 
         // Load results
         async function loadResults() {
@@ -1621,21 +1952,15 @@
             }, 5000);
         }
 
+
+
         // Initialize on page load
         window.addEventListener('load', async () => {
             await loadNominees(); // Load nominees first for default tab
             await loadElectionStatus(); // Load election status
             await loadCandidates(); // Load candidates
-            loadResults();
-            loadTopCandidates();
+            loadWinnerAnnouncement();
         });
-
-        // Auto-refresh results every 30 seconds when on results tab
-        setInterval(() => {
-            if (document.getElementById('results-tab').classList.contains('active')) {
-                loadResults();
-            }
-        }, 30000);
 
         // Auto-refresh election status every 10 seconds
         setInterval(() => {
@@ -1644,13 +1969,25 @@
             }
         }, 10000);
 
+        // Auto-refresh winner announcement every 30 seconds when on results tab
+        setInterval(() => {
+            if (document.getElementById('results-tab').classList.contains('active')) {
+                loadWinnerAnnouncement();
+            }
+        }, 30000);
+
         // Auto-refresh nominees every 60 seconds when on nominees tab
         setInterval(() => {
             if (document.getElementById('nominees-tab').classList.contains('active')) {
                 loadNominees();
             }
         }, 60000);
+
+        // Clean up intervals when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            if (announcementCountdownInterval) clearInterval(announcementCountdownInterval);
+        });
     </script>
 </body>
-
 </html>

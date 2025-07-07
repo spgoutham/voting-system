@@ -34,23 +34,14 @@ exports.handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { registerNumber, password, votes } = JSON.parse(event.body);
+    const { registerNumber, password, votes, preValidateOnly } = JSON.parse(event.body);
 
     // Validate input
-    if (!registerNumber || !password || !votes) {
+    if (!registerNumber || !password) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, message: 'Registration number, password, and votes are required' })
-      };
-    }
-
-    // Validate votes structure
-    if (!votes.president || !votes.secretary || !votes.treasurer) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ success: false, message: 'All positions must be voted for' })
+        body: JSON.stringify({ success: false, message: 'Registration number and password are required' })
       };
     }
 
@@ -64,42 +55,7 @@ exports.handler = async (event, context) => {
     const votersCollection = db.collection('voters');
     const scheduleCollection = db.collection('election_schedule');
 
-    // Check if voting is currently allowed based on schedule
-    const schedule = await scheduleCollection.findOne({ _id: 'current_schedule' });
-    const now = new Date();
-
-    if (schedule) {
-      const startTime = new Date(schedule.startTime);
-      const endTime = schedule.endTime ? new Date(schedule.endTime) : null;
-
-      if (now < startTime) {
-        return {
-          statusCode: 403,
-          headers,
-          body: JSON.stringify({ 
-            success: false, 
-            message: 'Voting has not started yet. Please wait for the scheduled time.',
-            status: 'NOT_STARTED',
-            startTime: startTime
-          })
-        };
-      }
-
-      if (endTime && now > endTime) {
-        return {
-          statusCode: 403,
-          headers,
-          body: JSON.stringify({ 
-            success: false, 
-            message: 'Voting has ended.',
-            status: 'ENDED',
-            endTime: endTime
-          })
-        };
-      }
-    }
-
-    // Validate credentials on server side
+    // Validate credentials first
     const userCredential = await credentialsCollection.findOne({
       regNumber: registerNumber.toString(),
       password: password,
@@ -148,6 +104,63 @@ exports.handler = async (event, context) => {
           success: false, 
           message: 'You have already voted!' 
         })
+      };
+    }
+
+    // If this is just a pre-validation request, return success
+    if (preValidateOnly) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Credentials validated successfully',
+          preValidated: true
+        })
+      };
+    }
+
+    // Check if voting is currently allowed based on schedule
+    const schedule = await scheduleCollection.findOne({ _id: 'current_schedule' });
+    const now = new Date();
+
+    if (schedule) {
+      const startTime = new Date(schedule.startTime);
+      const endTime = schedule.endTime ? new Date(schedule.endTime) : null;
+
+      if (now < startTime) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Voting has not started yet. Please wait for the scheduled time.',
+            status: 'NOT_STARTED',
+            startTime: startTime
+          })
+        };
+      }
+
+      if (endTime && now > endTime) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Voting has ended.',
+            status: 'ENDED',
+            endTime: endTime
+          })
+        };
+      }
+    }
+
+    // Validate votes structure for actual voting
+    if (!votes || !votes.president || !votes.secretary || !votes.treasurer) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: 'All positions must be voted for' })
       };
     }
 

@@ -54,7 +54,9 @@ exports.handler = async (event, context) => {
       timeUntilEnd: null,
       startTime: null,
       endTime: null,
-      hasSchedule: false
+      hasSchedule: false,
+      preVotingAllowed: false,
+      isPreVotingTime: false
     };
 
     if (schedule) {
@@ -65,11 +67,40 @@ exports.handler = async (event, context) => {
       const startTime = new Date(schedule.startTime);
       const endTime = schedule.endTime ? new Date(schedule.endTime) : null;
 
-      if (now < startTime) {
-        // Voting hasn't started yet
+      // Pre-voting time: 1 minute before start time
+      const preVotingTime = new Date(startTime.getTime() - (1 * 60 * 1000));
+
+      if (now < preVotingTime) {
+        // Before pre-voting time
         electionStatus.votingAllowed = false;
+        electionStatus.preVotingAllowed = false;
+        electionStatus.isPreVotingTime = false;
         electionStatus.status = 'SCHEDULED';
         electionStatus.message = 'Voting has not started yet';
+        electionStatus.timeUntilStart = Math.max(0, startTime.getTime() - now.getTime());
+        
+        // Calculate countdown values
+        const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        electionStatus.countdown = {
+          days,
+          hours,
+          minutes,
+          seconds,
+          totalSeconds
+        };
+
+      } else if (now >= preVotingTime && now < startTime) {
+        // Pre-voting time (1 minute before voting starts)
+        electionStatus.votingAllowed = false;
+        electionStatus.preVotingAllowed = true;
+        electionStatus.isPreVotingTime = true;
+        electionStatus.status = 'PRE_VOTING';
+        electionStatus.message = 'Get Ready! Enter your credentials now - Voting starts soon!';
         electionStatus.timeUntilStart = Math.max(0, startTime.getTime() - now.getTime());
         
         // Calculate countdown values
@@ -90,12 +121,16 @@ exports.handler = async (event, context) => {
       } else if (endTime && now > endTime) {
         // Voting has ended
         electionStatus.votingAllowed = false;
+        electionStatus.preVotingAllowed = false;
+        electionStatus.isPreVotingTime = false;
         electionStatus.status = 'CLOSED';
         electionStatus.message = 'Voting has ended';
 
       } else if (endTime && now >= startTime && now <= endTime) {
         // Voting is currently active with end time
         electionStatus.votingAllowed = true;
+        electionStatus.preVotingAllowed = true;
+        electionStatus.isPreVotingTime = false;
         electionStatus.status = 'OPEN';
         electionStatus.message = 'Voting is currently open';
         electionStatus.timeUntilEnd = Math.max(0, endTime.getTime() - now.getTime());
@@ -118,15 +153,22 @@ exports.handler = async (event, context) => {
       } else if (now >= startTime && !endTime) {
         // Voting started, no end time set
         electionStatus.votingAllowed = true;
+        electionStatus.preVotingAllowed = true;
+        electionStatus.isPreVotingTime = false;
         electionStatus.status = 'OPEN';
         electionStatus.message = 'Voting is currently open';
 
       } else {
         // Edge case: schedule exists but voting is disabled
         electionStatus.votingAllowed = false;
+        electionStatus.preVotingAllowed = false;
+        electionStatus.isPreVotingTime = false;
         electionStatus.status = 'DISABLED';
         electionStatus.message = 'Voting is currently disabled';
       }
+    } else {
+      // No schedule - always allow voting and pre-voting
+      electionStatus.preVotingAllowed = true;
     }
 
     return {
@@ -150,7 +192,9 @@ exports.handler = async (event, context) => {
         timeUntilEnd: null,
         startTime: null,
         endTime: null,
-        hasSchedule: false
+        hasSchedule: false,
+        preVotingAllowed: true,
+        isPreVotingTime: false
       })
     };
   } finally {

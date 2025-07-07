@@ -44,6 +44,8 @@ exports.handler = async (event, context) => {
     const schedule = await scheduleCollection.findOne({ _id: 'current_schedule' });
 
     const now = new Date();
+    console.log('⏰ Server time:', now.toISOString());
+    
     let electionStatus = {
       currentTime: now,
       votingAllowed: true,
@@ -60,15 +62,24 @@ exports.handler = async (event, context) => {
     };
 
     if (schedule) {
+      console.log('📅 Schedule found:', JSON.stringify(schedule));
       electionStatus.hasSchedule = true;
       electionStatus.startTime = schedule.startTime;
       electionStatus.endTime = schedule.endTime;
 
       const startTime = new Date(schedule.startTime);
       const endTime = schedule.endTime ? new Date(schedule.endTime) : null;
+      
+      console.log('🚀 Start time:', startTime.toISOString());
+      console.log('🏁 End time:', endTime ? endTime.toISOString() : 'No end time');
 
       // Pre-voting time: 1 minute before start time
       const preVotingTime = new Date(startTime.getTime() - (1 * 60 * 1000));
+      console.log('⏳ Pre-voting time:', preVotingTime.toISOString());
+      
+      const timeUntilStartMs = startTime.getTime() - now.getTime();
+      console.log('⏰ Time until start (raw ms):', timeUntilStartMs);
+      console.log('⏰ Time until start (seconds):', Math.floor(timeUntilStartMs / 1000));
 
       if (now < preVotingTime) {
         // Before pre-voting time
@@ -77,7 +88,9 @@ exports.handler = async (event, context) => {
         electionStatus.isPreVotingTime = false;
         electionStatus.status = 'SCHEDULED';
         electionStatus.message = 'Voting has not started yet';
-        electionStatus.timeUntilStart = Math.max(0, startTime.getTime() - now.getTime());
+        electionStatus.timeUntilStart = Math.max(0, timeUntilStartMs);
+        
+        console.log('📊 Status: SCHEDULED, timeUntilStart:', electionStatus.timeUntilStart);
         
         // Calculate countdown values
         const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
@@ -85,6 +98,8 @@ exports.handler = async (event, context) => {
         const hours = Math.floor((totalSeconds % 86400) / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
+        
+        console.log(`⏱️ Countdown breakdown: ${days}d ${hours}h ${minutes}m ${seconds}s`);
         
         electionStatus.countdown = {
           days,
@@ -101,7 +116,9 @@ exports.handler = async (event, context) => {
         electionStatus.isPreVotingTime = true;
         electionStatus.status = 'PRE_VOTING';
         electionStatus.message = 'Get Ready! Enter your credentials now - Voting starts soon!';
-        electionStatus.timeUntilStart = Math.max(0, startTime.getTime() - now.getTime());
+        electionStatus.timeUntilStart = Math.max(0, timeUntilStartMs);
+        
+        console.log('📊 Status: PRE_VOTING, timeUntilStart:', electionStatus.timeUntilStart);
         
         // Calculate countdown values
         const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
@@ -109,6 +126,8 @@ exports.handler = async (event, context) => {
         const hours = Math.floor((totalSeconds % 86400) / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
+        
+        console.log(`⏱️ Pre-voting countdown: ${days}d ${hours}h ${minutes}m ${seconds}s`);
         
         electionStatus.countdown = {
           days,

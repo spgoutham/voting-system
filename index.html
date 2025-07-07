@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Symposium Election 2025</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
-    <!-- Professional Google Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset and Base Styles */
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -18,56 +18,18 @@
         }
 
         body {
-            font-family: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0a0a20;
             color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
-            font-weight: 400;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 30%, rgba(30, 144, 255, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 30%);
         }
 
-        /* Enhanced Animated Star Background */
-        .stars, .twinkling, .cosmic-dust {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            pointer-events: none;
-        }
-
-        .stars {
-            background: #000 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="0.5" fill="white"/><circle cx="30" cy="25" r="0.3" fill="white"/><circle cx="50" cy="40" r="0.4" fill="white"/><circle cx="70" cy="15" r="0.2" fill="white"/><circle cx="90" cy="35" r="0.5" fill="white"/><circle cx="20" cy="60" r="0.3" fill="white"/><circle cx="40" cy="80" r="0.4" fill="white"/><circle cx="60" cy="70" r="0.2" fill="white"/><circle cx="80" cy="90" r="0.3" fill="white"/></svg>') repeat;
-            z-index: -3;
-        }
-
-        .twinkling {
-            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="15" cy="20" r="0.8" fill="white" opacity="0.8"/><circle cx="35" cy="55" r="0.6" fill="white" opacity="0.6"/><circle cx="75" cy="30" r="0.7" fill="white" opacity="0.7"/><circle cx="25" cy="80" r="0.5" fill="white" opacity="0.9"/><circle cx="85" cy="65" r="0.4" fill="white" opacity="0.5"/></svg>') repeat;
-            animation: move-twink-back 200s linear infinite;
-            z-index: -2;
-        }
-
-        .cosmic-dust {
-            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="5" cy="5" r="0.2" fill="%23ff6b6b" opacity="0.6"/><circle cx="25" cy="35" r="0.1" fill="%234ecdc4" opacity="0.8"/><circle cx="45" cy="15" r="0.15" fill="%23ffd700" opacity="0.7"/><circle cx="65" cy="55" r="0.2" fill="%23ff9ff3" opacity="0.5"/><circle cx="85" cy="25" r="0.1" fill="%2300d2d3" opacity="0.9"/></svg>') repeat;
-            animation: move-cosmic-dust 300s linear infinite reverse;
-            z-index: -1;
-        }
-
-        @keyframes move-twink-back {
-            from {transform: translateX(0px);}
-            to {transform: translateX(-10000px);}
-        }
-
-        @keyframes move-cosmic-dust {
-            from {transform: translateX(0px) translateY(0px);}
-            to {transform: translateX(-5000px) translateY(-2000px);}
-        }
-
-        /* Main Container */
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -76,58 +38,35 @@
             z-index: 1;
         }
 
-        /* Enhanced Header */
+        /* Header */
         .header {
             text-align: center;
             margin-bottom: 40px;
             padding: 40px 20px;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(30, 144, 255, 0.15), rgba(255, 107, 107, 0.1));
+            background: rgba(10, 10, 40, 0.7);
             border-radius: 20px;
-            backdrop-filter: blur(15px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: rotate-gradient 10s linear infinite;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .header h1 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Orbitron', sans-serif;
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #ff9ff3);
-            background-size: 400% 400%;
+            background: linear-gradient(45deg, #8a2be2, #1e90ff, #ff6b6b);
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
-            position: relative;
-            z-index: 1;
+            animation: gradientShift 5s ease infinite;
             letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         .header p {
-            font-family: 'Exo 2', sans-serif;
             font-size: 1.2rem;
-            font-weight: 300;
             opacity: 0.9;
-            position: relative;
-            z-index: 1;
             letter-spacing: 1px;
-        }
-
-        @keyframes rotate-gradient {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         @keyframes gradientShift {
@@ -145,59 +84,40 @@
         }
 
         .tab-btn {
-            font-family: 'Rajdhani', sans-serif;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 2px solid rgba(255,255,255,0.2);
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
             color: white;
             padding: 12px 25px;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .tab-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .tab-btn:hover::before {
-            left: 100%;
+        .tab-btn:hover {
+            background: rgba(30, 144, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: #667eea;
+            background: linear-gradient(135deg, #8a2be2, #1e90ff);
+            border-color: #8a2be2;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .tab-btn:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
         }
 
         /* Tab Content */
         .tab-content {
             display: none;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            background: rgba(10, 10, 40, 0.7);
             border-radius: 20px;
             padding: 30px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .tab-content.active {
@@ -206,35 +126,29 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Enhanced Nominees Showcase */
+        /* Nominees Section */
         .nominees-showcase {
             text-align: center;
             margin-bottom: 40px;
         }
 
         .nominees-showcase h2 {
-            font-family: 'Exo 2', sans-serif;
-            font-size: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #8a2be2;
             letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         .nominees-subtitle {
-            font-family: 'Exo 2', sans-serif;
             font-size: 1.1rem;
-            font-weight: 300;
             opacity: 0.8;
             margin-bottom: 30px;
-            letter-spacing: 0.5px;
         }
 
         .nominees-grid {
@@ -244,271 +158,68 @@
             margin-bottom: 30px;
         }
 
-        /* ENHANCED NOMINEE CARD WITH CINEMATIC EFFECTS */
         .nominee-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            background: rgba(30, 144, 255, 0.1);
             padding: 25px;
             border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        /* Cosmic shimmer effect */
-        .nominee-card::before {
-            content: '';
-            position: absolute;
-            top: -100%;
-            left: -100%;
-            width: 300%;
-            height: 300%;
-            background: conic-gradient(
-                transparent,
-                rgba(255, 107, 107, 0.3),
-                rgba(78, 205, 196, 0.3),
-                rgba(255, 215, 0, 0.3),
-                rgba(255, 159, 243, 0.3),
-                transparent
-            );
-            border-radius: 50%;
-            animation: rotate-shimmer 8s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nominee-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Particle trail effect */
-        .nominee-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.3), 
-                rgba(255, 215, 0, 0.5),
-                rgba(255,255,255,0.3), 
-                transparent
-            );
-            animation: cosmic-sweep 3s ease-in-out infinite;
-        }
-
-        @keyframes rotate-shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes cosmic-sweep {
-            0% { left: -100%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { left: 100%; opacity: 0; }
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            transition: all 0.3s ease;
         }
 
         .nominee-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.3),
-                0 0 30px rgba(255, 215, 0, 0.4),
-                inset 0 0 20px rgba(255,255,255,0.1);
-            border-color: rgba(255, 215, 0, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(30, 144, 255, 0.2);
+            border-color: #8a2be2;
         }
 
-        /* CINEMATIC NOMINEE NAME WITH TWINKLING STARS */
         .nominee-name {
-            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 15px;
             color: #fff;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: gentle-glow 2s ease-in-out infinite alternate;
-            letter-spacing: 0.5px;
-            text-transform: capitalize;
-        }
-
-        /* Star sparkle effects around nominee names */
-        .nominee-name::before,
-        .nominee-name::after {
-            content: '✦';
-            position: absolute;
-            color: #ffd700;
-            font-size: 1.2rem;
-            animation: twinkle 2s ease-in-out infinite;
-            opacity: 0;
-        }
-
-        .nominee-name::before {
-            top: -10px;
-            left: -15px;
-            animation-delay: 0s;
-        }
-
-        .nominee-name::after {
-            bottom: -10px;
-            right: -15px;
-            animation-delay: 1s;
-        }
-
-        /* Additional floating stars */
-        .nominee-card:hover .nominee-name::before,
-        .nominee-card:hover .nominee-name::after {
-            animation: floating-stars 3s ease-in-out infinite;
-        }
-
-        @keyframes gentle-glow {
-            0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4); }
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
-            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
-        }
-
-        @keyframes floating-stars {
-            0% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.8) rotate(0deg);
-            }
-            25% { 
-                opacity: 1; 
-                transform: translateY(-10px) scale(1.1) rotate(90deg);
-            }
-            50% { 
-                opacity: 0.8; 
-                transform: translateY(-15px) scale(1.3) rotate(180deg);
-            }
-            75% { 
-                opacity: 1; 
-                transform: translateY(-10px) scale(1.1) rotate(270deg);
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.8) rotate(360deg);
-            }
-        }
-
-        /* Enhanced sparkle particles */
-        .sparkle-particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 0.8rem;
-            color: #ffd700;
-            animation: sparkle-dance 4s ease-in-out infinite;
-            opacity: 0;
-        }
-
-        .sparkle-particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .sparkle-particle:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
-        .sparkle-particle:nth-child(3) { top: 30%; left: 70%; animation-delay: 2s; }
-        .sparkle-particle:nth-child(4) { top: 80%; left: 20%; animation-delay: 3s; }
-        .sparkle-particle:nth-child(5) { top: 50%; left: 50%; animation-delay: 1.5s; }
-
-        @keyframes sparkle-dance {
-            0%, 100% { 
-                opacity: 0; 
-                transform: translateY(0px) scale(0.5);
-            }
-            20% { 
-                opacity: 1; 
-                transform: translateY(-20px) scale(1);
-            }
-            40% { 
-                opacity: 0.7; 
-                transform: translateY(-30px) scale(1.2);
-            }
-            60% { 
-                opacity: 1; 
-                transform: translateY(-20px) scale(1);
-            }
-            80% { 
-                opacity: 0.5; 
-                transform: translateY(-10px) scale(0.8);
-            }
-        }
-
-        /* Add sparkles on hover */
-        .nominee-card:hover .sparkle-particle {
-            animation-play-state: running;
         }
 
         .nominee-tag {
-            font-family: 'Rajdhani', sans-serif;
             display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 8px 15px;
+            background: rgba(138, 43, 226, 0.2);
+            color: #8a2be2;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            text-transform: uppercase;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            animation: tag-pulse 3s ease-in-out infinite;
-            letter-spacing: 1px;
-        }
-
-        @keyframes tag-pulse {
-            0%, 100% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
-        }
-
-        .nominees-reveal {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1));
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 30px;
-        }
-
-        .reveal-text {
-            font-size: 1.1rem;
-            color: #ffc107;
-            font-weight: 600;
+            border: 1px solid rgba(138, 43, 226, 0.3);
         }
 
         /* Election Status Banner */
         .election-status-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .election-status-banner.waiting {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #4b1248, #f0c27b);
         }
 
         .election-status-banner.pre-voting {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
-            color: #2d3436;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: #000;
         }
 
         .election-status-banner.open {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #1e90ff, #00bfff);
         }
 
         .election-status-banner.closed {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            background: linear-gradient(135deg, #00b09b, #96c93d);
         }
 
         .election-status-banner.announcement {
-            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
-            color: #2d3436;
+            background: linear-gradient(135deg, #8a2be2, #ff6b6b);
         }
 
         .status-content {
@@ -519,10 +230,8 @@
         }
 
         #status-message {
-            font-family: 'Exo 2', sans-serif;
             font-size: 1.2rem;
             font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             letter-spacing: 0.5px;
         }
 
@@ -534,7 +243,7 @@
         .countdown-timer {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
@@ -543,11 +252,11 @@
             padding: 15px;
             border-radius: 10px;
             min-width: 70px;
-            backdrop-filter: blur(10px);
         }
 
         .time-value {
             display: block;
+            font-family: 'Orbitron', sans-serif;
             font-size: 2rem;
             font-weight: 700;
             line-height: 1;
@@ -572,38 +281,13 @@
             pointer-events: none;
         }
 
-        .voting-form.pre-voting {
-            /* Allow credential entry but disable voting */
-        }
-
-        .voting-form.pre-voting .candidates-container {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .voting-form.pre-voting .submit-btn {
-            background: #ffc107 !important;
-            color: #2d3436 !important;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .voting-form.disabled .submit-btn {
-            background: #ccc !important;
-            cursor: not-allowed;
-        }
-
         .voting-form h2 {
-            font-family: 'Orbitron', monospace;
+            font-family: 'Orbitron', sans-serif;
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+            color: #8a2be2;
             letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         /* Form Styles */
@@ -612,33 +296,28 @@
         }
 
         .form-group label {
-            font-family: 'Rajdhani', sans-serif;
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #fff;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            font-size: 1rem;
         }
 
         .form-group input {
             width: 100%;
             padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
             color: white;
             font-size: 1rem;
-            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            background: rgba(255,255,255,0.15);
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
         }
 
         .form-group input::placeholder {
@@ -676,23 +355,20 @@
         /* Position Sections */
         .position-section {
             margin-bottom: 35px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            background: rgba(30, 144, 255, 0.05);
             border-radius: 15px;
             padding: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(30, 144, 255, 0.2);
         }
 
         .position-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.4rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #8a2be2;
             letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         .candidate-option {
@@ -708,33 +384,27 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            user-select: none;
-            position: relative;
         }
 
         .candidate-option label:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
+            background: rgba(30, 144, 255, 0.2);
+            border-color: #8a2be2;
         }
 
         .candidate-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: #667eea;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(30, 144, 255, 0.3));
+            border-color: #8a2be2;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
         }
 
         .candidate-name {
-            font-family: 'Space Grotesk', sans-serif;
             font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
         }
 
         .candidate-tag {
@@ -742,71 +412,99 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .candidate-tag.popular {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
         }
 
         .candidate-tag.rising {
-            background: linear-gradient(135deg, #4ecdc4, #00d2d3);
+            background: rgba(30, 144, 255, 0.2);
+            color: #1e90ff;
+            border: 1px solid rgba(30, 144, 255, 0.3);
         }
 
         .candidate-tag.new {
-            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            background: rgba(138, 43, 226, 0.2);
+            color: #8a2be2;
+            border: 1px solid rgba(138, 43, 226, 0.3);
         }
 
         /* Submit Button */
         .submit-btn {
-            font-family: 'Rajdhani', sans-serif;
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 15px;
+            background: linear-gradient(135deg, #8a2be2, #1e90ff);
             color: white;
             border: none;
-            border-radius: 15px;
-            font-size: 1.3rem;
-            font-weight: 700;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             margin-top: 20px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .submit-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #5a67d8, #6b46c1);
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #7b1fa2, #1565c0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
         }
 
         .submit-btn:disabled {
             background: #666;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
         /* Winner Announcement */
         .winner-announcement {
             text-align: center;
             padding: 40px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(30, 144, 255, 0.2));
             border-radius: 20px;
-            border: 2px solid rgba(255, 215, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.5);
             margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .winner-announcement::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(138, 43, 226, 0.1) 10px,
+                    rgba(138, 43, 226, 0.1) 20px
+                );
+            animation: shine 10s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes shine {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50%, 50%); }
         }
 
         .winner-announcement h2 {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
             font-weight: 900;
             margin-bottom: 30px;
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            background: linear-gradient(45deg, #8a2be2, #1e90ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
             letter-spacing: 2px;
         }
 
@@ -818,13 +516,29 @@
         }
 
         .winner-card {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.1));
+            background: rgba(30, 144, 255, 0.1);
             padding: 25px;
             border-radius: 15px;
-            border: 2px solid rgba(255, 215, 0, 0.4);
+            border: 1px solid rgba(138, 43, 226, 0.5);
             position: relative;
             overflow: hidden;
-            animation: winnerGlow 2s ease-in-out infinite alternate;
+            transition: all 0.3s ease;
+        }
+
+        .winner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .winner-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
+            z-index: -1;
         }
 
         .winner-card::before {
@@ -832,46 +546,32 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 2rem;
-            animation: crown-spin 3s linear infinite;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
         }
 
-        @keyframes winnerGlow {
-            0% {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            }
-            100% {
-                box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
-            }
-        }
-
-        @keyframes crown-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .winner-position {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: #ff8c00;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #1e90ff;
             margin-bottom: 10px;
         }
 
         .winner-name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: #ffd700;
+            color: #fff;
             margin-bottom: 10px;
         }
 
         .winner-votes {
             font-size: 1rem;
-            color: #fff;
-            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* Results */
@@ -884,28 +584,30 @@
         .position-card {
             padding: 25px;
             border-radius: 15px;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
         }
 
         .position-card h3 {
+            font-family: 'Orbitron', sans-serif;
             margin-bottom: 15px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             text-align: center;
+            color: #8a2be2;
         }
 
         .total-votes {
             text-align: center;
             margin-bottom: 20px;
-            opacity: 0.9;
+            opacity: 0.8;
         }
 
         .candidate-result {
             margin-bottom: 15px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(30, 144, 255, 0.1);
             padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            border: 1px solid rgba(30, 144, 255, 0.2);
         }
 
         .candidate-result .candidate-name {
@@ -915,12 +617,12 @@
 
         .vote-count {
             font-size: 0.9rem;
-            opacity: 0.9;
+            opacity: 0.8;
             margin-bottom: 8px;
         }
 
         .vote-bar {
-            background: rgba(255,255,255,0.2);
+            background: rgba(30, 144, 255, 0.2);
             height: 8px;
             border-radius: 4px;
             overflow: hidden;
@@ -929,7 +631,7 @@
 
         .vote-progress {
             height: 100%;
-            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            background: linear-gradient(90deg, #8a2be2, #1e90ff);
             border-radius: 4px;
             transition: width 1s ease;
         }
@@ -937,57 +639,32 @@
         .vote-percentage {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #4ecdc4;
-        }
-
-        /* Results Access Denied */
-        .results-denied {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 159, 243, 0.1));
-            border-radius: 20px;
-            border: 2px solid rgba(255, 107, 107, 0.3);
-        }
-
-        .results-denied h2 {
-            font-family: 'Orbitron', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #ff6b6b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .results-denied p {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            line-height: 1.6;
+            color: #8a2be2;
         }
 
         /* Messages */
         .message {
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin: 20px 0;
             text-align: center;
             font-weight: 600;
         }
 
         .message.success {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.2));
+            background: rgba(76, 175, 80, 0.2);
             color: #4caf50;
             border: 1px solid rgba(76, 175, 80, 0.3);
         }
 
         .message.error {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(233, 30, 99, 0.2));
+            background: rgba(244, 67, 54, 0.2);
             color: #f44336;
             border: 1px solid rgba(244, 67, 54, 0.3);
         }
 
         .message.warning {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+            background: rgba(255, 193, 7, 0.2);
             color: #ffc107;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
@@ -999,8 +676,8 @@
         }
 
         .spinner {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-left: 4px solid #667eea;
+            border: 4px solid rgba(30, 144, 255, 0.2);
+            border-left: 4px solid #8a2be2;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -1013,16 +690,54 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Results Access Denied */
+        .results-denied {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .results-denied h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #8a2be2;
+        }
+
+        .results-denied p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Debug Button */
+        .debug-btn {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .debug-btn:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
-                letter-spacing: 0.5px;
             }
 
             .nominees-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
             }
 
             .countdown-timer {
@@ -1038,32 +753,18 @@
                 font-size: 1.5rem;
             }
 
-            .nav-tabs {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .tab-btn {
-                width: 200px;
-                text-align: center;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .candidates-container {
-                padding: 15px;
-            }
-
-            .winners-grid {
-                grid-template-columns: 1fr;
+            .winner-announcement h2 {
+                font-size: 1.8rem;
             }
         }
 
         @media (max-width: 480px) {
             .container {
                 padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
             }
 
             .tab-content {
@@ -1077,13 +778,14 @@
             .position-section {
                 padding: 20px;
             }
+
+            .winner-announcement h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="twinkling"></div>
-    <div class="cosmic-dust"></div>
     <div class="container">
         <div class="header">
             <h1>🚀 Galactic Symposium Election 2025</h1>
@@ -1110,11 +812,8 @@
                     </div>
                 </div>
 
-                <div class="nominees-reveal">
-                    <p class="reveal-text">
-                        🎭 Positions of the above is revealed!! 
-                        <br>Check the Cast vote for positions...
-                    </p>
+                <div style="text-align: center; margin-top: 30px; opacity: 0.8;">
+                    <p>🎭 Positions of the above nominees will be revealed in the voting section</p>
                 </div>
             </div>
         </div>
@@ -1148,6 +847,10 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Debug button - remove in production -->
+                        <button class="debug-btn" onclick="debugElectionStatus()">
+                            🐛 Debug Timer
+                        </button>
                     </div>
                 </div>
                 
@@ -1180,7 +883,7 @@
 
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
-            <h2 style="font-family: 'Orbitron', monospace; text-align: center; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-transform: uppercase;">Live Galactic Results</h2>
+            <h2 style="font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 30px; font-size: 2rem; color: #8a2be2;">Live Galactic Results</h2>
             
             <!-- Winner Announcement Display -->
             <div id="winner-announcement" style="display: none;">
@@ -1280,14 +983,14 @@
             }
         }
 
-        // Enhanced display nominees with sparkle effects
+        // Display nominees
         function displayNominees() {
             const container = document.getElementById('nominees-grid');
             
             if (nominees.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                        <p style="color: #ffd700; font-size: 1.2rem;">🚀 Nominees Coming Soon!</p>
+                        <p style="color: #8a2be2; font-size: 1.2rem;">🚀 Nominees Coming Soon!</p>
                         <p style="opacity: 0.8; margin-top: 10px;">The galactic candidates are preparing for launch...</p>
                     </div>
                 `;
@@ -1297,11 +1000,7 @@
             let html = '';
             nominees.forEach((nominee, index) => {
                 html += `
-                    <div class="nominee-card" style="animation-delay: ${index * 0.1}s">
-                        <div class="sparkle-particle">✦</div>
-                        <div class="sparkle-particle">✧</div>
-                        <div class="sparkle-particle">⋆</div>
-                        <div class="sparkle-particle">✦</div>
+                    <div class="nominee-card">
                         <div class="nominee-name">${nominee.name}</div>
                         <div class="nominee-tag">${nominee.tag || 'Nominee'}</div>
                     </div>
@@ -1316,21 +1015,29 @@
             try {
                 const response = await axios.get('/.netlify/functions/get-election-status');
                 electionStatus = response.data;
+                
+                console.log('Election Status Response:', electionStatus);
+                console.log('Time Until Start:', electionStatus.timeUntilStart);
+                console.log('Status:', electionStatus.status);
+                
                 updateElectionStatusDisplay();
                 
                 // Clear any existing countdown interval
                 if (countdownInterval) {
                     clearInterval(countdownInterval);
+                    countdownInterval = null;
                 }
                 
                 // Start countdown if needed
-                if (electionStatus.status === 'SCHEDULED' && electionStatus.timeUntilStart > 0) {
-                    if (electionStatus.timeUntilStart <= 60000) { // 1 minute or less
-                        enablePreVotingMode();
-                    }
+                if ((electionStatus.status === 'SCHEDULED' || electionStatus.status === 'PRE_VOTING') && electionStatus.timeUntilStart && electionStatus.timeUntilStart > 0) {
+                    console.log('Starting countdown, time remaining:', electionStatus.timeUntilStart, 'ms');
+                    console.log('That equals:', Math.floor(electionStatus.timeUntilStart / 1000), 'seconds');
                     startCountdown();
-                } else if (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd) {
+                } else if (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd && electionStatus.timeUntilEnd > 0) {
+                    console.log('Starting countdown to end, time remaining:', electionStatus.timeUntilEnd);
                     startCountdownUntilEnd();
+                } else {
+                    console.log('No countdown needed. Status:', electionStatus.status);
                 }
                 
             } catch (error) {
@@ -1411,56 +1118,109 @@
 
         // Start countdown until voting starts
         function startCountdown() {
+            // Store the initial time
+            let remainingTime = electionStatus.timeUntilStart;
+            
+            console.log('Starting countdown with:', remainingTime, 'ms');
+            
+            if (!remainingTime || remainingTime <= 0) {
+                console.log('Invalid remaining time:', remainingTime);
+                return;
+            }
+            
             const updateCountdown = () => {
-                if (electionStatus.timeUntilStart <= 0) {
+                if (remainingTime <= 0) {
+                    console.log('Countdown finished!');
                     clearInterval(countdownInterval);
+                    countdownInterval = null;
                     loadElectionStatus(); // Refresh status
                     return;
                 }
                 
-                const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
+                const totalSeconds = Math.floor(remainingTime / 1000);
                 const days = Math.floor(totalSeconds / 86400);
                 const hours = Math.floor((totalSeconds % 86400) / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
                 
-                document.getElementById('days').textContent = String(days).padStart(2, '0');
-                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                console.log(`Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s (${totalSeconds}s total)`);
                 
-                // Update the time remaining
-                electionStatus.timeUntilStart -= 1000;
+                // Update DOM elements if they exist
+                const daysEl = document.getElementById('days');
+                const hoursEl = document.getElementById('hours');
+                const minutesEl = document.getElementById('minutes');
+                const secondsEl = document.getElementById('seconds');
+                
+                if (daysEl) {
+                    daysEl.textContent = String(days).padStart(2, '0');
+                    console.log('Updated days to:', daysEl.textContent);
+                } else {
+                    console.log('Days element not found');
+                }
+                
+                if (hoursEl) {
+                    hoursEl.textContent = String(hours).padStart(2, '0');
+                    console.log('Updated hours to:', hoursEl.textContent);
+                } else {
+                    console.log('Hours element not found');
+                }
+                
+                if (minutesEl) {
+                    minutesEl.textContent = String(minutes).padStart(2, '0');
+                    console.log('Updated minutes to:', minutesEl.textContent);
+                } else {
+                    console.log('Minutes element not found');
+                }
+                
+                if (secondsEl) {
+                    secondsEl.textContent = String(seconds).padStart(2, '0');
+                    console.log('Updated seconds to:', secondsEl.textContent);
+                } else {
+                    console.log('Seconds element not found');
+                }
+                
+                // Decrease remaining time
+                remainingTime -= 1000;
             };
             
             updateCountdown(); // Initial call
             countdownInterval = setInterval(updateCountdown, 1000);
+            console.log('Countdown interval started');
         }
 
         // Start countdown until voting ends
         function startCountdownUntilEnd() {
             document.getElementById('status-message').textContent = 'Voting ends in:';
             
+            // Store the initial time
+            let remainingTime = electionStatus.timeUntilEnd;
+            
             const updateCountdown = () => {
-                if (electionStatus.timeUntilEnd <= 0) {
+                if (remainingTime <= 0) {
                     clearInterval(countdownInterval);
                     loadElectionStatus(); // Refresh status
                     return;
                 }
                 
-                const totalSeconds = Math.floor(electionStatus.timeUntilEnd / 1000);
+                const totalSeconds = Math.floor(remainingTime / 1000);
                 const days = Math.floor(totalSeconds / 86400);
                 const hours = Math.floor((totalSeconds % 86400) / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
                 
-                document.getElementById('days').textContent = String(days).padStart(2, '0');
-                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                // Update DOM elements if they exist
+                const daysEl = document.getElementById('days');
+                const hoursEl = document.getElementById('hours');
+                const minutesEl = document.getElementById('minutes');
+                const secondsEl = document.getElementById('seconds');
                 
-                // Update the time remaining
-                electionStatus.timeUntilEnd -= 1000;
+                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                
+                // Decrease remaining time
+                remainingTime -= 1000;
             };
             
             updateCountdown(); // Initial call
@@ -1536,24 +1296,24 @@
             if (preVotingMode) {
                 if (credentialsValidated) {
                     submitBtn.textContent = 'Ready to Vote - Waiting for Window';
-                    submitBtn.style.background = 'linear-gradient(135deg, #ffc107, #ff8c00)';
-                    submitBtn.style.color = '#2d3436';
+                    submitBtn.style.background = 'linear-gradient(135deg, #ff7e5f, #feb47b)';
+                    submitBtn.style.color = '#000';
                 } else {
                     submitBtn.textContent = 'Enter Valid Credentials';
-                    submitBtn.style.background = '#ccc';
+                    submitBtn.style.background = '#666';
                 }
             } else if (electionStatus.votingAllowed) {
                 if (credentialsValidated) {
                     submitBtn.textContent = 'Launch Vote';
-                    submitBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                    submitBtn.style.background = 'linear-gradient(135deg, #8a2be2, #1e90ff)';
                     submitBtn.style.color = 'white';
                 } else {
                     submitBtn.textContent = 'Enter Valid Credentials';
-                    submitBtn.style.background = '#ccc';
+                    submitBtn.style.background = '#666';
                 }
             } else {
                 submitBtn.textContent = 'Voting Not Available';
-                submitBtn.style.background = '#ccc';
+                submitBtn.style.background = '#666';
             }
         }
 
@@ -1709,14 +1469,17 @@
 
         // Start countdown to announcement
         function startAnnouncementCountdown() {
+            // Store the initial time
+            let remainingTime = announcementStatus.timeUntilAnnouncement;
+            
             const updateCountdown = () => {
-                if (announcementStatus.timeUntilAnnouncement <= 0) {
+                if (remainingTime <= 0) {
                     clearInterval(announcementCountdownInterval);
                     loadWinnerAnnouncement(); // Refresh status
                     return;
                 }
                 
-                const totalSeconds = Math.floor(announcementStatus.timeUntilAnnouncement / 1000);
+                const totalSeconds = Math.floor(remainingTime / 1000);
                 const days = Math.floor(totalSeconds / 86400);
                 const hours = Math.floor((totalSeconds % 86400) / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -1732,8 +1495,8 @@
                 if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
                 if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
                 
-                // Update the time remaining
-                announcementStatus.timeUntilAnnouncement -= 1000;
+                // Decrease remaining time
+                remainingTime -= 1000;
             };
             
             updateCountdown(); // Initial call
@@ -1900,9 +1663,9 @@
             };
 
             const colors = [
-                'linear-gradient(135deg, rgba(106,17,203,0.8) 0%, rgba(37,117,252,0.8) 100%)',
-                'linear-gradient(135deg, rgba(252,74,26,0.8) 0%, rgba(247,183,51,0.8) 100%)',
-                'linear-gradient(135deg, rgba(33,147,176,0.8) 0%, rgba(109,213,237,0.8) 100%)'
+                'rgba(138, 43, 226, 0.1)',
+                'rgba(30, 144, 255, 0.1)',
+                'rgba(255, 107, 107, 0.1)'
             ];
 
             let html = '<div class="results-grid">';
@@ -1942,6 +1705,43 @@
             container.innerHTML = html;
         }
 
+        // Debug function to test timer
+        async function debugElectionStatus() {
+            console.log('Starting debug...');
+            
+            try {
+                // Test debug endpoint
+                const debugResponse = await axios.get('/.netlify/functions/debug-election-status');
+                console.log('Debug Response:', debugResponse.data);
+                
+                // Test regular endpoint
+                const regularResponse = await axios.get('/.netlify/functions/get-election-status');
+                console.log('Regular Response:', regularResponse.data);
+                
+                // Test countdown with hardcoded values
+                console.log('Testing countdown with 5 minutes (300000ms)...');
+                electionStatus = {
+                    ...regularResponse.data,
+                    timeUntilStart: 300000, // 5 minutes
+                    status: 'PRE_VOTING'
+                };
+                
+                updateElectionStatusDisplay();
+                
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                
+                startCountdown();
+                
+                alert('Debug started! Check console for details. Timer should show 5 minutes.');
+                
+            } catch (error) {
+                console.error('Debug error:', error);
+                alert('Debug failed! Check console for error details.');
+            }
+        }
+
         // Show message
         function showMessage(text, type) {
             const messageDiv = document.getElementById('vote-message');
@@ -1951,8 +1751,6 @@
                 messageDiv.innerHTML = '';
             }, 5000);
         }
-
-
 
         // Initialize on page load
         window.addEventListener('load', async () => {

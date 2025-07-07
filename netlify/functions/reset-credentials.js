@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({ 
           success: false, 
-          message: 'Reset confirmation required. This will delete all existing credentials and votes.' 
+          message: 'Reset confirmation required. This will delete all existing credentials, votes, and announcements.' 
         })
       };
     }
@@ -84,12 +84,14 @@ exports.handler = async (event, context) => {
     const credentialsCollection = db.collection('user_credentials');
     const votersCollection = db.collection('voters');
     const votesCollection = db.collection('votes');
+    const announcementCollection = db.collection('winner_announcement');
 
-    // Clear all existing data
+    // Clear all existing data including winner announcements
     await Promise.all([
       credentialsCollection.deleteMany({}),
       votersCollection.deleteMany({}),
-      votesCollection.deleteMany({})
+      votesCollection.deleteMany({}),
+      announcementCollection.deleteMany({}) // Clear winner announcements
     ]);
 
     // Generate valid registration numbers
@@ -113,7 +115,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({ 
         success: true, 
-        message: `All data reset. ${credentials.length} new user credentials created successfully`,
+        message: `All data reset. ${credentials.length} new user credentials created successfully. Results are now sealed.`,
         credentials: credentials.map(cred => ({
           regNumber: cred.regNumber,
           password: cred.password

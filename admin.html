@@ -648,6 +648,9 @@
                         <button class="action-btn btn-warning" onclick="announceWinnersNow()">📢 Announce Now</button>
                     </div>
                 </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="action-btn btn-danger" onclick="clearWinnerAnnouncement()">🗑️ Clear Announcement & Seal Results</button>
+                </div>
             </div>
         </div>
 
@@ -722,7 +725,7 @@
                     </div>
                     <div class="position-content">
                         <div class="action-buttons">
-                            <button class="action-btn btn-danger" onclick="confirmAction('reset')">🗑️ Reset All Votes</button>
+                            <button class="action-btn btn-danger" onclick="confirmAction('reset')">🗑️ Reset All Votes & Seal Results</button>
                             <button class="action-btn btn-warning" onclick="confirmAction('backup')">💾 Backup Data</button>
                             <button class="action-btn btn-success" onclick="confirmAction('close')">🔒 Close Election</button>
                         </div>
@@ -730,11 +733,12 @@
                         <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
                             <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Important Notes:</h4>
                             <ul style="color: #856404; line-height: 1.6;">
-                                <li>Reset All Votes will permanently delete all voting data</li>
+                                <li><strong>Reset All Votes</strong> will delete all votes, voter records, and winner announcements (results become sealed again)</li>
                                 <li>Always backup data before making major changes</li>
-                                <li>Use Timer tab to control voting schedule</li>
+                                <li>Use Timer tab to control voting schedule and extend voting time</li>
                                 <li>Changes to candidates during active voting may cause confusion</li>
                                 <li>Use Credentials tab to view and manage user access</li>
+                                <li><strong>Winner announcements</strong> can be cleared separately to re-seal results</li>
                             </ul>
                         </div>
                     </div>
@@ -939,8 +943,8 @@
 
             const actions = {
                 reset: {
-                    title: 'Reset All Votes',
-                    message: 'This will permanently delete all votes. This action cannot be undone!'
+                    title: 'Reset All Votes & Seal Results',
+                    message: 'This will permanently delete all votes, voter records, and winner announcements. Results will be sealed again. This action cannot be undone!'
                 },
                 backup: {
                     title: 'Backup Data',
@@ -964,7 +968,7 @@
         function executeAction(action) {
             switch(action) {
                 case 'reset':
-                    showMessage('All votes have been reset.', 'success');
+                    resetAllVotes();
                     break;
                 case 'backup':
                     showMessage('Data backup created successfully.', 'success');
@@ -972,6 +976,26 @@
                 case 'close':
                     showMessage('Election has been closed.', 'success');
                     break;
+            }
+        }
+
+        async function resetAllVotes() {
+            try {
+                const response = await axios.post('/.netlify/functions/reset-all-data', {
+                    confirmReset: true,
+                    resetType: 'votes_only'
+                });
+                
+                if (response.data.success) {
+                    showMessage(response.data.message, 'success');
+                    loadStatistics(); // Refresh stats
+                    loadCredentials(); // Refresh credentials if on that tab
+                } else {
+                    showMessage(response.data.message || 'Error resetting votes', 'error');
+                }
+            } catch (error) {
+                console.error('Error resetting votes:', error);
+                showMessage('Error resetting votes. Please try again.', 'error');
             }
         }
 
@@ -1214,6 +1238,27 @@
             } catch (error) {
                 console.error('Error announcing winners:', error);
                 showMessage('Error announcing winners', 'error');
+            }
+        }
+
+        async function clearWinnerAnnouncement() {
+            if (!confirm('Are you sure you want to clear the winner announcement? This will seal the results again.')) {
+                return;
+            }
+
+            try {
+                const response = await axios.post('/.netlify/functions/set-winner-announcement', {
+                    action: 'clearAnnouncement'
+                });
+                
+                if (response.data.success) {
+                    showMessage('Winner announcement cleared. Results are now sealed.', 'success');
+                } else {
+                    showMessage(response.data.message || 'Error clearing announcement', 'error');
+                }
+            } catch (error) {
+                console.error('Error clearing announcement:', error);
+                showMessage('Error clearing announcement', 'error');
             }
         }
 

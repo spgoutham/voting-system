@@ -880,7 +880,7 @@ b, .zoho-bold {
                         <!-- Candidate sections will be loaded dynamically -->
                         <div class="loading">
                             <div class="spinner"></div>
-                            <p>Loading galactic candidates...</p>
+                            <p>Loading Altruix candidates...</p>
                         </div>
                     </div>
 
@@ -1001,7 +1001,7 @@ b, .zoho-bold {
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
                         <p style="color: #8a2be2; font-size: 1.2rem;">🚀 Nominees Coming Soon!</p>
-                        <p style="opacity: 0.8; margin-top: 10px;">The galactic candidates are preparing for launch...</p>
+                        <p style="opacity: 0.8; margin-top: 10px;">The Altruix candidates are preparing for launch...</p>
                     </div>
                 `;
                 return;
@@ -1349,9 +1349,9 @@ b, .zoho-bold {
         function displayCandidateForm() {
             const container = document.getElementById('candidates-container');
             const positions = {
-                president: { title: '👑 Galactic President', popularTags: ['Alice Johnson', 'Bob Smith'] },
-                secretary: { title: '📜 Cosmic Secretary', popularTags: ['David Wilson'] },
-                treasurer: { title: '💎 Nebula Treasurer', popularTags: ['Grace Lee'] }
+                president: { title: '👑 Altruix President', popularTags: ['Alice Johnson', 'Bob Smith'] },
+                secretary: { title: '📜 Altruix Secretary', popularTags: ['David Wilson'] },
+                treasurer: { title: '💎 Altruix Treasurer', popularTags: ['Grace Lee'] }
             };
 
             let html = '';
@@ -1520,15 +1520,15 @@ b, .zoho-bold {
             
             let winnersHtml = `
                 <div class="winner-announcement">
-                    <h2>🏆 GALACTIC CHAMPIONS REVEALED! 🏆</h2>
+                    <h2>🏆 ALTRUIX CHAMPIONS REVEALED! 🏆</h2>
                     <div class="winners-grid">
             `;
 
             Object.entries(winners).forEach(([position, winner]) => {
                 const positionTitles = {
-                    president: 'Galactic President',
-                    secretary: 'Cosmic Secretary',
-                    treasurer: 'Nebula Treasurer'
+                    president: 'Altruix President',
+                    secretary: 'Altruix Secretary',
+                    treasurer: 'Altruix Treasurer'
                 };
 
                 winnersHtml += `

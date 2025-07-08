@@ -55,7 +55,8 @@ exports.handler = async (event, context) => {
       status: 'NO_ANNOUNCEMENT',
       message: 'No winner announcement scheduled',
       winners: null,
-      canViewResults: false
+      canViewResults: false,
+      preFetched: false
     };
 
     if (announcement) {
@@ -63,6 +64,10 @@ exports.handler = async (event, context) => {
       announcementStatus.announcementTime = announcement.announcementTime;
       
       const announcementTime = new Date(announcement.announcementTime);
+      const timeUntilAnnouncement = announcementTime.getTime() - now.getTime();
+      
+      // Pre-fetch results 30 seconds before announcement
+      const preFetchTime = 30000; // 30 seconds
       
       if (announcement.isAnnounced || now >= announcementTime) {
         // Winners have been announced or time has passed
@@ -71,20 +76,48 @@ exports.handler = async (event, context) => {
         announcementStatus.message = 'Winners have been announced!';
         announcementStatus.canViewResults = true;
         
-        // Calculate winners
-        const results = await getWinners(votesCollection, candidatesCollection);
+        // Calculate winners with victory margins
+        const results = await getWinnersWithMargins(votesCollection, candidatesCollection);
         announcementStatus.winners = results;
         
+      } else if (timeUntilAnnouncement <= preFetchTime) {
+        // Pre-fetch phase - calculate results but don't show yet
+        announcementStatus.isAnnounced = false;
+        announcementStatus.status = 'PRE_FETCH';
+        announcementStatus.message = 'Preparing galactic results...';
+        announcementStatus.timeUntilAnnouncement = timeUntilAnnouncement;
+        announcementStatus.canViewResults = false;
+        announcementStatus.preFetched = true;
+        
+        // Pre-calculate winners for instant display
+        const results = await getWinnersWithMargins(votesCollection, candidatesCollection);
+        announcementStatus.preFetchedWinners = results;
+        
+        // Calculate countdown values
+        const totalSeconds = Math.floor(timeUntilAnnouncement / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        announcementStatus.countdown = {
+          days,
+          hours,
+          minutes,
+          seconds,
+          totalSeconds
+        };
+        
       } else {
-        // Announcement scheduled but not yet time
+        // Announcement scheduled but not yet in pre-fetch time
         announcementStatus.isAnnounced = false;
         announcementStatus.status = 'SCHEDULED';
         announcementStatus.message = 'Winner announcement coming soon...';
-        announcementStatus.timeUntilAnnouncement = announcementTime.getTime() - now.getTime();
+        announcementStatus.timeUntilAnnouncement = timeUntilAnnouncement;
         announcementStatus.canViewResults = false;
         
         // Calculate countdown values
-        const totalSeconds = Math.floor(announcementStatus.timeUntilAnnouncement / 1000);
+        const totalSeconds = Math.floor(timeUntilAnnouncement / 1000);
         const days = Math.floor(totalSeconds / 86400);
         const hours = Math.floor((totalSeconds % 86400) / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -108,6 +141,10 @@ exports.handler = async (event, context) => {
         announcementStatus.canViewResults = true;
         announcementStatus.status = 'NO_ANNOUNCEMENT';
         announcementStatus.message = 'Voting closed - Results available';
+        
+        // Show results with victory margins
+        const results = await getWinnersWithMargins(votesCollection, candidatesCollection);
+        announcementStatus.winners = results;
       }
     }
 
@@ -131,7 +168,8 @@ exports.handler = async (event, context) => {
         status: 'ERROR',
         message: 'Error checking announcement status',
         winners: null,
-        canViewResults: false
+        canViewResults: false,
+        preFetched: false
       })
     };
   } finally {
@@ -141,17 +179,17 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Helper function to calculate winners
-async function getWinners(votesCollection, candidatesCollection) {
+// Enhanced helper function to calculate winners with victory margins
+async function getWinnersWithMargins(votesCollection, candidatesCollection) {
   try {
     // Get current candidates from database
     const candidatesData = await candidatesCollection.findOne({ _id: 'current_candidates' });
     
     // Default candidates if none found in database
     const defaultCandidates = {
-      president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
-      secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
-      treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+      president: ['RAJESH', 'VARUN', 'AKHASH', 'SARAN'],
+      secretary: ['PRIYANKA', 'ABINAYA'],
+      treasurer: ['JEYA PRAKASH']
     };
 
     const candidates = candidatesData ? candidatesData.candidates : defaultCandidates;
@@ -180,28 +218,48 @@ async function getWinners(votesCollection, candidatesCollection) {
       }
     });
 
-    // Calculate winners for each position
+    // Calculate winners and margins for each position
     const winners = {};
+    const margins = {};
+    
     Object.keys(results).forEach(position => {
       const positionResults = results[position];
       const sortedCandidates = Object.entries(positionResults)
         .sort(([,a], [,b]) => b - a);
       
       if (sortedCandidates.length > 0) {
+        const winner = sortedCandidates[0];
+        const runnerUp = sortedCandidates.length > 1 ? sortedCandidates[1] : null;
+        
+        const victoryMargin = runnerUp ? winner[1] - runnerUp[1] : winner[1];
+        const totalVotes = Object.values(positionResults).reduce((sum, count) => sum + count, 0);
+        const winPercentage = totalVotes > 0 ? (winner[1] / totalVotes * 100) : 0;
+        
         winners[position] = {
-          name: sortedCandidates[0][0],
-          votes: sortedCandidates[0][1],
-          position: position
+          name: winner[0],
+          votes: winner[1],
+          position: position,
+          victoryMargin: victoryMargin,
+          runnerUpName: runnerUp ? runnerUp[0] : 'No opponent',
+          runnerUpVotes: runnerUp ? runnerUp[1] : 0,
+          winPercentage: Math.round(winPercentage * 10) / 10, // Round to 1 decimal
+          totalVotes: totalVotes,
+          isLandslide: victoryMargin > (totalVotes * 0.5), // More than 50% margin
+          isCloseRace: victoryMargin <= 3 && totalVotes > 5 // Close if margin <= 3 and meaningful vote count
         };
+        
+        margins[position] = victoryMargin;
       }
     });
 
     return {
       winners: winners,
-      fullResults: results
+      fullResults: results,
+      margins: margins,
+      hasResults: Object.keys(winners).length > 0
     };
   } catch (error) {
-    console.error('Error calculating winners:', error);
+    console.error('Error calculating winners with margins:', error);
     return null;
   }
 }

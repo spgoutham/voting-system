@@ -370,6 +370,18 @@
             border-bottom: 2px solid #ddd;
         }
 
+        /* Teacher credentials specific styles */
+        .credential-item.teacher {
+            background: linear-gradient(135deg, #f8f0ff 0%, #f0e6ff 100%);
+            border-left: 4px solid #8e44ad;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        }
+
+        .credential-item.student {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            border-left: 4px solid #3498db;
+        }
+
         /* NEW: Extend timer section */
         .extend-timer-section {
             background: linear-gradient(135deg, #ff9a9e, #fad0c4);
@@ -394,6 +406,22 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+
+        /* Export section styles */
+        .export-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         @media (max-width: 768px) {
@@ -421,8 +449,21 @@
                 text-align: center;
             }
 
+            .credential-item.teacher {
+                grid-template-columns: 1fr;
+            }
+
             .extend-timer-controls {
                 flex-direction: column;
+            }
+
+            .export-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons > div {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -687,14 +728,40 @@
             </div>
         </div>
 
-        <!-- Credentials Management Tab -->
+        <!-- Updated Credentials Management Tab -->
         <div id="credentials-tab" class="tab-content">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Credentials</h2>
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Credentials Management</h2>
             
             <div class="stats-grid" id="credentials-summary">
                 <!-- Summary will be loaded here -->
             </div>
 
+            <!-- Teacher Credentials Section -->
+            <div class="position-manager" style="margin-bottom: 30px;">
+                <div class="position-header" style="background: linear-gradient(135deg, #8e44ad, #9b59b6);">
+                    <span>👨‍🏫 Teacher Credentials</span>
+                    <span id="teacher-credentials-count">0 teacher(s)</span>
+                </div>
+                <div class="position-content">
+                    <!-- Generated Credential Display Area -->
+                    <div id="generated-credential-display"></div>
+                    
+                    <!-- Add Teacher Form -->
+                    <div class="add-candidate-form" style="background: #f0e6ff; border: 2px solid #8e44ad;">
+                        <input type="text" class="add-input" id="teacher-username-input" placeholder="Enter teacher username (e.g. john.doe)" style="flex: 2;">
+                        <button class="add-btn" onclick="createTeacherCredential()" style="background: linear-gradient(135deg, #8e44ad, #9b59b6);">
+                            🔑 Generate Credential
+                        </button>
+                    </div>
+                    
+                    <!-- Teacher Credentials List -->
+                    <div id="teacher-credentials-list" class="credentials-container" style="margin-top: 20px; max-height: 250px;">
+                        <!-- Teacher credentials will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student/All Credentials Section -->
             <div class="position-manager">
                 <div class="position-header">
                     <span>👥 All User Credentials</span>
@@ -707,10 +774,45 @@
                 </div>
             </div>
 
+            <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="action-btn btn-success" onclick="setupCredentials()">🔧 Setup New Credentials</button>
-                <button class="action-btn btn-danger" onclick="resetAllCredentials()">🗑️ Reset All Credentials</button>
-                <button class="action-btn btn-warning" onclick="exportCredentials()">📋 Export Credentials</button>
+                <!-- Export Buttons Section -->
+                <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; margin-bottom: 20px;">
+                    <div style="text-align: center;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">📊 Export Options</h4>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                            <button class="action-btn btn-success" onclick="exportSimpleCredentials()">
+                                📋 Export Login Credentials
+                                <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Username & Password Only</div>
+                            </button>
+                            <button class="action-btn btn-primary" onclick="exportFullCredentials()">
+                                📊 Export Full Data
+                                <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">All Details & Statistics</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Management Buttons -->
+                <div style="border-top: 1px solid #eee; padding-top: 20px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px; text-align: center;">🔧 Management Actions</h4>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                        <button class="action-btn btn-success" onclick="setupCredentials()">🔧 Setup New Credentials</button>
+                        <button class="action-btn btn-danger" onclick="resetAllCredentials()">🗑️ Reset All Credentials</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Tips Section -->
+            <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 10px; border-left: 4px solid #3498db;">
+                <h4 style="color: #2980b9; margin-bottom: 10px;">💡 Pro Tips:</h4>
+                <ul style="color: #2c3e50; line-height: 1.6; margin-bottom: 0;">
+                    <li><strong>Login Credentials Export:</strong> Contains only username/password - perfect for distribution to users</li>
+                    <li><strong>Full Data Export:</strong> Contains all details including voting status, timestamps - for admin analysis</li>
+                    <li><strong>Teacher Credentials:</strong> Use simple usernames like "john.doe" or "teacher1" for easy remembering</li>
+                    <li><strong>Generated Passwords:</strong> Are automatically strong and unique - copy them immediately after generation</li>
+                    <li>Teacher credentials are separate from student registration numbers and can vote independently</li>
+                </ul>
             </div>
         </div>
 
@@ -792,6 +894,7 @@
                 startElectionStatusUpdates();
             } else if (tabName === 'credentials') {
                 loadCredentials();
+                loadTeacherCredentials(); // Load teacher credentials
             } else if (tabName === 'nominees') {
                 loadNominees();
             } else {
@@ -1368,8 +1471,290 @@
             }
         }
 
-        function exportCredentials() {
-            showMessage('Export credentials feature will download CSV with all user data', 'success');
+        // Updated export functions for two CSV options
+
+        // Export simple credentials (username/password only)
+        async function exportSimpleCredentials() {
+            try {
+                showMessage('Preparing simple credentials export...', 'success');
+                
+                const response = await axios.get('/.netlify/functions/export-credentials?type=simple', {
+                    responseType: 'blob'
+                });
+                
+                const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+                
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+                link.download = `login_credentials_${dateStr}_${timeStr}.csv`;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url);
+                
+                showMessage('Simple credentials exported successfully! Check your downloads folder.', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting simple credentials:', error);
+                handleExportError(error, 'simple credentials');
+            }
+        }
+
+        // Export full credentials data
+        async function exportFullCredentials() {
+            try {
+                showMessage('Preparing full credentials export...', 'success');
+                
+                const response = await axios.get('/.netlify/functions/export-credentials?type=full', {
+                    responseType: 'blob'
+                });
+                
+                const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+                
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+                link.download = `full_credentials_data_${dateStr}_${timeStr}.csv`;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url);
+                
+                showMessage('Full credentials data exported successfully! Check your downloads folder.', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting full credentials:', error);
+                handleExportError(error, 'full credentials');
+            }
+        }
+
+        // Legacy function for backward compatibility
+        async function exportCredentials() {
+            return await exportFullCredentials();
+        }
+
+        // Helper function to handle export errors
+        function handleExportError(error, exportType) {
+            if (error.response && error.response.status === 404) {
+                showMessage(`No credentials found to export for ${exportType}.`, 'error');
+            } else if (error.response && error.response.data) {
+                try {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        const errorData = JSON.parse(reader.result);
+                        showMessage(`Export failed: ${errorData.message || 'Unknown error'}`, 'error');
+                    };
+                    reader.readAsText(error.response.data);
+                } catch (parseError) {
+                    showMessage(`Failed to export ${exportType}. Please try again.`, 'error');
+                }
+            } else {
+                showMessage(`Failed to export ${exportType}. Please check your connection and try again.`, 'error');
+            }
+        }
+
+        // Teacher credential management functions
+        async function createTeacherCredential() {
+            const usernameInput = document.getElementById('teacher-username-input');
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                showMessage('Please enter a username for the teacher.', 'error');
+                return;
+            }
+            
+            // Validate username
+            if (username.length < 3) {
+                showMessage('Username must be at least 3 characters long.', 'error');
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+                showMessage('Username can only contain letters, numbers, dots, underscores, and hyphens.', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('Creating teacher credential...', 'success');
+                
+                const response = await axios.post('/.netlify/functions/manage-teacher-credentials', {
+                    username: username
+                });
+                
+                if (response.data.success) {
+                    const { username: createdUsername, password } = response.data.data;
+                    
+                    // Clear input
+                    usernameInput.value = '';
+                    
+                    // Show success message with password
+                    showMessage(`Teacher credential created successfully!`, 'success');
+                    
+                    // Display the generated credential
+                    displayGeneratedCredential(createdUsername, password);
+                    
+                    // Refresh teacher credentials list
+                    loadTeacherCredentials();
+                    
+                } else {
+                    showMessage(response.data.message || 'Error creating teacher credential', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error creating teacher credential:', error);
+                
+                if (error.response && error.response.status === 409) {
+                    showMessage('Username already exists. Please choose a different username.', 'error');
+                } else if (error.response && error.response.data) {
+                    showMessage(`Error: ${error.response.data.message || 'Unknown error'}`, 'error');
+                } else {
+                    showMessage('Failed to create teacher credential. Please try again.', 'error');
+                }
+            }
+        }
+
+        function displayGeneratedCredential(username, password) {
+            const container = document.getElementById('generated-credential-display');
+            
+            container.innerHTML = `
+                <div style="background: #e8f5e8; border: 2px solid #27ae60; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                    <h4 style="color: #27ae60; margin-bottom: 15px;">✅ Teacher Credential Generated</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-family: monospace; background: white; padding: 15px; border-radius: 8px;">
+                        <div>
+                            <strong>Username:</strong><br>
+                            <span style="font-size: 1.2rem; color: #2c3e50; font-weight: bold;">${username}</span>
+                        </div>
+                        <div>
+                            <strong>Password:</strong><br>
+                            <span style="font-size: 1.2rem; color: #e74c3c; font-weight: bold;">${password}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="action-btn btn-primary" onclick="copyCredentialToClipboard('${username}', '${password}')" style="margin-right: 10px;">📋 Copy to Clipboard</button>
+                        <button class="action-btn btn-success" onclick="clearGeneratedCredential()">✅ Acknowledge</button>
+                    </div>
+                </div>
+            `;
+            
+            // Auto-clear after 2 minutes
+            setTimeout(() => {
+                clearGeneratedCredential();
+            }, 120000);
+        }
+
+        function copyCredentialToClipboard(username, password) {
+            const credentialText = `Username: ${username}\nPassword: ${password}`;
+            
+            navigator.clipboard.writeText(credentialText).then(() => {
+                showMessage('Credential copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = credentialText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showMessage('Credential copied to clipboard!', 'success');
+            });
+        }
+
+        function clearGeneratedCredential() {
+            const container = document.getElementById('generated-credential-display');
+            container.innerHTML = '';
+        }
+
+        async function loadTeacherCredentials() {
+            try {
+                const response = await axios.get('/.netlify/functions/manage-teacher-credentials');
+                
+                if (response.data.success) {
+                    displayTeacherCredentials(response.data.teacherCredentials);
+                } else {
+                    showMessage('Error loading teacher credentials', 'error');
+                    displayTeacherCredentials([]);
+                }
+                
+            } catch (error) {
+                console.error('Error loading teacher credentials:', error);
+                showMessage('Error loading teacher credentials', 'error');
+                displayTeacherCredentials([]);
+            }
+        }
+
+        function displayTeacherCredentials(teacherCredentials) {
+            const container = document.getElementById('teacher-credentials-list');
+            const countElement = document.getElementById('teacher-credentials-count');
+            
+            countElement.textContent = `${teacherCredentials.length} teacher(s)`;
+            
+            if (teacherCredentials.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7; font-style: italic;">No teacher credentials created yet.</div>';
+                return;
+            }
+            
+            let html = '<div class="credential-item credential-header">';
+            html += '<div>Username</div><div>Password</div><div>Status</div><div>Voted</div><div>Actions</div>';
+            html += '</div>';
+            
+            teacherCredentials.forEach(teacher => {
+                const status = teacher.isActive ? '✅ Active' : '❌ Inactive';
+                const voted = teacher.hasVoted ? '✅ Yes' : '❌ No';
+                
+                html += `
+                    <div class="credential-item teacher">
+                        <div style="font-weight: bold;">${teacher.username}</div>
+                        <div style="font-family: monospace;">${teacher.password}</div>
+                        <div>${status}</div>
+                        <div>${voted}</div>
+                        <div>
+                            <button class="remove-btn" onclick="deleteTeacherCredential('${teacher.username}')" style="font-size: 0.8rem; padding: 4px 8px;">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function deleteTeacherCredential(username) {
+            if (!confirm(`Are you sure you want to delete the teacher credential for "${username}"? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await axios.post('/.netlify/functions/manage-teacher-credentials', {
+                    username: username,
+                    action: 'delete'
+                });
+                
+                if (response.data.success) {
+                    showMessage(`Teacher credential for "${username}" deleted successfully.`, 'success');
+                    loadTeacherCredentials();
+                    loadCredentials(); // Refresh main credentials list
+                } else {
+                    showMessage(response.data.message || 'Error deleting teacher credential', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error deleting teacher credential:', error);
+                showMessage('Error deleting teacher credential. Please try again.', 'error');
+            }
         }
 
         // Nominees Management Functions
@@ -1586,6 +1971,13 @@
                         addCandidate(position);
                     }
                 });
+            });
+
+            // Add enter key support for teacher username input
+            document.getElementById('teacher-username-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createTeacherCredential();
+                }
             });
         });
 

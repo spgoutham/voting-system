@@ -4,12 +4,15 @@ const { MongoClient } = require('mongodb');
 const MONGODB_URI = 'mongodb+srv://gou8sarav:r4MvYsciylNFHtt9@voting.bg9nvss.mongodb.net/?retryWrites=true&w=majority&appName=voting';
 const DB_NAME = 'voting_system';
 
-// CORS headers
+// CORS headers with cache-busting
 const headers = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Cache-Control, Pragma',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Content-Type': 'application/json'
+  'Content-Type': 'application/json',
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0'
 };
 
 exports.handler = async (event, context) => {

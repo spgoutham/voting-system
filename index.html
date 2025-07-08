@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galactic Symposium Election 2025</title>
+    <title>ALTRUIX SYMPOSIUM CLASS ELECTION 2025</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -813,14 +813,14 @@ b, .zoho-bold {
         <!-- Nominees Showcase Tab -->
         <div id="nominees-tab" class="tab-content active">
             <div class="nominees-showcase">
-                <h2>🌟 Meet Your Galactic Nominees</h2>
-                <p class="nominees-subtitle">Get to know the stellar candidates before the voting begins!</p>
+                <h2>🌟 Meet Your Altruix Nominees</h2>
+                <p class="nominees-subtitle">Get to know the Altruix candidates before the voting begins!</p>
                 
                 <div class="nominees-grid" id="nominees-grid">
                     <!-- Nominees will be loaded here -->
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>Loading our stellar nominees...</p>
+                        <p>Loading our Altruix nominees...</p>
                     </div>
                 </div>
 
@@ -833,7 +833,7 @@ b, .zoho-bold {
         <!-- Voting Tab -->
         <div id="vote-tab" class="tab-content">
             <div class="voting-form">
-                <h2>Cast Your Cosmic Vote</h2>
+                <h2>Cast Your Vote</h2>
                 
                 <!-- Election Status Banner -->
                 <div id="election-status-banner" class="election-status-banner">
@@ -893,7 +893,7 @@ b, .zoho-bold {
 
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
-            <h2 style="font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 30px; font-size: 2rem; color: #8a2be2;">Live Galactic Results</h2>
+            <h2 style="font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 30px; font-size: 2rem; color: #8a2be2;">Live Altruix Results</h2>
             
             <!-- Winner Announcement Display -->
             <div id="winner-announcement" style="display: none;">
@@ -904,7 +904,7 @@ b, .zoho-bold {
             <div id="results-container">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Scanning the cosmos for results...</p>
+                    <p>Scanning the Altruix for results...</p>
                 </div>
             </div>
         </div>
@@ -1543,7 +1543,7 @@ b, .zoho-bold {
             winnersHtml += `
                     </div>
                     <div style="margin-top: 30px; font-size: 1.1rem; opacity: 0.9;">
-                        🌟 Congratulations to our new galactic leaders! 🌟
+                        🌟 Congratulations to our new Altruix leaders! 🌟
                     </div>
                 </div>
             `;
@@ -1557,7 +1557,7 @@ b, .zoho-bold {
             container.innerHTML = `
                 <div class="results-denied">
                     <h2>🔒 Results Sealed</h2>
-                    <p>The cosmic ballot box is sealed until the official winner announcement.</p>
+                    <p>The Altruix ballot box is sealed until the official winner announcement.</p>
                     <p>Stay tuned for the grand reveal! ✨</p>
                 </div>
             `;
@@ -1622,7 +1622,7 @@ b, .zoho-bold {
                 const response = await axios.post('/.netlify/functions/submit-vote', voteData);
                 
                 if (response.data.success) {
-                    showMessage('Vote successfully launched into the cosmos! Thank you for voting.', 'success');
+                    showMessage('Vote successfully launched into the Altruix! Thank you for voting.', 'success');
                     hasVoted = true;
                     document.getElementById('voting-form').reset();
                     submitBtn.textContent = 'Vote Launched';
@@ -1657,7 +1657,7 @@ b, .zoho-bold {
             } catch (error) {
                 console.error('Error loading results:', error);
                 document.getElementById('results-container').innerHTML = 
-                    '<div class="message error">Error scanning the cosmos for results. Please try again.</div>';
+                    '<div class="message error">Error scanning the Altruix for results. Please try again.</div>';
             }
         }
 
@@ -1667,9 +1667,9 @@ b, .zoho-bold {
             
             const positions = ['president', 'secretary', 'treasurer'];
             const positionTitles = {
-                president: '👑 Galactic President',
-                secretary: '📜 Cosmic Secretary', 
-                treasurer: '💎 Nebula Treasurer'
+                president: '👑 Altruix President',
+                secretary: '📜 Altruix Secretary', 
+                treasurer: '💎 Altruix Treasurer'
             };
 
             const colors = [

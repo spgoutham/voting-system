@@ -33,56 +33,136 @@ exports.handler = async (event, context) => {
   let client;
 
   try {
-    // Parse request body
-    const { registerNumber, password } = JSON.parse(event.body);
-
-    // Validate input
-    if (!registerNumber || !password) {
+    // Parse request body with error handling
+    let requestBody;
+    try {
+      requestBody = JSON.parse(event.body);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
           success: false, 
-          message: 'Registration number and password are required',
-          valid: false
+          valid: false,
+          canVote: false,
+          message: 'Invalid JSON in request body'
         })
       };
     }
 
-    // Connect to MongoDB
-    client = new MongoClient(MONGODB_URI);
-    await client.connect();
+    const { registerNumber, password } = requestBody;
+
+    // Enhanced input validation
+    if (!registerNumber) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          valid: false,
+          canVote: false,
+          message: 'Registration number is required'
+        })
+      };
+    }
+
+    if (!password) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          valid: false,
+          canVote: false,
+          message: 'Password is required'
+        })
+      };
+    }
+
+    // Normalize registration number - handle both string and number inputs
+    const normalizedRegNumber = String(registerNumber).trim();
+    const normalizedPassword = String(password).trim();
+
+    console.log('Credential validation attempt:', { 
+      regNumber: normalizedRegNumber, 
+      hasPassword: !!normalizedPassword 
+    });
+
+    // Connect to MongoDB with better error handling
+    try {
+      client = new MongoClient(MONGODB_URI);
+      await client.connect();
+    } catch (connectionError) {
+      console.error('MongoDB connection error:', connectionError);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          valid: false,
+          canVote: false,
+          message: 'Database connection failed'
+        })
+      };
+    }
     
     const db = client.db(DB_NAME);
     const credentialsCollection = db.collection('user_credentials');
     const votersCollection = db.collection('voters');
 
-    // Validate credentials
+    // Enhanced credential validation with debugging
+    console.log('Looking for credential with regNumber:', normalizedRegNumber);
+    
     const userCredential = await credentialsCollection.findOne({
-      regNumber: registerNumber.toString(),
-      password: password,
+      regNumber: normalizedRegNumber,
+      password: normalizedPassword,
       isActive: true
     });
 
     if (!userCredential) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          success: true,
-          valid: false,
-          message: 'Invalid registration number or password',
-          canVote: false
-        })
-      };
+      // Debug: Also try to find the user without password to see if the regNumber exists
+      const userWithoutPassword = await credentialsCollection.findOne({
+        regNumber: normalizedRegNumber,
+        isActive: true
+      });
+      
+      if (userWithoutPassword) {
+        console.log('User found but password mismatch for regNumber:', normalizedRegNumber);
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ 
+            success: true,
+            valid: false,
+            canVote: false,
+            message: 'Invalid password for this registration number'
+          })
+        };
+      } else {
+        console.log('No user found with regNumber:', normalizedRegNumber);
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ 
+            success: true,
+            valid: false,
+            canVote: false,
+            message: 'Registration number not found or inactive'
+          })
+        };
+      }
     }
+
+    console.log('Credential validation successful for regNumber:', normalizedRegNumber);
 
     // Check if user has already voted
     const hasVoted = userCredential.hasVoted || await votersCollection.findOne({
-      registerNumber: registerNumber.toString()
+      registerNumber: normalizedRegNumber
     });
 
     if (hasVoted) {
+      console.log('User has already voted:', normalizedRegNumber);
       return {
         statusCode: 200,
         headers,
@@ -97,6 +177,7 @@ exports.handler = async (event, context) => {
     }
 
     // Valid credentials and can vote
+    console.log('Credentials valid and user can vote:', normalizedRegNumber);
     return {
       statusCode: 200,
       headers,
@@ -105,7 +186,7 @@ exports.handler = async (event, context) => {
         valid: true,
         canVote: true,
         message: 'Credentials validated successfully - Ready to vote!',
-        regNumber: registerNumber
+        regNumber: normalizedRegNumber
       })
     };
 
@@ -118,12 +199,16 @@ exports.handler = async (event, context) => {
         success: false, 
         valid: false,
         canVote: false,
-        message: 'Error validating credentials' 
+        message: 'Error validating credentials: ' + error.message
       })
     };
   } finally {
     if (client) {
-      await client.close();
+      try {
+        await client.close();
+      } catch (closeError) {
+        console.error('Error closing MongoDB connection:', closeError);
+      }
     }
   }
 };

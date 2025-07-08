@@ -33,21 +33,60 @@ exports.handler = async (event, context) => {
   let client;
 
   try {
-    // Parse request body
-    const { registerNumber, password, votes, preValidateOnly } = JSON.parse(event.body);
-
-    // Validate input
-    if (!registerNumber || !password) {
+    // Parse request body with error handling
+    let requestBody;
+    try {
+      requestBody = JSON.parse(event.body);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, message: 'Registration number and password are required' })
+        body: JSON.stringify({ success: false, message: 'Invalid JSON in request body' })
       };
     }
 
-    // Connect to MongoDB
-    client = new MongoClient(MONGODB_URI);
-    await client.connect();
+    const { registerNumber, password, votes, preValidateOnly } = requestBody;
+
+    // Enhanced input validation with better error messages
+    if (!registerNumber) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: 'Registration number is required' })
+      };
+    }
+
+    if (!password) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: 'Password is required' })
+      };
+    }
+
+    // Normalize registration number - handle both string and number inputs
+    const normalizedRegNumber = String(registerNumber).trim();
+    const normalizedPassword = String(password).trim();
+
+    console.log('Vote submission attempt:', { 
+      regNumber: normalizedRegNumber, 
+      hasPassword: !!normalizedPassword,
+      preValidateOnly: !!preValidateOnly 
+    });
+
+    // Connect to MongoDB with better error handling
+    try {
+      client = new MongoClient(MONGODB_URI);
+      await client.connect();
+    } catch (connectionError) {
+      console.error('MongoDB connection error:', connectionError);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ success: false, message: 'Database connection failed' })
+      };
+    }
     
     const db = client.db(DB_NAME);
     const credentialsCollection = db.collection('user_credentials');
@@ -55,26 +94,50 @@ exports.handler = async (event, context) => {
     const votersCollection = db.collection('voters');
     const scheduleCollection = db.collection('election_schedule');
 
-    // Validate credentials first
+    // Enhanced credential validation with debugging
+    console.log('Looking for credential with regNumber:', normalizedRegNumber);
+    
     const userCredential = await credentialsCollection.findOne({
-      regNumber: registerNumber.toString(),
-      password: password,
+      regNumber: normalizedRegNumber,
+      password: normalizedPassword,
       isActive: true
     });
 
+    // Debug: Also try to find the user without password to see if the regNumber exists
     if (!userCredential) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ 
-          success: false, 
-          message: 'Invalid registration number or password' 
-        })
-      };
+      const userWithoutPassword = await credentialsCollection.findOne({
+        regNumber: normalizedRegNumber,
+        isActive: true
+      });
+      
+      if (userWithoutPassword) {
+        console.log('User found but password mismatch for regNumber:', normalizedRegNumber);
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Invalid password for this registration number' 
+          })
+        };
+      } else {
+        console.log('No user found with regNumber:', normalizedRegNumber);
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            message: 'Registration number not found or inactive' 
+          })
+        };
+      }
     }
+
+    console.log('Credential validation successful for regNumber:', normalizedRegNumber);
 
     // Check if user has already voted
     if (userCredential.hasVoted) {
+      console.log('User has already voted according to credentials:', normalizedRegNumber);
       return {
         statusCode: 400,
         headers,
@@ -87,13 +150,14 @@ exports.handler = async (event, context) => {
 
     // Double-check in voters collection as well
     const existingVoter = await votersCollection.findOne({
-      registerNumber: registerNumber.toString()
+      registerNumber: normalizedRegNumber
     });
 
     if (existingVoter) {
+      console.log('User has already voted according to voters collection:', normalizedRegNumber);
       // Update credential to reflect voted status if inconsistent
       await credentialsCollection.updateOne(
-        { regNumber: registerNumber.toString() },
+        { regNumber: normalizedRegNumber },
         { $set: { hasVoted: true, votedAt: existingVoter.votedAt } }
       );
       
@@ -109,6 +173,7 @@ exports.handler = async (event, context) => {
 
     // If this is just a pre-validation request, return success
     if (preValidateOnly) {
+      console.log('Pre-validation successful for regNumber:', normalizedRegNumber);
       return {
         statusCode: 200,
         headers,
@@ -156,7 +221,15 @@ exports.handler = async (event, context) => {
     }
 
     // Validate votes structure for actual voting
-    if (!votes || !votes.president || !votes.secretary || !votes.treasurer) {
+    if (!votes || typeof votes !== 'object') {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, message: 'Votes object is required' })
+      };
+    }
+
+    if (!votes.president || !votes.secretary || !votes.treasurer) {
       return {
         statusCode: 400,
         headers,
@@ -193,14 +266,14 @@ exports.handler = async (event, context) => {
 
     // Record voter to prevent duplicate voting
     await votersCollection.insertOne({
-      registerNumber: registerNumber.toString(),
+      registerNumber: normalizedRegNumber,
       votedAt: new Date(),
       ipAddress: event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || 'unknown'
     });
 
     // Update user credential to mark as voted
     await credentialsCollection.updateOne(
-      { regNumber: registerNumber.toString() },
+      { regNumber: normalizedRegNumber },
       { 
         $set: { 
           hasVoted: true, 
@@ -225,13 +298,14 @@ exports.handler = async (event, context) => {
 
     await Promise.all(votePromises);
 
+    console.log('Vote submitted successfully for regNumber:', normalizedRegNumber);
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ 
         success: true, 
         message: 'Vote submitted successfully!',
-        regNumber: registerNumber
+        regNumber: normalizedRegNumber
       })
     };
 
@@ -242,12 +316,16 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({ 
         success: false, 
-        message: 'Internal server error' 
+        message: 'Internal server error: ' + error.message
       })
     };
   } finally {
     if (client) {
-      await client.close();
+      try {
+        await client.close();
+      } catch (closeError) {
+        console.error('Error closing MongoDB connection:', closeError);
+      }
     }
   }
 };

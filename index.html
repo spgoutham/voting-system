@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALTRUIX SYMPOSIUM CLASS ELECTION 2025</title>
+    <title>ALTRUIXX SYMPOSIUM CLASS ELECTION 2025</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -647,7 +647,127 @@ b, .zoho-bold {
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
 
-        /* Winner Announcement */
+        /* Grand Reveal Effects */
+        .countdown-final-seconds {
+            animation: finalCountdownPulse 1s ease-in-out infinite !important;
+        }
+
+        @keyframes finalCountdownPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                filter: brightness(1) hue-rotate(0deg);
+            }
+            50% { 
+                transform: scale(1.05); 
+                filter: brightness(1.2) hue-rotate(10deg);
+            }
+        }
+
+        .winner-reveal-entrance {
+            animation: grandRevealEntrance 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes grandRevealEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotateY(-180deg);
+                filter: blur(20px);
+            }
+            30% {
+                opacity: 0.3;
+                transform: scale(0.7) rotateY(-90deg);
+                filter: blur(10px);
+            }
+            60% {
+                opacity: 0.7;
+                transform: scale(1.1) rotateY(10deg);
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+                filter: blur(0px);
+            }
+        }
+
+        .fireworks-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: fireworkBurst 2s ease-out forwards;
+        }
+
+        @keyframes fireworkBurst {
+            0% {
+                transform: scale(0) translate(0, 0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1) translate(var(--dx), var(--dy));
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) translate(var(--dx), var(--dy));
+                opacity: 0;
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(45deg, #8a2be2, #1e90ff);
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotateZ(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotateZ(720deg);
+                opacity: 0;
+            }
+        }
+
+        .winner-crown-glow {
+            position: relative;
+        }
+
+        .winner-crown-glow::after {
+            content: '👑';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            animation: crownGlow 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px #ffd700);
+        }
+
+        @keyframes crownGlow {
+            0%, 100% {
+                transform: translateX(-50%) scale(1) rotateZ(-5deg);
+                filter: drop-shadow(0 0 20px #ffd700);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.1) rotateZ(5deg);
+                filter: drop-shadow(0 0 30px #ffd700) drop-shadow(0 0 40px #ff6b6b);
+            }
+        }
         .winner-announcement {
             text-align: center;
             padding: 40px;
@@ -1038,14 +1158,14 @@ b, .zoho-bold {
         <!-- Nominees Showcase Tab -->
         <div id="nominees-tab" class="tab-content active">
             <div class="nominees-showcase">
-                <h2>🌟 Meet Your Altruix Nominees</h2>
-                <p class="nominees-subtitle">Get to know the Altruix candidates before the voting begins!</p>
+                <h2>🌟 Meet Your Altruixx Nominees</h2>
+                <p class="nominees-subtitle">Get to know the Altruixx candidates before the voting begins!</p>
                 
                 <div class="nominees-grid" id="nominees-grid">
                     <!-- Nominees will be loaded here -->
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>Loading our Altruix nominees...</p>
+                        <p>Loading our Altruixx nominees...</p>
                     </div>
                 </div>
 
@@ -1107,7 +1227,7 @@ b, .zoho-bold {
                         <!-- Candidate sections will be loaded dynamically -->
                         <div class="loading">
                             <div class="spinner"></div>
-                            <p>Loading Altruix candidates...</p>
+                            <p>Loading Altruixx candidates...</p>
                         </div>
                     </div>
 
@@ -1120,7 +1240,7 @@ b, .zoho-bold {
 
         <!-- Results Tab -->
         <div id="results-tab" class="tab-content">
-            <h2 style="font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 30px; font-size: 2rem; color: #8a2be2;">Live Altruix Results</h2>
+            <h2 style="font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 30px; font-size: 2rem; color: #8a2be2;">Live Altruixx Results</h2>
             
             <!-- Winner Announcement Display -->
             <div id="winner-announcement" style="display: none;">
@@ -1245,7 +1365,7 @@ b, .zoho-bold {
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
                         <p style="color: #8a2be2; font-size: 1.2rem;">🚀 Nominees Coming Soon!</p>
-                        <p style="opacity: 0.8; margin-top: 10px;">The Altruix candidates are preparing for launch...</p>
+                        <p style="opacity: 0.8; margin-top: 10px;">The Altruixx candidates are preparing for launch...</p>
                     </div>
                 `;
                 return;
@@ -1619,9 +1739,9 @@ b, .zoho-bold {
         function displayCandidateForm() {
             const container = document.getElementById('candidates-container');
             const positions = {
-                president: { title: '👑 Altruix President', popularTags: ['Alice Johnson', 'Bob Smith'] },
-                secretary: { title: '📜 Altruix Secretary', popularTags: ['David Wilson'] },
-                treasurer: { title: '💎 Altruix Treasurer', popularTags: ['Grace Lee'] }
+                president: { title: '👑 Altruixx President', popularTags: ['Alice Johnson', 'Bob Smith'] },
+                secretary: { title: '📜 Altruixx Secretary', popularTags: ['David Wilson'] },
+                treasurer: { title: '💎 Altruixx Treasurer', popularTags: ['Grace Lee'] }
             };
 
             let html = '';
@@ -1698,18 +1818,18 @@ b, .zoho-bold {
             const resultsContainer = document.getElementById('results-container');
             
             if (announcementStatus.status === 'SCHEDULED' && !announcementStatus.isAnnounced) {
-                // Show countdown to announcement
+                // Always show countdown to announcement - NEVER switch to sealed box during countdown
                 announcementDiv.style.display = 'block';
                 resultsContainer.style.display = 'none';
                 
                 announcementDiv.innerHTML = `
                     <div class="election-status-banner announcement">
                         <div class="status-content">
-                            <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;">
-                                🎉 Winner Announcement Coming Soon! 🎉
+                            <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);">
+                                🎉 ALTRUIXX CHAMPIONS REVEAL IN 🎉
                             </div>
                             <div class="countdown-display">
-                                <div class="countdown-timer">
+                                <div class="countdown-timer" id="announcement-countdown-timer">
                                     <div class="time-unit">
                                         <span id="announce-days" class="time-value">00</span>
                                         <span class="time-label">Days</span>
@@ -1732,18 +1852,21 @@ b, .zoho-bold {
                     </div>
                 `;
             } else if (announcementStatus.isAnnounced && announcementStatus.winners) {
-                // Show winners
+                // Show winners with grand reveal
                 announcementDiv.style.display = 'block';
                 resultsContainer.style.display = 'block';
-                displayWinners();
+                displayWinnersWithGrandReveal();
             } else if (announcementStatus.canViewResults) {
                 // Show regular results
                 announcementDiv.style.display = 'none';
                 resultsContainer.style.display = 'block';
             } else {
-                // Access denied
-                announcementDiv.style.display = 'none';
-                resultsContainer.style.display = 'block';
+                // Access denied - but ONLY if not in countdown mode
+                if (announcementStatus.status !== 'SCHEDULED') {
+                    announcementDiv.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+                    displayResultsAccessDenied();
+                }
             }
         }
 
@@ -1764,11 +1887,15 @@ b, .zoho-bold {
             // Store the initial time
             let remainingTime = announcementStatus.timeUntilAnnouncement;
             let preFetchTriggered = false;
+            let finalEffectsTriggered = false;
             
             const updateCountdown = () => {
                 if (remainingTime <= 0) {
                     clearInterval(announcementCountdownInterval);
-                    loadWinnerAnnouncement(); // Refresh status
+                    // Trigger grand reveal
+                    setTimeout(() => {
+                        loadWinnerAnnouncement();
+                    }, 1000);
                     return;
                 }
                 
@@ -1776,6 +1903,32 @@ b, .zoho-bold {
                 if (!preFetchTriggered && remainingTime <= 10000) { // 10 seconds = 10000ms
                     preFetchTriggered = true;
                     preFetchWinnerData();
+                }
+
+                // Add final countdown effects in last 30 seconds
+                if (!finalEffectsTriggered && remainingTime <= 30000) { // 30 seconds
+                    finalEffectsTriggered = true;
+                    const countdownTimer = document.getElementById('announcement-countdown-timer');
+                    if (countdownTimer) {
+                        countdownTimer.classList.add('countdown-final-seconds');
+                        // Add dramatic messaging
+                        const statusDiv = document.querySelector('.announcement .status-content div');
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '🚨 FINAL COUNTDOWN! ALTRUIXX CHAMPIONS ABOUT TO BE REVEALED! 🚨';
+                            statusDiv.style.fontSize = '1.6rem';
+                            statusDiv.style.animation = 'finalCountdownPulse 0.5s ease-in-out infinite';
+                        }
+                    }
+                }
+
+                // Ultra dramatic effects in final 10 seconds
+                if (remainingTime <= 10000) {
+                    const statusDiv = document.querySelector('.announcement .status-content div');
+                    if (statusDiv) {
+                        const seconds = Math.ceil(remainingTime / 1000);
+                        statusDiv.innerHTML = `🔥 REVEAL IN ${seconds}! PREPARE FOR ALTRUIXX GLORY! 🔥`;
+                        statusDiv.style.animation = 'finalCountdownPulse 0.2s ease-in-out infinite';
+                    }
                 }
                 
                 const totalSeconds = Math.floor(remainingTime / 1000);
@@ -1792,7 +1945,13 @@ b, .zoho-bold {
                 if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
                 if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
                 if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                if (secondsEl) {
+                    secondsEl.textContent = String(seconds).padStart(2, '0');
+                    // Add pulse effect to seconds in final countdown
+                    if (remainingTime <= 30000) {
+                        secondsEl.style.animation = 'finalCountdownPulse 0.5s ease-in-out infinite';
+                    }
+                }
                 
                 // Decrease remaining time
                 remainingTime -= 1000;
@@ -1802,45 +1961,121 @@ b, .zoho-bold {
             announcementCountdownInterval = setInterval(updateCountdown, 1000);
         }
 
-        // Display winners with effects
-        function displayWinners() {
+        // Display winners with GRAND REVEAL effects
+        function displayWinnersWithGrandReveal() {
             const announcementDiv = document.getElementById('winner-announcement');
             
             // Use pre-fetched data if available, otherwise use the regular data
             const winnersData = winnerDataPreFetched || announcementStatus.winners;
             const winners = winnersData.winners;
             
+            // Create fireworks effect
+            function createFireworks() {
+                const fireworksContainer = document.createElement('div');
+                fireworksContainer.className = 'fireworks-effect';
+                
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        for (let j = 0; j < 8; j++) {
+                            const firework = document.createElement('div');
+                            firework.className = 'firework';
+                            firework.style.left = Math.random() * 100 + '%';
+                            firework.style.top = Math.random() * 100 + '%';
+                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+                            firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700'][Math.floor(Math.random() * 4)];
+                            fireworksContainer.appendChild(firework);
+                            
+                            setTimeout(() => firework.remove(), 2000);
+                        }
+                    }, i * 200);
+                }
+                
+                return fireworksContainer;
+            }
+
+            // Create confetti effect
+            function createConfetti() {
+                const confettiContainer = document.createElement('div');
+                confettiContainer.className = 'fireworks-effect';
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.animationDelay = Math.random() * 2 + 's';
+                        confetti.style.background = ['#8a2be2', '#1e90ff', '#ff6b6b', '#ffd700', '#00bfff'][Math.floor(Math.random() * 5)];
+                        confettiContainer.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 3000);
+                    }, i * 50);
+                }
+                
+                return confettiContainer;
+            }
+            
             let winnersHtml = `
-                <div class="winner-announcement">
-                    <h2>🏆 ALTRUIX CHAMPIONS REVEALED! 🏆</h2>
+                <div class="winner-announcement winner-reveal-entrance">
+                    <h2 style="font-size: 3rem; text-shadow: 0 0 30px rgba(138, 43, 226, 0.8);">
+                        🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
+                    </h2>
+                    <div style="font-size: 1.3rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite;">
+                        ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
+                    </div>
                     <div class="winners-grid">
             `;
 
-            Object.entries(winners).forEach(([position, winner]) => {
+            Object.entries(winners).forEach(([position, winner], index) => {
                 const positionTitles = {
-                    president: 'Altruix President',
-                    secretary: 'Altruix Secretary',
-                    treasurer: 'Altruix Treasurer'
+                    president: 'Altruixx President',
+                    secretary: 'Altruixx Secretary',
+                    treasurer: 'Altruixx Treasurer'
                 };
 
                 winnersHtml += `
-                    <div class="winner-card">
-                        <div class="winner-position">${positionTitles[position]}</div>
-                        <div class="winner-name">${winner.name}</div>
-                        <div class="winner-votes">${winner.votes} votes</div>
+                    <div class="winner-card winner-crown-glow" style="animation-delay: ${index * 0.5}s;">
+                        <div class="winner-position" style="font-size: 1.2rem; color: #ffd700; text-shadow: 0 0 10px #ffd700;">
+                            ${positionTitles[position]}
+                        </div>
+                        <div class="winner-name" style="font-size: 2rem; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);">
+                            ${winner.name}
+                        </div>
+                        <div class="winner-votes" style="font-size: 1.2rem; color: #00bfff;">
+                            🎯 ${winner.votes} votes
+                        </div>
                     </div>
                 `;
             });
 
             winnersHtml += `
                     </div>
-                    <div style="margin-top: 30px; font-size: 1.1rem; opacity: 0.9;">
-                        🌟 Congratulations to our new Altruix leaders! 🌟
+                    <div style="margin-top: 40px; font-size: 1.4rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);">
+                        🌟 LONG LIVE THE ALTRUIXX CHAMPIONS! 🌟
+                    </div>
+                    <div style="margin-top: 20px; font-size: 1rem; opacity: 0.8;">
+                        🚀 Ready to launch into a new era of excellence! 🚀
                     </div>
                 </div>
             `;
 
             announcementDiv.innerHTML = winnersHtml;
+            
+            // Add fireworks and confetti
+            setTimeout(() => {
+                announcementDiv.appendChild(createFireworks());
+                announcementDiv.appendChild(createConfetti());
+            }, 1000);
+            
+            // Add sound effect simulation (visual pulse)
+            setTimeout(() => {
+                document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
+            }, 1500);
+        }
+
+        // Keep the original display function for fallback
+        function displayWinners() {
+            displayWinnersWithGrandReveal();
         }
 
         // Display access denied message
@@ -1849,7 +2084,7 @@ b, .zoho-bold {
             container.innerHTML = `
                 <div class="results-denied">
                     <h2>🔒 Results Sealed</h2>
-                    <p>The Altruix ballot box is sealed until the official winner announcement.</p>
+                    <p>The Altruixx ballot box is sealed until the official winner announcement.</p>
                     <p>Stay tuned for the grand reveal! ✨</p>
                 </div>
             `;
@@ -1888,7 +2123,7 @@ b, .zoho-bold {
                 const response = await axios.post('/.netlify/functions/submit-vote', pendingVoteData);
                 
                 if (response.data.success) {
-                    showMessage('Vote successfully launched into the Altruix! Thank you for voting.', 'success');
+                    showMessage('Vote successfully launched into the Altruixx! Thank you for voting.', 'success');
                     hasVoted = true;
                     document.getElementById('voting-form').reset();
                     submitBtn.textContent = 'Vote Launched';
@@ -1987,7 +2222,7 @@ b, .zoho-bold {
             } catch (error) {
                 console.error('Error loading results:', error);
                 document.getElementById('results-container').innerHTML = 
-                    '<div class="message error">Error scanning the Altruix for results. Please try again.</div>';
+                    '<div class="message error">Error scanning the Altruixx for results. Please try again.</div>';
             }
         }
 
@@ -1997,9 +2232,9 @@ b, .zoho-bold {
             
             const positions = ['president', 'secretary', 'treasurer'];
             const positionTitles = {
-                president: '👑 Altruix President',
-                secretary: '📜 Altruix Secretary', 
-                treasurer: '💎 Altruix Treasurer'
+                president: '👑 Altruixx President',
+                secretary: '📜 Altruixx Secretary', 
+                treasurer: '💎 Altruixx Treasurer'
             };
 
             const colors = [

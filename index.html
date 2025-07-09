@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Montserrat:wght@600;700;800;900&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* Base Styles */
@@ -19,7 +19,7 @@
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Poppins', 'Inter', sans-serif;
             background-color: #0a0a20;
             color: #ffffff;
             min-height: 100vh;
@@ -66,16 +66,17 @@ b, .zoho-bold {
         }
 
         .header h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Montserrat', 'Poppins', sans-serif;
             font-size: 3rem;
-            font-weight: 800;
+            font-weight: 900;
             margin-bottom: 15px;
             background: linear-gradient(45deg, #8a2be2, #1e90ff, #ff6b6b);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: gradientShift 5s ease infinite;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .header p {
@@ -114,7 +115,7 @@ b, .zoho-bold {
         }
 
         .tab-btn {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Montserrat', 'Poppins', sans-serif;
             background: rgba(30, 144, 255, 0.1);
             border: 1px solid rgba(30, 144, 255, 0.3);
             color: white;
@@ -122,11 +123,12 @@ b, .zoho-bold {
             border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             letter-spacing: 1px;
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
         }
 
         .tab-btn::before {
@@ -357,13 +359,14 @@ b, .zoho-bold {
             border: none;
             padding: 12px 25px;
             border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 15px;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .login-button:hover {
@@ -391,12 +394,14 @@ b, .zoho-bold {
         }
 
         .voting-form h2 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Montserrat', 'Poppins', sans-serif;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2rem;
+            font-weight: 800;
             color: #8a2be2;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         /* Form Styles */
@@ -550,12 +555,13 @@ b, .zoho-bold {
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             letter-spacing: 1px;
             margin-top: 20px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+            text-transform: uppercase;
         }
 
         .submit-btn:hover:not(:disabled) {
@@ -664,23 +670,18 @@ b, .zoho-bold {
         }
 
         .winner-reveal-entrance {
-            animation: grandRevealEntrance 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: grandRevealEntrance 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes grandRevealEntrance {
             0% {
                 opacity: 0;
-                transform: scale(0.3) rotateY(-180deg);
-                filter: blur(20px);
-            }
-            30% {
-                opacity: 0.3;
-                transform: scale(0.7) rotateY(-90deg);
+                transform: scale(0.5) rotateY(-90deg);
                 filter: blur(10px);
             }
-            60% {
-                opacity: 0.7;
-                transform: scale(1.1) rotateY(10deg);
+            70% {
+                opacity: 0.8;
+                transform: scale(1.05) rotateY(5deg);
                 filter: blur(2px);
             }
             100% {
@@ -817,24 +818,33 @@ b, .zoho-bold {
 
         .winners-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .winner-card {
-            background: rgba(30, 144, 255, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(138, 43, 226, 0.5);
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(138, 43, 226, 0.15));
+            padding: 40px 25px;
+            border-radius: 20px;
+            border: 2px solid rgba(138, 43, 226, 0.5);
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .winner-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4);
         }
 
         .winner-card::after {
@@ -863,22 +873,35 @@ b, .zoho-bold {
         }
 
         .winner-position {
+            font-family: 'Montserrat', sans-serif;
             font-size: 1rem;
-            font-weight: 600;
-            color: #1e90ff;
-            margin-bottom: 10px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px #ffd700;
         }
 
         .winner-name {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
             color: #fff;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+            line-height: 1.2;
         }
 
         .winner-votes {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #00bfff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Results */
@@ -1817,15 +1840,16 @@ b, .zoho-bold {
             const announcementDiv = document.getElementById('winner-announcement');
             const resultsContainer = document.getElementById('results-container');
             
-            if (announcementStatus.status === 'SCHEDULED' && !announcementStatus.isAnnounced) {
-                // Always show countdown to announcement - NEVER switch to sealed box during countdown
+            // Check for scheduled announcement OR pre-fetch phase
+            if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && !announcementStatus.isAnnounced) {
+                // Always show countdown to announcement during both SCHEDULED and PRE_FETCH phases
                 announcementDiv.style.display = 'block';
                 resultsContainer.style.display = 'none';
                 
                 announcementDiv.innerHTML = `
                     <div class="election-status-banner announcement">
                         <div class="status-content">
-                            <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);">
+                            <div style="font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8); text-transform: uppercase; letter-spacing: 2px;">
                                 🎉 ALTRUIXX CHAMPIONS REVEAL IN 🎉
                             </div>
                             <div class="countdown-display">
@@ -1851,18 +1875,19 @@ b, .zoho-bold {
                         </div>
                     </div>
                 `;
-            } else if (announcementStatus.isAnnounced && announcementStatus.winners) {
+            } else if (announcementStatus.isAnnounced && (announcementStatus.winners || announcementStatus.preFetchedWinners)) {
                 // Show winners with grand reveal
                 announcementDiv.style.display = 'block';
                 resultsContainer.style.display = 'block';
                 displayWinnersWithGrandReveal();
             } else if (announcementStatus.canViewResults) {
-                // Show regular results
+                // Show regular results with victory margins
                 announcementDiv.style.display = 'none';
                 resultsContainer.style.display = 'block';
+                loadResults();
             } else {
-                // Access denied - but ONLY if not in countdown mode
-                if (announcementStatus.status !== 'SCHEDULED') {
+                // Access denied - only if truly no access (not during countdown phases)
+                if (announcementStatus.status !== 'SCHEDULED' && announcementStatus.status !== 'PRE_FETCH') {
                     announcementDiv.style.display = 'none';
                     resultsContainer.style.display = 'block';
                     displayResultsAccessDenied();
@@ -1966,7 +1991,7 @@ b, .zoho-bold {
             const announcementDiv = document.getElementById('winner-announcement');
             
             // Use pre-fetched data if available, otherwise use the regular data
-            const winnersData = winnerDataPreFetched || announcementStatus.winners;
+            const winnersData = winnerDataPreFetched || announcementStatus.winners || announcementStatus.preFetchedWinners;
             const winners = winnersData.winners;
             
             // Create fireworks effect
@@ -1974,21 +1999,21 @@ b, .zoho-bold {
                 const fireworksContainer = document.createElement('div');
                 fireworksContainer.className = 'fireworks-effect';
                 
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 15; i++) {
                     setTimeout(() => {
-                        for (let j = 0; j < 8; j++) {
+                        for (let j = 0; j < 6; j++) {
                             const firework = document.createElement('div');
                             firework.className = 'firework';
                             firework.style.left = Math.random() * 100 + '%';
                             firework.style.top = Math.random() * 100 + '%';
-                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
-                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 150 + 'px');
+                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 150 + 'px');
                             firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700'][Math.floor(Math.random() * 4)];
                             fireworksContainer.appendChild(firework);
                             
                             setTimeout(() => firework.remove(), 2000);
                         }
-                    }, i * 200);
+                    }, i * 150);
                 }
                 
                 return fireworksContainer;
@@ -1999,7 +2024,7 @@ b, .zoho-bold {
                 const confettiContainer = document.createElement('div');
                 confettiContainer.className = 'fireworks-effect';
                 
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 30; i++) {
                     setTimeout(() => {
                         const confetti = document.createElement('div');
                         confetti.className = 'confetti';
@@ -2009,7 +2034,7 @@ b, .zoho-bold {
                         confettiContainer.appendChild(confetti);
                         
                         setTimeout(() => confetti.remove(), 3000);
-                    }, i * 50);
+                    }, i * 40);
                 }
                 
                 return confettiContainer;
@@ -2017,44 +2042,53 @@ b, .zoho-bold {
             
             let winnersHtml = `
                 <div class="winner-announcement winner-reveal-entrance">
-                    <h2 style="font-size: 3rem; text-shadow: 0 0 30px rgba(138, 43, 226, 0.8);">
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; text-shadow: 0 0 30px rgba(138, 43, 226, 0.8); text-transform: uppercase; letter-spacing: 3px;">
                         🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
                     </h2>
-                    <div style="font-size: 1.3rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite;">
+                    <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
                         ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
                     </div>
                     <div class="winners-grid">
             `;
 
-            Object.entries(winners).forEach(([position, winner], index) => {
-                const positionTitles = {
-                    president: 'Altruixx President',
-                    secretary: 'Altruixx Secretary',
-                    treasurer: 'Altruixx Treasurer'
-                };
+            // Define the exact order: president, secretary, treasurer
+            const positionOrder = ['president', 'secretary', 'treasurer'];
+            const positionTitles = {
+                president: 'ALTRUIXX PRESIDENT',
+                secretary: 'ALTRUIXX SECRETARY',
+                treasurer: 'ALTRUIXX TREASURER'
+            };
 
-                winnersHtml += `
-                    <div class="winner-card winner-crown-glow" style="animation-delay: ${index * 0.5}s;">
-                        <div class="winner-position" style="font-size: 1.2rem; color: #ffd700; text-shadow: 0 0 10px #ffd700;">
-                            ${positionTitles[position]}
+            positionOrder.forEach((position, index) => {
+                if (winners[position]) {
+                    const winner = winners[position];
+                    const marginText = winner.victoryMargin > 0 ? 
+                        `WON BY ${winner.victoryMargin} VOTES` : 
+                        `${winner.votes} VOTES`;
+                    
+                    winnersHtml += `
+                        <div class="winner-card winner-crown-glow" style="animation-delay: ${index * 0.6}s;">
+                            <div class="winner-position">
+                                ${positionTitles[position]}
+                            </div>
+                            <div class="winner-name">
+                                ${winner.name}
+                            </div>
+                            <div class="winner-votes">
+                                🎯 ${marginText}
+                            </div>
                         </div>
-                        <div class="winner-name" style="font-size: 2rem; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);">
-                            ${winner.name}
-                        </div>
-                        <div class="winner-votes" style="font-size: 1.2rem; color: #00bfff;">
-                            🎯 ${winner.votes} votes
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
             });
 
             winnersHtml += `
                     </div>
-                    <div style="margin-top: 40px; font-size: 1.4rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);">
+                    <div style="font-family: 'Poppins', sans-serif; margin-top: 50px; font-size: 1.6rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
                         🌟 LONG LIVE THE ALTRUIXX CHAMPIONS! 🌟
                     </div>
-                    <div style="margin-top: 20px; font-size: 1rem; opacity: 0.8;">
-                        🚀 Ready to launch into a new era of excellence! 🚀
+                    <div style="font-family: 'Inter', sans-serif; margin-top: 20px; font-size: 1.1rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                        🚀 READY TO LAUNCH INTO A NEW ERA OF EXCELLENCE! 🚀
                     </div>
                 </div>
             `;
@@ -2065,12 +2099,12 @@ b, .zoho-bold {
             setTimeout(() => {
                 announcementDiv.appendChild(createFireworks());
                 announcementDiv.appendChild(createConfetti());
-            }, 1000);
+            }, 800);
             
             // Add sound effect simulation (visual pulse)
             setTimeout(() => {
                 document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
-            }, 1500);
+            }, 1200);
         }
 
         // Keep the original display function for fallback
@@ -2226,21 +2260,21 @@ b, .zoho-bold {
             }
         }
 
-        // Display results
+        // Display results with victory margins
         function displayResults(results) {
             const container = document.getElementById('results-container');
             
             const positions = ['president', 'secretary', 'treasurer'];
             const positionTitles = {
-                president: '👑 Altruixx President',
-                secretary: '📜 Altruixx Secretary', 
-                treasurer: '💎 Altruixx Treasurer'
+                president: '👑 ALTRUIXX PRESIDENT',
+                secretary: '📜 ALTRUIXX SECRETARY', 
+                treasurer: '💎 ALTRUIXX TREASURER'
             };
 
             const colors = [
-                'rgba(138, 43, 226, 0.1)',
-                'rgba(30, 144, 255, 0.1)',
-                'rgba(255, 107, 107, 0.1)'
+                'rgba(138, 43, 226, 0.15)',
+                'rgba(30, 144, 255, 0.15)',
+                'rgba(255, 107, 107, 0.15)'
             ];
 
             let html = '<div class="results-grid">';
@@ -2249,31 +2283,34 @@ b, .zoho-bold {
                 const positionResults = results[position] || {};
                 const totalVotes = Object.values(positionResults).reduce((sum, count) => sum + count, 0);
                 
-                html += `
-                    <div class="position-card" style="background: ${colors[index]}">
-                        <h3>${positionTitles[position]}</h3>
-                        <p class="total-votes">Total Votes: ${totalVotes}</p>
-                `;
-
                 // Sort candidates by vote count
                 const sortedCandidates = Object.entries(positionResults)
                     .sort(([,a], [,b]) => b - a);
 
-                sortedCandidates.forEach(([candidate, votes]) => {
-                    const percentage = totalVotes > 0 ? (votes / totalVotes * 100) : 0;
+                if (sortedCandidates.length > 0) {
+                    const winner = sortedCandidates[0];
+                    const runnerUp = sortedCandidates.length > 1 ? sortedCandidates[1] : null;
+                    const margin = runnerUp ? winner[1] - runnerUp[1] : winner[1];
+                    
                     html += `
-                        <div class="candidate-result">
-                            <div class="candidate-name">${candidate}</div>
-                            <div class="vote-count">${votes} votes</div>
-                            <div class="vote-bar">
-                                <div class="vote-progress" style="width: ${percentage}%"></div>
+                        <div class="position-card" style="background: ${colors[index]}; border: 2px solid rgba(138, 43, 226, 0.3);">
+                            <h3 style="font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">${positionTitles[position]}</h3>
+                            <div style="text-align: center; margin: 25px 0;">
+                                <div style="font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 900; color: #8a2be2; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                                    ${winner[0]}
+                                </div>
+                                <div style="font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; color: #00bfff; text-transform: uppercase;">
+                                    ${runnerUp ? `WON BY ${margin} VOTES` : `${winner[1]} VOTES`}
+                                </div>
+                                ${runnerUp ? `
+                                    <div style="font-family: 'Inter', sans-serif; font-size: 0.9rem; margin-top: 10px; opacity: 0.7; text-transform: uppercase;">
+                                        RUNNER-UP: ${runnerUp[0]}
+                                    </div>
+                                ` : ''}
                             </div>
-                            <div class="vote-percentage">${percentage.toFixed(1)}%</div>
                         </div>
                     `;
-                });
-
-                html += '</div>';
+                }
             });
 
             html += '</div>';

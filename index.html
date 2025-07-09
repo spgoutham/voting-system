@@ -285,6 +285,35 @@ b, .zoho-bold {
             margin-top: 5px;
         }
 
+        /* Login Button for Pre-voting */
+        .login-button {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.3);
+        }
+
+        .login-button:disabled {
+            background: #666;
+            color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Voting Form */
         .voting-form {
             max-width: 800px;
@@ -473,6 +502,84 @@ b, .zoho-bold {
         .submit-btn:disabled {
             background: #666;
             cursor: not-allowed;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .confirmation-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 40, 0.95);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .confirmation-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #8a2be2;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .confirmation-content p {
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-btn, .cancel-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 176, 155, 0.3);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
 
         /* Winner Announcement */
@@ -771,6 +878,14 @@ b, .zoho-bold {
             .winner-announcement h2 {
                 font-size: 1.8rem;
             }
+
+            .confirmation-content {
+                padding: 30px 20px;
+            }
+
+            .confirmation-buttons {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -859,8 +974,10 @@ b, .zoho-bold {
                                 </div>
                             </div>
                         </div>
-                        <!-- Debug button - remove in production -->
-                       
+                        <!-- Login Button for Pre-voting -->
+                        <button id="pre-login-btn" class="login-button" style="display: none;" onclick="handlePreLogin()">
+                            🚀 Prepare for Launch
+                        </button>
                     </div>
                 </div>
                 
@@ -910,6 +1027,21 @@ b, .zoho-bold {
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <h3>🚀 Confirm Your Vote Launch</h3>
+            <p>Are you sure you want to launch your vote into the Altruix? This action cannot be undone once your vote enters the cosmic ballot box.</p>
+            <div id="vote-summary" style="background: rgba(30, 144, 255, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                <!-- Vote summary will be populated here -->
+            </div>
+            <div class="confirmation-buttons">
+                <button class="confirm-btn" onclick="confirmVoteSubmission()">✅ Launch Vote</button>
+                <button class="cancel-btn" onclick="cancelVoteSubmission()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let hasVoted = false;
@@ -921,6 +1053,8 @@ b, .zoho-bold {
         let nominees = [];
         let credentialsValidated = false;
         let preVotingMode = false;
+        let winnerDataPreFetched = null;
+        let pendingVoteData = null;
 
         // Tab switching
         function showTab(tabName) {
@@ -1078,11 +1212,26 @@ b, .zoho-bold {
             passwordInput.addEventListener('input', debouncedValidation);
         });
 
+        // Handle pre-login during pre-voting mode
+        function handlePreLogin() {
+            const regNumber = document.getElementById('registerNumber').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!regNumber || !password) {
+                showMessage('Please enter your registration number and password first.', 'warning');
+                return;
+            }
+            
+            // Trigger credential validation
+            validateCredentials();
+        }
+
         // Update the election status display
         function updateElectionStatusDisplay() {
             const banner = document.getElementById('election-status-banner');
             const statusMessage = document.getElementById('status-message');
             const countdownDisplay = document.getElementById('countdown-display');
+            const preLoginBtn = document.getElementById('pre-login-btn');
             const votingForm = document.querySelector('.voting-form');
             
             // Update banner class based on status
@@ -1108,6 +1257,13 @@ b, .zoho-bold {
                 countdownDisplay.style.display = 'block';
             } else {
                 countdownDisplay.style.display = 'none';
+            }
+            
+            // Show/hide pre-login button
+            if (preVotingMode && electionStatus.preVotingAllowed) {
+                preLoginBtn.style.display = 'block';
+            } else {
+                preLoginBtn.style.display = 'none';
             }
             
             // Enable/disable voting form
@@ -1266,9 +1422,13 @@ b, .zoho-bold {
                         statusDiv.className = 'credential-status invalid';
                         statusDiv.textContent = '❌ You have already voted!';
                         credentialsValidated = false;
-                    } else if (response.data.canVote) {
+                    } else if (response.data.canVote || preVotingMode) {
                         statusDiv.className = 'credential-status valid';
-                        statusDiv.textContent = '✅ Credentials validated - Ready to launch!';
+                        if (preVotingMode) {
+                            statusDiv.textContent = '✅ Credentials validated - Ready for launch window!';
+                        } else {
+                            statusDiv.textContent = '✅ Credentials validated - Ready to launch!';
+                        }
                         credentialsValidated = true;
                     } else {
                         statusDiv.className = 'credential-status invalid';
@@ -1477,16 +1637,35 @@ b, .zoho-bold {
             }
         }
 
+        // Pre-fetch winner data 10 seconds before announcement
+        async function preFetchWinnerData() {
+            console.log('Pre-fetching winner data...');
+            try {
+                const response = await axios.get('/.netlify/functions/get-winner-data');
+                winnerDataPreFetched = response.data;
+                console.log('Winner data pre-fetched successfully');
+            } catch (error) {
+                console.error('Error pre-fetching winner data:', error);
+            }
+        }
+
         // Start countdown to announcement
         function startAnnouncementCountdown() {
             // Store the initial time
             let remainingTime = announcementStatus.timeUntilAnnouncement;
+            let preFetchTriggered = false;
             
             const updateCountdown = () => {
                 if (remainingTime <= 0) {
                     clearInterval(announcementCountdownInterval);
                     loadWinnerAnnouncement(); // Refresh status
                     return;
+                }
+                
+                // Pre-fetch winner data 10 seconds before announcement
+                if (!preFetchTriggered && remainingTime <= 10000) { // 10 seconds = 10000ms
+                    preFetchTriggered = true;
+                    preFetchWinnerData();
                 }
                 
                 const totalSeconds = Math.floor(remainingTime / 1000);
@@ -1516,7 +1695,10 @@ b, .zoho-bold {
         // Display winners with effects
         function displayWinners() {
             const announcementDiv = document.getElementById('winner-announcement');
-            const winners = announcementStatus.winners.winners;
+            
+            // Use pre-fetched data if available, otherwise use the regular data
+            const winnersData = winnerDataPreFetched || announcementStatus.winners;
+            const winners = winnersData.winners;
             
             let winnersHtml = `
                 <div class="winner-announcement">
@@ -1561,6 +1743,74 @@ b, .zoho-bold {
                     <p>Stay tuned for the grand reveal! ✨</p>
                 </div>
             `;
+        }
+
+        // Show confirmation modal
+        function showVoteConfirmation(voteData) {
+            const modal = document.getElementById('confirmation-modal');
+            const summary = document.getElementById('vote-summary');
+            
+            // Generate vote summary
+            let summaryHtml = '<strong>Your Vote Summary:</strong><br><br>';
+            summaryHtml += `<strong>👑 President:</strong> ${voteData.votes.president}<br>`;
+            summaryHtml += `<strong>📜 Secretary:</strong> ${voteData.votes.secretary}<br>`;
+            summaryHtml += `<strong>💎 Treasurer:</strong> ${voteData.votes.treasurer}<br>`;
+            summaryHtml += `<br><strong>Voter:</strong> ${voteData.registerNumber}`;
+            
+            summary.innerHTML = summaryHtml;
+            modal.style.display = 'block';
+            
+            // Store the vote data for later submission
+            pendingVoteData = voteData;
+        }
+
+        // Confirm vote submission
+        async function confirmVoteSubmission() {
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'none';
+            
+            // Disable submit button
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Launching...';
+
+            try {
+                const response = await axios.post('/.netlify/functions/submit-vote', pendingVoteData);
+                
+                if (response.data.success) {
+                    showMessage('Vote successfully launched into the Altruix! Thank you for voting.', 'success');
+                    hasVoted = true;
+                    document.getElementById('voting-form').reset();
+                    submitBtn.textContent = 'Vote Launched';
+                    
+                    // Clear credential status
+                    document.getElementById('credential-status').style.display = 'none';
+                    credentialsValidated = false;
+                } else {
+                    showMessage(response.data.message || 'Error launching vote', 'error');
+                    submitBtn.disabled = false;
+                    updateSubmitButton();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                let errorMessage = 'Error launching vote. Please try again.';
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                showMessage(errorMessage, 'error');
+                submitBtn.disabled = false;
+                updateSubmitButton();
+            }
+            
+            // Clear pending vote data
+            pendingVoteData = null;
+        }
+
+        // Cancel vote submission
+        function cancelVoteSubmission() {
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'none';
+            pendingVoteData = null;
         }
 
         // Form submission
@@ -1613,38 +1863,8 @@ b, .zoho-bold {
                 return;
             }
 
-            // Disable submit button
-            const submitBtn = document.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Launching...';
-
-            try {
-                const response = await axios.post('/.netlify/functions/submit-vote', voteData);
-                
-                if (response.data.success) {
-                    showMessage('Vote successfully launched into the Altruix! Thank you for voting.', 'success');
-                    hasVoted = true;
-                    document.getElementById('voting-form').reset();
-                    submitBtn.textContent = 'Vote Launched';
-                    
-                    // Clear credential status
-                    document.getElementById('credential-status').style.display = 'none';
-                    credentialsValidated = false;
-                } else {
-                    showMessage(response.data.message || 'Error launching vote', 'error');
-                    submitBtn.disabled = false;
-                    updateSubmitButton();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                let errorMessage = 'Error launching vote. Please try again.';
-                if (error.response && error.response.data && error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                }
-                showMessage(errorMessage, 'error');
-                submitBtn.disabled = false;
-                updateSubmitButton();
-            }
+            // Show confirmation modal instead of submitting directly
+            showVoteConfirmation(voteData);
         });
 
         // Load results
@@ -1761,6 +1981,14 @@ b, .zoho-bold {
                 messageDiv.innerHTML = '';
             }, 5000);
         }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('confirmation-modal');
+            if (e.target === modal) {
+                cancelVoteSubmission();
+            }
+        });
 
         // Initialize on page load
         window.addEventListener('load', async () => {

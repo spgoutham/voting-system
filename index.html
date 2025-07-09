@@ -227,10 +227,10 @@ b, .zoho-bold {
         .nominee-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
             background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
             transform: scale(0);
             transition: transform 0.6s ease;
@@ -783,10 +783,10 @@ b, .zoho-bold {
         .winner-announcement::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
             background: 
                 radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
                 repeating-linear-gradient(
@@ -1339,8 +1339,16 @@ b, .zoho-bold {
 
         // Load nominees from backend
         async function loadNominees() {
+            // Show loading immediately
+            document.getElementById('nominees-grid').innerHTML = `
+                <div class="loading" style="grid-column: 1/-1;">
+                    <div class="spinner"></div>
+                    <p>Loading our Altruixx nominees...</p>
+                </div>
+            `;
+
             try {
-                const response = await axios.get('/.netlify/functions/get-nominees');
+                const response = await axios.get('/.netlify/functions/get-nominees?' + Date.now()); // Cache bust
                 nominees = response.data.nominees || [];
                 displayNominees();
             } catch (error) {
@@ -1353,7 +1361,7 @@ b, .zoho-bold {
         // Fallback: Extract nominees from candidates
         async function loadCandidatesForNominees() {
             try {
-                const response = await axios.get('/.netlify/functions/get-candidates');
+                const response = await axios.get('/.netlify/functions/get-candidates?' + Date.now()); // Cache bust
                 const candidatesData = response.data;
                 
                 // Extract all unique names from all positions
@@ -1409,8 +1417,13 @@ b, .zoho-bold {
 
         // Load election status and handle countdown
         async function loadElectionStatus() {
+            // Show loading for status banner
+            const banner = document.getElementById('election-status-banner');
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = 'Loading election status...';
+            
             try {
-                const response = await axios.get('/.netlify/functions/get-election-status');
+                const response = await axios.get('/.netlify/functions/get-election-status?' + Date.now()); // Cache bust
                 electionStatus = response.data;
                 
                 console.log('Election Status Response:', electionStatus);
@@ -1742,8 +1755,16 @@ b, .zoho-bold {
 
         // Load candidates from backend
         async function loadCandidates() {
+            // Show loading immediately
+            document.getElementById('candidates-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading Altruixx candidates...</p>
+                </div>
+            `;
+
             try {
-                const response = await axios.get('/.netlify/functions/get-candidates');
+                const response = await axios.get('/.netlify/functions/get-candidates?' + Date.now()); // Cache bust
                 currentCandidates = response.data;
                 displayCandidateForm();
             } catch (error) {
@@ -1807,8 +1828,16 @@ b, .zoho-bold {
 
         // Load winner announcement status
         async function loadWinnerAnnouncement() {
+            // Show loading immediately
+            document.getElementById('results-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Checking Altruixx announcement status...</p>
+                </div>
+            `;
+
             try {
-                const response = await axios.get('/.netlify/functions/get-winner-announcement');
+                const response = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now()); // Cache bust
                 announcementStatus = response.data;
                 updateAnnouncementDisplay();
                 
@@ -1818,10 +1847,10 @@ b, .zoho-bold {
                 }
                 
                 // Start countdown if needed
-                if (announcementStatus.status === 'SCHEDULED' && announcementStatus.timeUntilAnnouncement > 0) {
+                if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && announcementStatus.timeUntilAnnouncement > 0) {
                     startAnnouncementCountdown();
-                } else if (announcementStatus.isAnnounced && announcementStatus.winners) {
-                    displayWinners();
+                } else if (announcementStatus.isAnnounced && (announcementStatus.winners || announcementStatus.preFetchedWinners)) {
+                    displayWinnersWithGrandReveal();
                 } else if (announcementStatus.canViewResults) {
                     loadResults();
                 } else {
@@ -2248,8 +2277,16 @@ b, .zoho-bold {
 
         // Load results
         async function loadResults() {
+            // Show loading immediately
+            document.getElementById('results-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Scanning the Altruixx for results...</p>
+                </div>
+            `;
+
             try {
-                const response = await axios.get('/.netlify/functions/get-results');
+                const response = await axios.get('/.netlify/functions/get-results?' + Date.now()); // Cache bust
                 const results = response.data;
                 
                 displayResults(results);

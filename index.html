@@ -815,29 +815,33 @@ b, .zoho-bold {
 /* Replace the existing .winner-card and related CSS with this: */
 
 .winner-card {
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(138, 43, 226, 0.15));
-    padding: 40px 25px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(138, 43, 226, 0.2));  /* PERMANENT GOLD BACKGROUND */
+    padding: 50px 25px 40px 25px;
     border-radius: 20px;
-    border: 2px solid rgba(138, 43, 226, 0.5);
+    border: 2px solid #ffd700;                                    /* PERMANENT GOLD BORDER */
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 200px;
+    min-height: 220px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    box-shadow: 
+        0 5px 20px rgba(138, 43, 226, 0.3), 
+        0 0 20px rgba(255, 215, 0, 0.2),                          /* PERMANENT GOLD GLOW */
+        inset 0 0 30px rgba(255, 215, 0, 0.08);                   /* PERMANENT INNER GLOW */
 }
-
 .winner-card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4), 0 0 30px rgba(255, 215, 0, 0.3);
+    box-shadow: 
+        0 15px 40px rgba(138, 43, 226, 0.4), 
+        0 0 40px rgba(255, 215, 0, 0.4),                          /* STRONGER GLOW ON HOVER */
+        inset 0 0 60px rgba(255, 215, 0, 0.15);                   /* STRONGER INNER GLOW */
     border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(138, 43, 226, 0.25)); /* BRIGHTER ON HOVER */
 }
-
 /* FIXED: Complete box coverage for hover effect */
 .winner-card::after {
     content: '';

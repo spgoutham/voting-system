@@ -283,26 +283,43 @@ b, .zoho-bold {
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .election-status-banner.waiting {
-            background: linear-gradient(135deg, #4b1248, #f0c27b);
-        }
+.election-status-banner.waiting {
+    background: linear-gradient(135deg, #4b1248, #8a2be2);
+}
 
-        .election-status-banner.pre-voting {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
-            color: #000;
-        }
+.election-status-banner.pre-voting {
+    background: linear-gradient(135deg, #8a2be2, #ffd700);
+    color: #000;
+}
 
-        .election-status-banner.open {
-            background: linear-gradient(135deg, #1e90ff, #00bfff);
-        }
+.election-status-banner.announcement {
+    background: linear-gradient(135deg, #8a2be2, #ffd700);
+    position: relative;
+    overflow: hidden;
+}
 
-        .election-status-banner.closed {
-            background: linear-gradient(135deg, #00b09b, #96c93d);
-        }
+.election-status-banner.announcement::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 215, 0, 0.1) 10px,
+        rgba(255, 215, 0, 0.1) 20px
+    );
+    animation: shimmer 3s linear infinite;
+    z-index: -1;
+}
 
-        .election-status-banner.announcement {
-            background: linear-gradient(135deg, #8a2be2, #ff6b6b);
-        }
+@keyframes shimmer {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
 
         .status-content {
             display: flex;
@@ -322,27 +339,32 @@ b, .zoho-bold {
             max-width: 500px;
         }
 
-        .countdown-timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+       .countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 80px; /* Prevent layout shift */
+}
+      .time-unit {
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+       .time-value {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    min-height: 2rem; /* Prevent content shift */
+}
 
-        .time-unit {
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
-            border-radius: 10px;
-            min-width: 70px;
-        }
-
-        .time-value {
-            display: block;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1;
-        }
 
         .time-label {
             display: block;
@@ -653,22 +675,21 @@ b, .zoho-bold {
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
 
-        /* Grand Reveal Effects */
-        .countdown-final-seconds {
-            animation: finalCountdownPulse 1s ease-in-out infinite !important;
-        }
+       .countdown-final-seconds .time-value {
+    animation: pulseGlow 0.5s ease-in-out infinite !important;
+    color: #ffd700 !important;
+}
 
-        @keyframes finalCountdownPulse {
-            0%, 100% { 
-                transform: scale(1); 
-                filter: brightness(1) hue-rotate(0deg);
-            }
-            50% { 
-                transform: scale(1.05); 
-                filter: brightness(1.2) hue-rotate(10deg);
-            }
-        }
-
+@keyframes pulseGlow {
+    0%, 100% { 
+        transform: scale(1); 
+        text-shadow: 0 0 10px #ffd700;
+    }
+    50% { 
+        transform: scale(1.1); 
+        text-shadow: 0 0 20px #ffd700, 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+}
         .winner-reveal-entrance {
             animation: grandRevealEntrance 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -826,38 +847,44 @@ b, .zoho-bold {
             margin-right: auto;
         }
 
-        .winner-card {
-            background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(138, 43, 226, 0.15));
-            padding: 40px 25px;
-            border-radius: 20px;
-            border: 2px solid rgba(138, 43, 226, 0.5);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
+     .winner-card {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(138, 43, 226, 0.15));
+    padding: 40px 25px;
+    border-radius: 20px;
+    border: 2px solid rgba(138, 43, 226, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
 
-        .winner-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4);
-        }
-
-        .winner-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
-            z-index: -1;
-        }
-
+       .winner-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4), 0 0 30px rgba(255, 215, 0, 0.3);
+    border-color: #ffd700;
+}
+       .winner-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
+    z-index: -1;
+    border-radius: 18px;
+    transition: all 0.4s ease;
+}
+.winner-card:hover::after {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(138, 43, 226, 0.2));
+}
         .winner-card::before {
             content: '👑';
             position: absolute;
@@ -1548,78 +1575,61 @@ b, .zoho-bold {
             updateSubmitButton();
         }
 
-        // Start countdown until voting starts
-        function startCountdown() {
-            // Store the initial time
-            let remainingTime = electionStatus.timeUntilStart;
-            
-            console.log('Starting countdown with:', remainingTime, 'ms');
-            
-            if (!remainingTime || remainingTime <= 0) {
-                console.log('Invalid remaining time:', remainingTime);
-                return;
-            }
-            
-            const updateCountdown = () => {
-                if (remainingTime <= 0) {
-                    console.log('Countdown finished!');
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                    loadElectionStatus(); // Refresh status
-                    return;
-                }
-                
-                const totalSeconds = Math.floor(remainingTime / 1000);
-                const days = Math.floor(totalSeconds / 86400);
-                const hours = Math.floor((totalSeconds % 86400) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                
-                console.log(`Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s (${totalSeconds}s total)`);
-                
-                // Update DOM elements if they exist
-                const daysEl = document.getElementById('days');
-                const hoursEl = document.getElementById('hours');
-                const minutesEl = document.getElementById('minutes');
-                const secondsEl = document.getElementById('seconds');
-                
-                if (daysEl) {
-                    daysEl.textContent = String(days).padStart(2, '0');
-                    console.log('Updated days to:', daysEl.textContent);
-                } else {
-                    console.log('Days element not found');
-                }
-                
-                if (hoursEl) {
-                    hoursEl.textContent = String(hours).padStart(2, '0');
-                    console.log('Updated hours to:', hoursEl.textContent);
-                } else {
-                    console.log('Hours element not found');
-                }
-                
-                if (minutesEl) {
-                    minutesEl.textContent = String(minutes).padStart(2, '0');
-                    console.log('Updated minutes to:', minutesEl.textContent);
-                } else {
-                    console.log('Minutes element not found');
-                }
-                
-                if (secondsEl) {
-                    secondsEl.textContent = String(seconds).padStart(2, '0');
-                    console.log('Updated seconds to:', secondsEl.textContent);
-                } else {
-                    console.log('Seconds element not found');
-                }
-                
-                // Decrease remaining time
-                remainingTime -= 1000;
-            };
-            
-            updateCountdown(); // Initial call
-            countdownInterval = setInterval(updateCountdown, 1000);
-            console.log('Countdown interval started');
+      function startCountdown() {
+    // Store the initial time
+    let remainingTime = electionStatus.timeUntilStart;
+    
+    console.log('Starting countdown with:', remainingTime, 'ms');
+    
+    if (!remainingTime || remainingTime <= 0) {
+        console.log('Invalid remaining time:', remainingTime);
+        return;
+    }
+    
+    const updateCountdown = () => {
+        if (remainingTime <= 0) {
+            console.log('Countdown finished!');
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            loadElectionStatus(); // Refresh status
+            return;
         }
-
+        
+        const totalSeconds = Math.floor(remainingTime / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        console.log(`Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s (${totalSeconds}s total)`);
+        
+        // Update DOM elements if they exist and only if values changed
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        if (daysEl && daysEl.textContent !== String(days).padStart(2, '0')) {
+            daysEl.textContent = String(days).padStart(2, '0');
+        }
+        if (hoursEl && hoursEl.textContent !== String(hours).padStart(2, '0')) {
+            hoursEl.textContent = String(hours).padStart(2, '0');
+        }
+        if (minutesEl && minutesEl.textContent !== String(minutes).padStart(2, '0')) {
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+        }
+        if (secondsEl && secondsEl.textContent !== String(seconds).padStart(2, '0')) {
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        // Decrease remaining time
+        remainingTime -= 1000;
+    };
+    
+    updateCountdown(); // Initial call
+    countdownInterval = setInterval(updateCountdown, 1000);
+    console.log('Countdown interval started');
+}
         // Start countdown until voting ends
         function startCountdownUntilEnd() {
             document.getElementById('status-message').textContent = 'Voting ends in:';
@@ -1945,84 +1955,84 @@ b, .zoho-bold {
             }
         }
 
-        // Start countdown to announcement
-        function startAnnouncementCountdown() {
-            // Store the initial time
-            let remainingTime = announcementStatus.timeUntilAnnouncement;
-            let preFetchTriggered = false;
-            let finalEffectsTriggered = false;
-            
-            const updateCountdown = () => {
-                if (remainingTime <= 0) {
-                    clearInterval(announcementCountdownInterval);
-                    // Trigger grand reveal
-                    setTimeout(() => {
-                        loadWinnerAnnouncement();
-                    }, 1000);
-                    return;
-                }
-                
-                // Pre-fetch winner data 10 seconds before announcement
-                if (!preFetchTriggered && remainingTime <= 10000) { // 10 seconds = 10000ms
-                    preFetchTriggered = true;
-                    preFetchWinnerData();
-                }
-
-                // Add final countdown effects in last 30 seconds
-                if (!finalEffectsTriggered && remainingTime <= 30000) { // 30 seconds
-                    finalEffectsTriggered = true;
-                    const countdownTimer = document.getElementById('announcement-countdown-timer');
-                    if (countdownTimer) {
-                        countdownTimer.classList.add('countdown-final-seconds');
-                        // Add dramatic messaging
-                        const statusDiv = document.querySelector('.announcement .status-content div');
-                        if (statusDiv) {
-                            statusDiv.innerHTML = '🚨 FINAL COUNTDOWN! ALTRUIXX CHAMPIONS ABOUT TO BE REVEALED! 🚨';
-                            statusDiv.style.fontSize = '1.6rem';
-                            statusDiv.style.animation = 'finalCountdownPulse 0.5s ease-in-out infinite';
-                        }
-                    }
-                }
-
-                // Ultra dramatic effects in final 10 seconds
-                if (remainingTime <= 10000) {
-                    const statusDiv = document.querySelector('.announcement .status-content div');
-                    if (statusDiv) {
-                        const seconds = Math.ceil(remainingTime / 1000);
-                        statusDiv.innerHTML = `🔥 REVEAL IN ${seconds}! PREPARE FOR ALTRUIXX GLORY! 🔥`;
-                        statusDiv.style.animation = 'finalCountdownPulse 0.2s ease-in-out infinite';
-                    }
-                }
-                
-                const totalSeconds = Math.floor(remainingTime / 1000);
-                const days = Math.floor(totalSeconds / 86400);
-                const hours = Math.floor((totalSeconds % 86400) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                
-                const daysEl = document.getElementById('announce-days');
-                const hoursEl = document.getElementById('announce-hours');
-                const minutesEl = document.getElementById('announce-minutes');
-                const secondsEl = document.getElementById('announce-seconds');
-                
-                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-                if (secondsEl) {
-                    secondsEl.textContent = String(seconds).padStart(2, '0');
-                    // Add pulse effect to seconds in final countdown
-                    if (remainingTime <= 30000) {
-                        secondsEl.style.animation = 'finalCountdownPulse 0.5s ease-in-out infinite';
-                    }
-                }
-                
-                // Decrease remaining time
-                remainingTime -= 1000;
-            };
-            
-            updateCountdown(); // Initial call
-            announcementCountdownInterval = setInterval(updateCountdown, 1000);
+      function startAnnouncementCountdown() {
+    // Store the initial time
+    let remainingTime = announcementStatus.timeUntilAnnouncement;
+    let preFetchTriggered = false;
+    let finalEffectsTriggered = false;
+    
+    const updateCountdown = () => {
+        if (remainingTime <= 0) {
+            clearInterval(announcementCountdownInterval);
+            // Trigger grand reveal
+            setTimeout(() => {
+                loadWinnerAnnouncement();
+            }, 1000);
+            return;
         }
+        
+        // Pre-fetch winner data 10 seconds before announcement
+        if (!preFetchTriggered && remainingTime <= 10000) { // 10 seconds = 10000ms
+            preFetchTriggered = true;
+            preFetchWinnerData();
+        }
+
+        // Add final countdown effects in last 30 seconds
+        if (!finalEffectsTriggered && remainingTime <= 30000) { // 30 seconds
+            finalEffectsTriggered = true;
+            const countdownTimer = document.getElementById('announcement-countdown-timer');
+            if (countdownTimer) {
+                countdownTimer.classList.add('countdown-final-seconds');
+                // Add dramatic messaging
+                const statusDiv = document.querySelector('.announcement .status-content div');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '🚨 FINAL COUNTDOWN! ALTRUIXX CHAMPIONS ABOUT TO BE REVEALED! 🚨';
+                    statusDiv.style.fontSize = '1.6rem';
+                }
+            }
+        }
+
+        // Ultra dramatic effects in final 10 seconds - but don't change content every second
+        if (remainingTime <= 10000) {
+            const statusDiv = document.querySelector('.announcement .status-content div');
+            if (statusDiv && Math.ceil(remainingTime / 1000) % 2 === 0) { // Only update every 2 seconds
+                const seconds = Math.ceil(remainingTime / 1000);
+                statusDiv.innerHTML = `🔥 REVEAL IN ${seconds}! PREPARE FOR ALTRUIXX GLORY! 🔥`;
+            }
+        }
+        
+        const totalSeconds = Math.floor(remainingTime / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        // Only update DOM if elements exist and values have changed
+        const daysEl = document.getElementById('announce-days');
+        const hoursEl = document.getElementById('announce-hours');
+        const minutesEl = document.getElementById('announce-minutes');
+        const secondsEl = document.getElementById('announce-seconds');
+        
+        if (daysEl && daysEl.textContent !== String(days).padStart(2, '0')) {
+            daysEl.textContent = String(days).padStart(2, '0');
+        }
+        if (hoursEl && hoursEl.textContent !== String(hours).padStart(2, '0')) {
+            hoursEl.textContent = String(hours).padStart(2, '0');
+        }
+        if (minutesEl && minutesEl.textContent !== String(minutes).padStart(2, '0')) {
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+        }
+        if (secondsEl && secondsEl.textContent !== String(seconds).padStart(2, '0')) {
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        // Decrease remaining time
+        remainingTime -= 1000;
+    };
+    
+    updateCountdown(); // Initial call
+    announcementCountdownInterval = setInterval(updateCountdown, 1000);
+}
 
         // Display winners with GRAND REVEAL effects
         function displayWinnersWithGrandReveal() {
@@ -2082,74 +2092,74 @@ b, .zoho-bold {
             }
             
             let winnersHtml = `
-                <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
-                    <h2 style="font-family: 'Poppins', sans-serif; font-size: 3.5rem; font-weight: 900; text-shadow: 0 0 30px rgba(138, 43, 226, 0.8); text-transform: uppercase; letter-spacing: 3px;">
-                        🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
-                    </h2>
-                    <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
-                        ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
-                    </div>
-                    <div class="winners-grid">
-            `;
+        <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
+            <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 50px rgba(255, 215, 0, 0.5); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px;">
+                🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
+            </h2>
+            <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
+            </div>
+            <div class="winners-grid">
+    `;
 
-            // Define the exact order: president, secretary, treasurer
-            const positionOrder = ['president', 'secretary', 'treasurer'];
-            const positionTitles = {
-                president: 'ALTRUIXX PRESIDENT',
-                secretary: 'ALTRUIXX SECRETARY',
-                treasurer: 'ALTRUIXX TREASURER'
-            };
+    // Define the exact order: president, secretary, treasurer
+    const positionOrder = ['president', 'secretary', 'treasurer'];
+    const positionTitles = {
+        president: 'ALTRUIXX PRESIDENT',
+        secretary: 'ALTRUIXX SECRETARY',
+        treasurer: 'ALTRUIXX TREASURER'
+    };
 
-            positionOrder.forEach((position, index) => {
-                if (winners[position]) {
-                    const winner = winners[position];
-                    const marginText = winner.victoryMargin > 0 ? 
-                        `WON BY ${winner.victoryMargin} VOTES` : 
-                        `${winner.votes} VOTES`;
-                    
-                    winnersHtml += `
-                        <div class="winner-card winner-crown-glow" style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s;">
-                            <div class="winner-position">
-                                ${positionTitles[position]}
-                            </div>
-                            <div class="winner-name">
-                                ${winner.name}
-                            </div>
-                            <div class="winner-votes">
-                                🎯 ${marginText}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
+    positionOrder.forEach((position, index) => {
+        if (winners[position]) {
+            const winner = winners[position];
+            const marginText = winner.victoryMargin > 0 ? 
+                `WON BY ${winner.victoryMargin} VOTES` : 
+                `${winner.votes} VOTES`;
+            
             winnersHtml += `
+                <div class="winner-card winner-crown-glow" style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s;">
+                    <div class="winner-position">
+                        ${positionTitles[position]}
                     </div>
-                    <div style="font-family: 'Poppins', sans-serif; margin-top: 50px; font-size: 1.6rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
-                        🌟 LONG LIVE THE ALTRUIXX CHAMPIONS! 🌟
+                    <div class="winner-name">
+                        ${winner.name}
                     </div>
-                    <div style="font-family: 'Poppins', sans-serif; margin-top: 20px; font-size: 1.1rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                        🚀 READY TO LAUNCH INTO A NEW ERA OF EXCELLENCE! 🚀
+                    <div class="winner-votes">
+                        🎯 ${marginText}
                     </div>
                 </div>
             `;
-
-            announcementDiv.innerHTML = winnersHtml;
-            
-            // Only add effects if this is a fresh reveal
-            if (shouldShowEffects) {
-                // Add fireworks and confetti
-                setTimeout(() => {
-                    announcementDiv.appendChild(createFireworks());
-                    announcementDiv.appendChild(createConfetti());
-                }, 800);
-                
-                // Add sound effect simulation (visual pulse)
-                setTimeout(() => {
-                    document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
-                }, 1200);
-            }
         }
+    });
+
+    winnersHtml += `
+            </div>
+            <div style="font-family: 'Poppins', sans-serif; margin-top: 50px; font-size: 1.6rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                🌟 LONG LIVE THE ALTRUIXX CHAMPIONS! 🌟
+            </div>
+            <div style="font-family: 'Poppins', sans-serif; margin-top: 20px; font-size: 1.1rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                🚀 READY TO LAUNCH INTO A NEW ERA OF EXCELLENCE! 🚀
+            </div>
+        </div>
+    `;
+
+    announcementDiv.innerHTML = winnersHtml;
+    
+    // Only add effects if this is a fresh reveal
+    if (shouldShowEffects) {
+        // Add fireworks and confetti
+        setTimeout(() => {
+            announcementDiv.appendChild(createFireworks());
+            announcementDiv.appendChild(createConfetti());
+        }, 800);
+        
+        // Add sound effect simulation (visual pulse)
+        setTimeout(() => {
+            document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
+        }, 1200);
+    }
+}
 
         // Keep the original display function for fallback
         function displayWinners() {

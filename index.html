@@ -666,21 +666,73 @@ b, .zoho-bold {
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
 
-       .countdown-final-seconds .time-value {
-    animation: pulseGlow 0.5s ease-in-out infinite !important;
-    color: #ffd700 !important;
-}
+       /* Enhanced Final Countdown Effects */
+        .countdown-final-seconds .time-value {
+            animation: megaPulseGlow 0.3s ease-in-out infinite !important;
+            color: #ffd700 !important;
+            font-size: 2.5rem !important;
+        }
 
-@keyframes pulseGlow {
-    0%, 100% { 
-        transform: scale(1); 
-        text-shadow: 0 0 10px #ffd700;
-    }
-    50% { 
-        transform: scale(1.1); 
-        text-shadow: 0 0 20px #ffd700, 0 0 30px rgba(255, 215, 0, 0.5);
-    }
-}
+        .countdown-ultra-final .time-value {
+            animation: ultimateGlow 0.2s ease-in-out infinite !important;
+            color: #ff0000 !important;
+            font-size: 3rem !important;
+        }
+
+        @keyframes megaPulseGlow {
+            0%, 100% { 
+                transform: scale(1) rotateY(0deg); 
+                text-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            }
+            50% { 
+                transform: scale(1.2) rotateY(10deg); 
+                text-shadow: 0 0 25px #ffd700, 0 0 50px #ffd700, 0 0 75px rgba(255, 215, 0, 0.8);
+                box-shadow: 0 0 40px rgba(255, 215, 0, 1);
+            }
+        }
+
+        @keyframes ultimateGlow {
+            0%, 100% { 
+                transform: scale(1) rotateZ(0deg); 
+                text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 60px #ff0000;
+                color: #ff0000;
+            }
+            25% { 
+                transform: scale(1.3) rotateZ(5deg); 
+                text-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700, 0 0 90px #ffd700;
+                color: #ffd700;
+            }
+            50% { 
+                transform: scale(1.4) rotateZ(-5deg); 
+                text-shadow: 0 0 35px #ff6b6b, 0 0 70px #ff6b6b, 0 0 100px #ff6b6b;
+                color: #ff6b6b;
+            }
+            75% { 
+                transform: scale(1.3) rotateZ(3deg); 
+                text-shadow: 0 0 30px #8a2be2, 0 0 60px #8a2be2, 0 0 90px #8a2be2;
+                color: #8a2be2;
+            }
+        }
+
+        /* Screen shake effect for final seconds */
+        @keyframes screenQuake {
+            0%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-2px) rotateZ(-0.5deg); }
+            20% { transform: translateX(2px) rotateZ(0.5deg); }
+            30% { transform: translateX(-3px) rotateZ(-0.8deg); }
+            40% { transform: translateX(3px) rotateZ(0.8deg); }
+            50% { transform: translateX(-2px) rotateZ(-0.5deg); }
+            60% { transform: translateX(2px) rotateZ(0.5deg); }
+            70% { transform: translateX(-3px) rotateZ(-0.8deg); }
+            80% { transform: translateX(3px) rotateZ(0.8deg); }
+            90% { transform: translateX(-1px) rotateZ(-0.3deg); }
+        }
+
+        .screen-shake {
+            animation: screenQuake 0.5s ease-in-out infinite !important;
+        }
+
         .winner-reveal-entrance {
             animation: grandRevealEntrance 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -1128,13 +1180,53 @@ b, .zoho-bold {
             transform: translateZ(0);
             backface-visibility: hidden;
         }
+
+        /* ENHANCED MOBILE RESPONSIVE DESIGN */
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 30px 15px;
+                margin-bottom: 30px;
+            }
+
             .header h1 {
                 font-size: 2.2rem;
+                letter-spacing: 1px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .nav-tabs {
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                letter-spacing: 0.5px;
+            }
+
+            .tab-content {
+                padding: 20px 15px;
             }
 
             .nominees-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .nominee-card {
+                padding: 20px;
+            }
+
+            .nominee-name {
+                font-size: 1.2rem;
             }
 
             .countdown-timer {
@@ -1143,49 +1235,314 @@ b, .zoho-bold {
             
             .time-unit {
                 min-width: 60px;
-                padding: 10px;
+                padding: 10px 8px;
             }
             
             .time-value {
                 font-size: 1.5rem;
             }
 
-            .winner-announcement h2 {
-                font-size: 1.8rem;
+            .time-label {
+                font-size: 0.7rem;
             }
 
+            /* MOBILE WINNER ANNOUNCEMENT STYLES */
+            .winner-announcement {
+                padding: 25px 15px;
+                margin: 20px 0;
+            }
+
+            .winner-announcement h2 {
+                font-size: 1.6rem;
+                letter-spacing: 1px;
+                margin-bottom: 20px;
+            }
+
+            /* MOBILE WINNERS GRID - SINGLE COLUMN */
+            .winners-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-top: 25px;
+                max-width: 400px;
+            }
+
+            .winner-card {
+                padding: 30px 20px;
+                min-height: 180px;
+                border-radius: 15px;
+            }
+
+            .winner-position {
+                font-size: 0.85rem;
+                letter-spacing: 1px;
+                margin-bottom: 12px;
+            }
+
+            .winner-name {
+                font-size: 1.4rem;
+                letter-spacing: 0.5px;
+                margin-bottom: 12px;
+                line-height: 1.3;
+            }
+
+            .winner-votes {
+                font-size: 0.95rem;
+                letter-spacing: 0.3px;
+            }
+
+            /* MOBILE RESULTS GRID */
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .position-card {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+
+            .position-card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            /* MOBILE ELECTION STATUS */
+            .election-status-banner {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            #status-message {
+                font-size: 1rem;
+                text-align: center;
+                line-height: 1.4;
+            }
+
+            .countdown-display {
+                max-width: 100%;
+                margin-top: 15px;
+            }
+
+            /* MOBILE FORM ADJUSTMENTS */
+            .voting-form h2 {
+                font-size: 1.6rem;
+                letter-spacing: 1px;
+                margin-bottom: 25px;
+            }
+
+            .position-section {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+            }
+
+            .position-title {
+                font-size: 1.1rem;
+                letter-spacing: 0.5px;
+                margin-bottom: 15px;
+            }
+
+            .candidate-option label {
+                padding: 12px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .candidate-name {
+                font-size: 0.95rem;
+            }
+
+            .candidate-tag {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+
+            .submit-btn {
+                padding: 14px;
+                font-size: 1rem;
+                letter-spacing: 0.5px;
+            }
+
+            /* MOBILE CONFIRMATION MODAL */
             .confirmation-content {
                 padding: 30px 20px;
+                max-width: 350px;
+            }
+
+            .confirmation-content h3 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
             }
 
             .confirmation-buttons {
                 flex-direction: column;
+                gap: 12px;
+            }
+
+            .confirm-btn, .cancel-btn {
+                padding: 12px 20px;
+                min-width: 100%;
+            }
+
+            /* MOBILE LOADING STATES */
+            .loading {
+                padding: 30px 15px;
+            }
+
+            .results-denied {
+                padding: 40px 15px;
+            }
+
+            .results-denied h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            .results-denied p {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
+            /* MOBILE ENHANCED COUNTDOWN EFFECTS */
+            .countdown-final-seconds .time-value {
+                font-size: 2rem !important;
+            }
+
+            .countdown-ultra-final .time-value {
+                font-size: 2.3rem !important;
+            }
+
+            /* MOBILE FIREWORKS ADJUSTMENTS */
+            .firework {
+                width: 3px;
+                height: 3px;
+            }
+
+            .confetti {
+                width: 6px;
+                height: 6px;
             }
         }
 
         @media (max-width: 480px) {
             .container {
-                padding: 15px;
+                padding: 10px;
+            }
+
+            .header {
+                padding: 25px 10px;
             }
 
             .header h1 {
                 font-size: 1.8rem;
+                letter-spacing: 0.5px;
+            }
+
+            .header p {
+                font-size: 0.9rem;
             }
 
             .tab-content {
-                padding: 20px;
+                padding: 15px 10px;
             }
 
             .nominees-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
 
-            .position-section {
-                padding: 20px;
+            .nominee-card {
+                padding: 15px;
+            }
+
+            .nominee-name {
+                font-size: 1.1rem;
+            }
+
+            .winner-announcement {
+                padding: 20px 10px;
             }
 
             .winner-announcement h2 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
+                line-height: 1.3;
+            }
+
+            .winners-grid {
+                gap: 15px;
+                max-width: 320px;
+            }
+
+            .winner-card {
+                padding: 25px 15px;
+                min-height: 160px;
+            }
+
+            .winner-position {
+                font-size: 0.8rem;
+            }
+
+            .winner-name {
+                font-size: 1.2rem;
+            }
+
+            .winner-votes {
+                font-size: 0.9rem;
+            }
+
+            .position-section {
+                padding: 15px 10px;
+            }
+
+            .position-title {
+                font-size: 1rem;
+            }
+
+            .time-unit {
+                min-width: 55px;
+                padding: 8px 6px;
+            }
+
+            .time-value {
+                font-size: 1.3rem;
+            }
+
+            .countdown-final-seconds .time-value {
+                font-size: 1.8rem !important;
+            }
+
+            .countdown-ultra-final .time-value {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* TABLET SPECIFIC ADJUSTMENTS */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .winners-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 25px;
+            }
+
+            .winner-card {
+                padding: 40px 20px;
+                min-height: 200px;
+            }
+
+            .winner-name {
+                font-size: 1.6rem;
+            }
+
+            .countdown-timer {
+                gap: 12px;
+            }
+
+            .time-unit {
+                min-width: 65px;
+                padding: 12px 10px;
+            }
+
+            .time-value {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -1330,6 +1687,8 @@ b, .zoho-bold {
         let preVotingMode = false;
         let winnerDataPreFetched = null;
         let pendingVoteData = null;
+        let resultsTabLoaded = false; // Track if results tab has been loaded
+        let autoRefreshEnabled = false; // Track if auto-refresh should be enabled
 
         // Tab switching
         function showTab(tabName) {
@@ -1351,7 +1710,14 @@ b, .zoho-bold {
 
             // Load appropriate content
             if (tabName === 'results') {
-                loadWinnerAnnouncement();
+                if (!resultsTabLoaded) {
+                    resultsTabLoaded = true;
+                    loadWinnerAnnouncement();
+                    // Enable auto-refresh only after first manual load
+                    setTimeout(() => {
+                        autoRefreshEnabled = true;
+                    }, 1000);
+                }
             } else if (tabName === 'vote') {
                 loadElectionStatus();
             } else if (tabName === 'nominees') {
@@ -1831,31 +2197,38 @@ b, .zoho-bold {
             container.innerHTML = html;
         }
 
-        // Load winner announcement status
+        // FIXED: Load winner announcement with proper state management
         async function loadWinnerAnnouncement() {
+            console.log('Loading winner announcement...');
+            
             // Show loading immediately and clear any previous content
             const resultsContainer = document.getElementById('results-container');
             const announcementDiv = document.getElementById('winner-announcement');
             
-            // Clear previous content
-            announcementDiv.style.display = 'none';
-            announcementDiv.innerHTML = '';
-            
-            resultsContainer.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Checking Altruixx announcement status...</p>
-                </div>
-            `;
+            // Only show loading if not previously loaded
+            if (!resultsContainer.innerHTML || resultsContainer.innerHTML.includes('Scanning the Altruix')) {
+                announcementDiv.style.display = 'none';
+                announcementDiv.innerHTML = '';
+                
+                resultsContainer.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Checking Altruixx announcement status...</p>
+                    </div>
+                `;
+            }
 
             try {
                 const response = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now()); // Cache bust
                 announcementStatus = response.data;
+                console.log('Announcement Status:', announcementStatus);
+                
                 updateAnnouncementDisplay();
                 
                 // Clear any existing announcement countdown interval
                 if (announcementCountdownInterval) {
                     clearInterval(announcementCountdownInterval);
+                    announcementCountdownInterval = null;
                 }
                 
                 // Start countdown if needed
@@ -1880,6 +2253,8 @@ b, .zoho-bold {
         function updateAnnouncementDisplay() {
             const announcementDiv = document.getElementById('winner-announcement');
             const resultsContainer = document.getElementById('results-container');
+            
+            console.log('Updating announcement display, status:', announcementStatus.status);
             
             // Check for scheduled announcement OR pre-fetch phase
             if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && !announcementStatus.isAnnounced) {
@@ -1955,10 +2330,21 @@ b, .zoho-bold {
     let remainingTime = announcementStatus.timeUntilAnnouncement;
     let preFetchTriggered = false;
     let finalEffectsTriggered = false;
+    let ultraFinalTriggered = false;
+    let screenShakeTriggered = false;
+    
+    console.log('Starting announcement countdown with:', remainingTime, 'ms');
     
     const updateCountdown = () => {
         if (remainingTime <= 0) {
             clearInterval(announcementCountdownInterval);
+            announcementCountdownInterval = null;
+            // Remove any final effects
+            document.body.classList.remove('screen-shake');
+            const timer = document.getElementById('announcement-countdown-timer');
+            if (timer) {
+                timer.classList.remove('countdown-final-seconds', 'countdown-ultra-final');
+            }
             // Trigger grand reveal
             setTimeout(() => {
                 loadWinnerAnnouncement();
@@ -1987,12 +2373,36 @@ b, .zoho-bold {
             }
         }
 
+        // ULTRA dramatic effects in final 10 seconds
+        if (!ultraFinalTriggered && remainingTime <= 10000) {
+            ultraFinalTriggered = true;
+            const countdownTimer = document.getElementById('announcement-countdown-timer');
+            if (countdownTimer) {
+                countdownTimer.classList.remove('countdown-final-seconds');
+                countdownTimer.classList.add('countdown-ultra-final');
+                // Create floating particles effect
+                createFloatingParticles();
+            }
+        }
+
+        // Screen shake in final 5 seconds
+        if (!screenShakeTriggered && remainingTime <= 5000) {
+            screenShakeTriggered = true;
+            document.body.classList.add('screen-shake');
+        }
+
         // Ultra dramatic effects in final 10 seconds - but don't change content every second
         if (remainingTime <= 10000) {
             const statusDiv = document.querySelector('.announcement .status-content div');
             if (statusDiv && Math.ceil(remainingTime / 1000) % 2 === 0) { // Only update every 2 seconds
                 const seconds = Math.ceil(remainingTime / 1000);
-                statusDiv.innerHTML = `🔥 REVEAL IN ${seconds}! PREPARE FOR ALTRUIXX GLORY! 🔥`;
+                const messages = [
+                    `🔥 REVEAL IN ${seconds}! PREPARE FOR ALTRUIXX GLORY! 🔥`,
+                    `⚡ ${seconds} SECONDS TO COSMIC REVELATION! ⚡`,
+                    `🌟 CHAMPIONS EMERGING IN ${seconds}! 🌟`,
+                    `🚀 T-MINUS ${seconds} TO ULTIMATE GLORY! 🚀`
+                ];
+                statusDiv.innerHTML = messages[Math.floor(Math.random() * messages.length)];
             }
         }
         
@@ -2028,6 +2438,77 @@ b, .zoho-bold {
     updateCountdown(); // Initial call
     announcementCountdownInterval = setInterval(updateCountdown, 1000);
 }
+
+        // Enhanced floating particles effect for final countdown
+        function createFloatingParticles() {
+            const particleContainer = document.createElement('div');
+            particleContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                pointer-events: none;
+                z-index: 9999;
+            `;
+            
+            // Create multiple particles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: absolute;
+                        width: 6px;
+                        height: 6px;
+                        background: ${['#8a2be2', '#1e90ff', '#ff6b6b', '#ffd700'][Math.floor(Math.random() * 4)]};
+                        border-radius: 50%;
+                        left: ${Math.random() * 100}vw;
+                        top: ${Math.random() * 100}vh;
+                        animation: floatAround 3s ease-in-out infinite;
+                        box-shadow: 0 0 10px currentColor;
+                    `;
+                    
+                    // Add custom animation keyframes
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes floatAround {
+                            0%, 100% {
+                                transform: translate(0, 0) scale(0.5);
+                                opacity: 0.3;
+                            }
+                            25% {
+                                transform: translate(${(Math.random() - 0.5) * 100}px, ${(Math.random() - 0.5) * 100}px) scale(1);
+                                opacity: 1;
+                            }
+                            50% {
+                                transform: translate(${(Math.random() - 0.5) * 150}px, ${(Math.random() - 0.5) * 150}px) scale(0.8);
+                                opacity: 0.8;
+                            }
+                            75% {
+                                transform: translate(${(Math.random() - 0.5) * 80}px, ${(Math.random() - 0.5) * 80}px) scale(1.2);
+                                opacity: 0.6;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    particleContainer.appendChild(particle);
+                    
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        particle.remove();
+                        style.remove();
+                    }, 3000);
+                }, i * 150);
+            }
+            
+            document.body.appendChild(particleContainer);
+            
+            // Remove container after all particles are done
+            setTimeout(() => {
+                particleContainer.remove();
+            }, 6000);
+        }
 
         // Display winners with GRAND REVEAL effects
         function displayWinnersWithGrandReveal() {
@@ -2434,9 +2915,9 @@ b, .zoho-bold {
             await loadNominees(); // Load nominees first for default tab
             await loadElectionStatus(); // Load election status
             await loadCandidates(); // Load candidates
-            loadWinnerAnnouncement();
         });
 
+        // FIXED: Auto-refresh with proper state management
         // Auto-refresh election status every 10 seconds
         setInterval(() => {
             if (document.getElementById('vote-tab').classList.contains('active')) {
@@ -2444,9 +2925,12 @@ b, .zoho-bold {
             }
         }, 10000);
 
-        // Auto-refresh winner announcement every 30 seconds when on results tab
+        // FIXED: Auto-refresh winner announcement only when enabled and on results tab
         setInterval(() => {
-            if (document.getElementById('results-tab').classList.contains('active')) {
+            if (autoRefreshEnabled && 
+                document.getElementById('results-tab').classList.contains('active') && 
+                resultsTabLoaded) {
+                console.log('Auto-refreshing winner announcement...');
                 loadWinnerAnnouncement();
             }
         }, 30000);

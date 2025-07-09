@@ -769,16 +769,17 @@ b, .zoho-bold {
             position: relative;
         }
 
-        .winner-crown-glow::after {
-            content: '👑';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 3rem;
-            animation: crownGlow 2s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px #ffd700);
-        }
+       .winner-crown-glow::after {
+    content: '👑';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    animation: crownGlow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px #ffd700);
+    z-index: 3;
+}
 
         @keyframes crownGlow {
             0%, 100% {
@@ -847,7 +848,11 @@ b, .zoho-bold {
             margin-right: auto;
         }
 
-     .winner-card {
+   /* COMPLETE FIX for Winner Card Hover Effect */
+
+/* Replace the existing .winner-card and related CSS with this: */
+
+.winner-card {
     background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(138, 43, 226, 0.15));
     padding: 40px 25px;
     border-radius: 20px;
@@ -865,40 +870,83 @@ b, .zoho-bold {
     backface-visibility: hidden;
 }
 
-       .winner-card:hover {
+.winner-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4), 0 0 30px rgba(255, 215, 0, 0.3);
     border-color: #ffd700;
 }
-       .winner-card::after {
+
+/* FIXED: Complete box coverage for hover effect */
+.winner-card::after {
+    content: '';
+    position: absolute;
+    top: -2px;          /* Account for border */
+    left: -2px;         /* Account for border */
+    right: -2px;        /* Account for border */ 
+    bottom: -2px;       /* Account for border */
+    width: calc(100% + 4px);   /* Full width including border */
+    height: calc(100% + 4px);  /* Full height including border */
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
+    z-index: -1;
+    border-radius: 20px;    /* Match parent border-radius */
+    transition: all 0.4s ease;
+    opacity: 1;
+}
+
+.winner-card:hover::after {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(138, 43, 226, 0.2));
+    box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+/* Alternative approach if the above doesn't work - use ::before instead */
+.winner-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(30, 144, 255, 0.1));
-    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background: transparent;
     border-radius: 18px;
+    z-index: 0;
     transition: all 0.4s ease;
+    pointer-events: none;
 }
-.winner-card:hover::after {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(138, 43, 226, 0.2));
+
+.winner-card:hover::before {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(138, 43, 226, 0.1));
+    box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.3);
 }
-        .winner-card::before {
-            content: '👑';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5rem;
-            animation: float 3s ease-in-out infinite;
-        }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+/* Ensure content stays above the effects */
+.winner-position,
+.winner-name,
+.winner-votes {
+    position: relative;
+    z-index: 2;
+}
+.winner-crown-glow::after {
+    content: '👑';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    animation: crownGlow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px #ffd700);
+    z-index: 3;
+}
 
+@keyframes crownGlow {
+    0%, 100% {
+        transform: translateX(-50%) scale(1) rotateZ(-5deg);
+        filter: drop-shadow(0 0 20px #ffd700);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.1) rotateZ(5deg);
+        filter: drop-shadow(0 0 30px #ffd700) drop-shadow(0 0 40px #ff6b6b);
+    }
+}
         .winner-position {
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
@@ -2093,9 +2141,9 @@ b, .zoho-bold {
             
             let winnersHtml = `
         <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
-            <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 50px rgba(255, 215, 0, 0.5); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px;">
-                🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
-            </h2>
+           <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 50px rgba(255, 215, 0, 0.5); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px;">
+    🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
+</h2>
             <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
                 ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
             </div>

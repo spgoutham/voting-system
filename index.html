@@ -328,6 +328,8 @@ b, .zoho-bold {
         .countdown-display {
             width: 100%;
             max-width: 500px;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
        .countdown-timer {
@@ -336,6 +338,8 @@ b, .zoho-bold {
     gap: 15px;
     flex-wrap: wrap;
     min-height: 80px; /* Prevent layout shift */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
       .time-unit {
     background: rgba(255,255,255,0.2);
@@ -346,6 +350,8 @@ b, .zoho-bold {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
        .time-value {
     display: block;
@@ -354,7 +360,9 @@ b, .zoho-bold {
     font-weight: 700;
     line-height: 1;
     min-height: 2rem; /* Prevent content shift */
-    transition: none; /* Remove transitions to prevent blinking */
+    transition: none !important; /* Remove all transitions to prevent blinking */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 
@@ -547,9 +555,20 @@ b, .zoho-bold {
         }
 
         .candidate-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
-            border-color: #ffd700;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 165, 0, 0.5)) !important;
+            border: 2px solid #ffd700 !important;
+            box-shadow: 
+                0 5px 15px rgba(255, 215, 0, 0.6),
+                0 0 20px rgba(255, 215, 0, 0.4),
+                inset 0 0 20px rgba(255, 215, 0, 0.1) !important;
+            color: #000 !important;
+            font-weight: 800 !important;
+        }
+
+        .candidate-option input[type="radio"]:checked + label .candidate-name {
+            color: #000 !important;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8) !important;
+            font-weight: 900 !important;
         }
 
         .candidate-name {
@@ -1600,18 +1619,48 @@ b, .zoho-bold {
             .time-unit {
                 min-width: 55px;
                 padding: 8px 6px;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
             }
 
             .time-value {
                 font-size: 1.3rem;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: block !important;
+                transition: none !important;
+            }
+
+            /* ENHANCED MOBILE GOLD SELECTION */
+            .candidate-option input[type="radio"]:checked + label {
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 165, 0, 0.8)) !important;
+                border: 3px solid #ffd700 !important;
+                box-shadow: 
+                    0 10px 25px rgba(255, 215, 0, 0.9),
+                    0 0 35px rgba(255, 215, 0, 0.7),
+                    inset 0 0 30px rgba(255, 215, 0, 0.3) !important;
+                transform: scale(1.05) !important;
+            }
+
+            .candidate-option input[type="radio"]:checked + label .candidate-name {
+                color: #000 !important;
+                text-shadow: 0 0 20px rgba(255, 215, 0, 1) !important;
+                font-weight: 900 !important;
             }
 
             .countdown-final-seconds .time-value {
                 font-size: 1.8rem !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transition: none !important;
             }
 
             .countdown-ultra-final .time-value {
                 font-size: 2rem !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transition: none !important;
             }
         }
 
@@ -2005,11 +2054,27 @@ b, .zoho-bold {
             // Update status message
             statusMessage.textContent = electionStatus.message;
             
-            // Show/hide countdown
-            if (electionStatus.status === 'SCHEDULED' || electionStatus.status === 'PRE_VOTING' || (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd)) {
+            // Show/hide countdown - STABLE VERSION
+            const shouldShowCountdown = electionStatus.status === 'SCHEDULED' || 
+                                      electionStatus.status === 'PRE_VOTING' || 
+                                      (electionStatus.status === 'OPEN' && electionStatus.timeUntilEnd);
+            
+            if (shouldShowCountdown) {
                 countdownDisplay.style.display = 'block';
+                countdownDisplay.style.opacity = '1';
+                countdownDisplay.style.visibility = 'visible';
+                // Ensure timer elements are also visible
+                const timer = document.querySelector('.countdown-timer');
+                if (timer) {
+                    timer.style.display = 'flex';
+                    timer.style.opacity = '1';
+                    timer.style.visibility = 'visible';
+                }
             } else {
-                countdownDisplay.style.display = 'none';
+                // Only hide if absolutely necessary
+                if (electionStatus.status === 'CLOSED' || electionStatus.status === 'FINISHED') {
+                    countdownDisplay.style.display = 'none';
+                }
             }
             
             // Show/hide pre-login button
@@ -2394,22 +2459,22 @@ b, .zoho-bold {
                             <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; text-shadow: 0 0 20px rgba(138, 43, 226, 0.8); text-transform: uppercase; letter-spacing: 2px;">
                                 🎉 ALTRUIXX CHAMPIONS REVEAL IN 🎉
                             </div>
-                            <div class="countdown-display">
-                                <div class="countdown-timer" id="announcement-countdown-timer">
-                                    <div class="time-unit">
-                                        <span id="announce-days" class="time-value">00</span>
+                            <div class="countdown-display" style="display: block !important; opacity: 1 !important; visibility: visible !important;">
+                                <div class="countdown-timer" id="announcement-countdown-timer" style="display: flex !important; opacity: 1 !important; visibility: visible !important;">
+                                    <div class="time-unit" style="opacity: 1 !important; visibility: visible !important;">
+                                        <span id="announce-days" class="time-value" style="opacity: 1 !important; visibility: visible !important; transition: none !important;">00</span>
                                         <span class="time-label">Days</span>
                                     </div>
-                                    <div class="time-unit">
-                                        <span id="announce-hours" class="time-value">00</span>
+                                    <div class="time-unit" style="opacity: 1 !important; visibility: visible !important;">
+                                        <span id="announce-hours" class="time-value" style="opacity: 1 !important; visibility: visible !important; transition: none !important;">00</span>
                                         <span class="time-label">Hours</span>
                                     </div>
-                                    <div class="time-unit">
-                                        <span id="announce-minutes" class="time-value">00</span>
+                                    <div class="time-unit" style="opacity: 1 !important; visibility: visible !important;">
+                                        <span id="announce-minutes" class="time-value" style="opacity: 1 !important; visibility: visible !important; transition: none !important;">00</span>
                                         <span class="time-label">Minutes</span>
                                     </div>
-                                    <div class="time-unit">
-                                        <span id="announce-seconds" class="time-value">00</span>
+                                    <div class="time-unit" style="opacity: 1 !important; visibility: visible !important;">
+                                        <span id="announce-seconds" class="time-value" style="opacity: 1 !important; visibility: visible !important; transition: none !important;">00</span>
                                         <span class="time-label">Seconds</span>
                                     </div>
                                 </div>

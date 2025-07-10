@@ -2880,84 +2880,295 @@ b, .zoho-bold {
             }, 6000);
         }
 
-        // Display winners with GRAND REVEAL effects
-        function displayWinnersWithGrandReveal() {
-            const announcementDiv = document.getElementById('winner-announcement');
-            
-            // Use pre-fetched data if available, otherwise use the regular data
-            const winnersData = winnerDataPreFetched || announcementStatus.winners || announcementStatus.preFetchedWinners;
-            const winners = winnersData.winners;
-            
-            // Only create effects if this is a fresh reveal (not a refresh)
-            let shouldShowEffects = !announcementDiv.querySelector('.winner-announcement');
-            
-            // Create enhanced fireworks effect
-            function createEnhancedFireworks() {
-                const fireworksContainer = document.createElement('div');
-                fireworksContainer.className = 'fireworks-effect';
+        // Replace the displayWinnersWithGrandReveal function in your HTML with this version:
+
+function displayWinnersWithGrandReveal() {
+    const announcementDiv = document.getElementById('winner-announcement');
+    
+    // Use pre-fetched data if available, otherwise use the regular data
+    const winnersData = winnerDataPreFetched || announcementStatus.winners || announcementStatus.preFetchedWinners;
+    const winners = winnersData.winners;
+    
+    // Check if this is a fresh reveal (not a refresh)
+    let shouldShowEffects = !announcementDiv.querySelector('.winner-announcement');
+    
+    // PERSISTENT EFFECTS - No auto-removal timeouts
+    function createPersistentFireworks() {
+        const fireworksContainer = document.createElement('div');
+        fireworksContainer.className = 'fireworks-effect persistent-effects';
+        fireworksContainer.id = 'persistent-fireworks';
+        
+        function addFireworkBurst() {
+            for (let j = 0; j < 8; j++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = Math.random() * 100 + '%';
+                firework.style.top = Math.random() * 100 + '%';
+                firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+                firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+                firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700', '#ff69b4', '#00ff00', '#ff4500'][Math.floor(Math.random() * 7)];
+                firework.style.width = (Math.random() * 8 + 4) + 'px';
+                firework.style.height = firework.style.width;
+                firework.style.boxShadow = `0 0 10px ${firework.style.background}`;
+                fireworksContainer.appendChild(firework);
                 
-                for (let i = 0; i < 20; i++) {
+                // Remove individual firework after animation, but keep container
+                setTimeout(() => {
+                    if (firework.parentNode) {
+                        firework.remove();
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Initial burst
+        addFireworkBurst();
+        
+        // Continuous fireworks every 2-4 seconds
+        const fireworkInterval = setInterval(() => {
+            if (document.getElementById('persistent-fireworks')) {
+                addFireworkBurst();
+            } else {
+                clearInterval(fireworkInterval);
+            }
+        }, Math.random() * 2000 + 2000);
+        
+        // Store interval ID for cleanup
+        fireworksContainer.dataset.intervalId = fireworkInterval;
+        
+        return fireworksContainer;
+    }
+
+    function createPersistentCosmicRays() {
+        const cosmicContainer = document.createElement('div');
+        cosmicContainer.className = 'cosmic-rays persistent-effects';
+        cosmicContainer.id = 'persistent-cosmic';
+        
+        function addCosmicRay() {
+            const ray = document.createElement('div');
+            ray.className = 'cosmic-ray';
+            ray.style.left = Math.random() * 100 + '%';
+            ray.style.animationDelay = Math.random() * 2 + 's';
+            ray.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            ray.style.background = `linear-gradient(to bottom, transparent, ${['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00'][Math.floor(Math.random() * 5)]}, transparent)`;
+            ray.style.width = Math.random() * 3 + 2 + 'px';
+            ray.style.boxShadow = `0 0 15px ${ray.style.background}`;
+            cosmicContainer.appendChild(ray);
+            
+            setTimeout(() => {
+                if (ray.parentNode) {
+                    ray.remove();
+                }
+            }, 6000);
+        }
+        
+        // Initial rays
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => addCosmicRay(), i * 300);
+        }
+        
+        // Continuous cosmic rays
+        const cosmicInterval = setInterval(() => {
+            if (document.getElementById('persistent-cosmic')) {
+                addCosmicRay();
+                // Sometimes add multiple rays
+                if (Math.random() > 0.7) {
+                    setTimeout(() => addCosmicRay(), 200);
+                }
+            } else {
+                clearInterval(cosmicInterval);
+            }
+        }, Math.random() * 1500 + 1000);
+        
+        cosmicContainer.dataset.intervalId = cosmicInterval;
+        
+        return cosmicContainer;
+    }
+
+    function createPersistentSparkles(card) {
+        function addSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'winner-sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            sparkle.style.background = ['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00', '#ff4500'][Math.floor(Math.random() * 6)];
+            sparkle.style.width = Math.random() * 6 + 3 + 'px';
+            sparkle.style.height = sparkle.style.width;
+            sparkle.style.boxShadow = `0 0 8px ${sparkle.style.background}`;
+            card.appendChild(sparkle);
+            
+            setTimeout(() => {
+                if (sparkle.parentNode) {
+                    sparkle.remove();
+                }
+            }, 5000);
+        }
+        
+        // Initial sparkles
+        for (let i = 0; i < 6; i++) {
+            setTimeout(() => addSparkle(), i * 500);
+        }
+        
+        // Continuous sparkles
+        const sparkleInterval = setInterval(() => {
+            if (card.parentNode && document.querySelector('.winner-announcement')) {
+                addSparkle();
+                // Sometimes add extra sparkles
+                if (Math.random() > 0.6) {
+                    setTimeout(() => addSparkle(), 300);
+                }
+            } else {
+                clearInterval(sparkleInterval);
+            }
+        }, Math.random() * 2000 + 1500);
+        
+        // Store interval for cleanup
+        if (!card.dataset.sparkleIntervals) {
+            card.dataset.sparkleIntervals = '';
+        }
+        card.dataset.sparkleIntervals += sparkleInterval + ',';
+    }
+
+    function createPersistentConfetti() {
+        const confettiContainer = document.createElement('div');
+        confettiContainer.className = 'persistent-confetti';
+        confettiContainer.id = 'persistent-confetti';
+        confettiContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 5;
+        `;
+        
+        function addConfetti() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = ['#8a2be2', '#1e90ff', '#ff6b6b', '#ffd700', '#00ff00', '#ff4500', '#ff69b4'][Math.floor(Math.random() * 7)];
+                    confetti.style.width = Math.random() * 10 + 6 + 'px';
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confettiContainer.appendChild(confetti);
+                    
                     setTimeout(() => {
-                        for (let j = 0; j < 8; j++) {
-                            const firework = document.createElement('div');
-                            firework.className = 'firework';
-                            firework.style.left = Math.random() * 100 + '%';
-                            firework.style.top = Math.random() * 100 + '%';
-                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
-                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
-                            firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700', '#ff69b4'][Math.floor(Math.random() * 5)];
-                            firework.style.width = (Math.random() * 6 + 3) + 'px';
-                            firework.style.height = firework.style.width;
-                            fireworksContainer.appendChild(firework);
-                            
-                            setTimeout(() => firework.remove(), 2500);
+                        if (confetti.parentNode) {
+                            confetti.remove();
                         }
-                    }, i * 100);
-                }
-                
-                return fireworksContainer;
+                    }, 8000);
+                }, i * 100);
             }
+        }
+        
+        // Initial confetti
+        addConfetti();
+        
+        // Continuous confetti every 5-8 seconds
+        const confettiInterval = setInterval(() => {
+            if (document.getElementById('persistent-confetti')) {
+                addConfetti();
+            } else {
+                clearInterval(confettiInterval);
+            }
+        }, Math.random() * 3000 + 5000);
+        
+        confettiContainer.dataset.intervalId = confettiInterval;
+        
+        return confettiContainer;
+    }
 
-            // Create cosmic rays effect
-            function createCosmicRays() {
-                const cosmicContainer = document.createElement('div');
-                cosmicContainer.className = 'cosmic-rays';
-                
-                for (let i = 0; i < 15; i++) {
-                    setTimeout(() => {
-                        const ray = document.createElement('div');
-                        ray.className = 'cosmic-ray';
-                        ray.style.left = Math.random() * 100 + '%';
-                        ray.style.animationDelay = Math.random() * 2 + 's';
-                        ray.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                        cosmicContainer.appendChild(ray);
-                        
-                        setTimeout(() => ray.remove(), 5000);
-                    }, i * 200);
-                }
-                
-                return cosmicContainer;
-            }
-
-            // Create sparkles around winners
-            function createWinnerSparkles(card) {
-                for (let i = 0; i < 6; i++) {
-                    setTimeout(() => {
-                        const sparkle = document.createElement('div');
-                        sparkle.className = 'winner-sparkle';
-                        sparkle.style.left = Math.random() * 100 + '%';
-                        sparkle.style.top = Math.random() * 100 + '%';
-                        sparkle.style.animationDelay = Math.random() * 2 + 's';
-                        card.appendChild(sparkle);
-                        
-                        setTimeout(() => sparkle.remove(), 4000);
-                    }, i * 300);
-                }
-            }
+    function createFloatingGlowOrbs() {
+        const orbContainer = document.createElement('div');
+        orbContainer.className = 'floating-orbs';
+        orbContainer.id = 'floating-orbs';
+        orbContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        
+        function addOrb() {
+            const orb = document.createElement('div');
+            orb.style.cssText = `
+                position: absolute;
+                width: ${Math.random() * 20 + 10}px;
+                height: ${Math.random() * 20 + 10}px;
+                background: ${['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00'][Math.floor(Math.random() * 5)]};
+                border-radius: 50%;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                animation: floatOrb ${Math.random() * 10 + 8}s ease-in-out infinite;
+                box-shadow: 0 0 20px currentColor;
+                opacity: 0.7;
+            `;
             
-            // FIXED ORDER: Winners first, then title
-            let winnersHtml = `
-        <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
+            orbContainer.appendChild(orb);
+            
+            setTimeout(() => {
+                if (orb.parentNode) {
+                    orb.remove();
+                }
+            }, 20000);
+        }
+        
+        // Add orb animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatOrb {
+                0%, 100% {
+                    transform: translate(0, 0) scale(0.8);
+                    opacity: 0.4;
+                }
+                25% {
+                    transform: translate(${(Math.random() - 0.5) * 200}px, ${(Math.random() - 0.5) * 200}px) scale(1.2);
+                    opacity: 0.8;
+                }
+                50% {
+                    transform: translate(${(Math.random() - 0.5) * 150}px, ${(Math.random() - 0.5) * 150}px) scale(0.9);
+                    opacity: 0.6;
+                }
+                75% {
+                    transform: translate(${(Math.random() - 0.5) * 180}px, ${(Math.random() - 0.5) * 180}px) scale(1.1);
+                    opacity: 0.7;
+                }
+            }
+        `;
+        if (!document.getElementById('orb-styles')) {
+            style.id = 'orb-styles';
+            document.head.appendChild(style);
+        }
+        
+        // Initial orbs
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => addOrb(), i * 1000);
+        }
+        
+        // Continuous orbs
+        const orbInterval = setInterval(() => {
+            if (document.getElementById('floating-orbs')) {
+                addOrb();
+            } else {
+                clearInterval(orbInterval);
+            }
+        }, 3000);
+        
+        orbContainer.dataset.intervalId = orbInterval;
+        
+        return orbContainer;
+    }
+            
+    // WINNER CONTENT - FIXED ORDER
+    let winnersHtml = `
+        <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}" id="main-winner-announcement">
             <!-- WINNERS FIRST -->
             <div class="winners-grid">
     `;
@@ -2978,7 +3189,9 @@ b, .zoho-bold {
                 `${winner.votes} VOTES`;
             
             winnersHtml += `
-                <div class="winner-card winner-glow-pulse" style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s; position: relative; overflow: hidden;">
+                <div class="winner-card winner-glow-pulse persistent-winner-card" 
+                     style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s; position: relative; overflow: hidden;"
+                     data-position="${position}">
                     <div class="winner-position">
                         ${positionTitles[position]}
                     </div>
@@ -3012,28 +3225,41 @@ b, .zoho-bold {
 
     announcementDiv.innerHTML = winnersHtml;
     
-    // Only add effects if this is a fresh reveal
+    // Add all persistent effects
     if (shouldShowEffects) {
-        // Add enhanced fireworks and cosmic effects
+        console.log('🎉 Adding persistent winner announcement effects...');
+        
+        // Add enhanced fireworks
         setTimeout(() => {
-            announcementDiv.appendChild(createEnhancedFireworks());
-            announcementDiv.appendChild(createCosmicRays());
+            announcementDiv.appendChild(createPersistentFireworks());
         }, 500);
+        
+        // Add cosmic rays
+        setTimeout(() => {
+            announcementDiv.appendChild(createPersistentCosmicRays());
+        }, 800);
+        
+        // Add floating orbs
+        setTimeout(() => {
+            announcementDiv.appendChild(createFloatingGlowOrbs());
+        }, 1200);
+        
+        // Add confetti overlay
+        setTimeout(() => {
+            document.body.appendChild(createPersistentConfetti());
+        }, 1000);
         
         // Add sparkles to winner cards
         setTimeout(() => {
-            const winnerCards = document.querySelectorAll('.winner-card');
-            winnerCards.forEach(card => {
-                createWinnerSparkles(card);
+            const winnerCards = document.querySelectorAll('.persistent-winner-card');
+            winnerCards.forEach((card, index) => {
+                setTimeout(() => {
+                    createPersistentSparkles(card);
+                }, index * 300);
             });
-        }, 1000);
+        }, 1500);
         
-        // Add sound effect simulation (visual pulse)
-        setTimeout(() => {
-            document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
-        }, 1200);
-        
-        // Create screen flash effect
+        // Enhanced screen flash for initial reveal
         setTimeout(() => {
             const flash = document.createElement('div');
             flash.style.cssText = `
@@ -3042,29 +3268,161 @@ b, .zoho-bold {
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+                background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(138,43,226,0.2) 50%, transparent 70%);
                 pointer-events: none;
                 z-index: 9999;
-                animation: flashEffect 1s ease-out forwards;
+                animation: grandFlashEffect 2s ease-out forwards;
             `;
             
             const style = document.createElement('style');
             style.textContent = `
-                @keyframes flashEffect {
-                    0% { opacity: 0; }
-                    10% { opacity: 1; }
-                    100% { opacity: 0; }
+                @keyframes grandFlashEffect {
+                    0% { opacity: 0; transform: scale(0.8); }
+                    20% { opacity: 1; transform: scale(1.1); }
+                    50% { opacity: 0.8; transform: scale(1); }
+                    100% { opacity: 0; transform: scale(1.2); }
                 }
             `;
-            document.head.appendChild(style);
+            if (!document.getElementById('flash-styles')) {
+                style.id = 'flash-styles';
+                document.head.appendChild(style);
+            }
+            
             document.body.appendChild(flash);
             
             setTimeout(() => {
                 flash.remove();
-                style.remove();
-            }, 1000);
-        }, 200);
+            }, 2000);
+        }, 300);
+        
+        // Continuous pulsing background effect
+        setTimeout(() => {
+            const backgroundPulse = document.createElement('div');
+            backgroundPulse.id = 'background-pulse';
+            backgroundPulse.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at center, rgba(138,43,226,0.1) 0%, transparent 70%);
+                animation: backgroundPulse 4s ease-in-out infinite;
+                pointer-events: none;
+                z-index: 0;
+            `;
+            
+            const pulseStyle = document.createElement('style');
+            pulseStyle.textContent = `
+                @keyframes backgroundPulse {
+                    0%, 100% { 
+                        opacity: 0.3; 
+                        transform: scale(1); 
+                    }
+                    50% { 
+                        opacity: 0.6; 
+                        transform: scale(1.05); 
+                    }
+                }
+            `;
+            if (!document.getElementById('pulse-styles')) {
+                pulseStyle.id = 'pulse-styles';
+                document.head.appendChild(pulseStyle);
+            }
+            
+            const mainAnnouncement = document.getElementById('main-winner-announcement');
+            if (mainAnnouncement) {
+                mainAnnouncement.appendChild(backgroundPulse);
+            }
+        }, 2000);
     }
+    
+    console.log('🏆 Winner announcement displayed with persistent effects');
+}
+
+// Add function to clear all winner effects (for admin use)
+function clearWinnerEffects() {
+    console.log('🧹 Clearing all winner effects...');
+    
+    // Clear persistent effects
+    const fireworks = document.getElementById('persistent-fireworks');
+    if (fireworks) {
+        if (fireworks.dataset.intervalId) {
+            clearInterval(parseInt(fireworks.dataset.intervalId));
+        }
+        fireworks.remove();
+    }
+    
+    const cosmic = document.getElementById('persistent-cosmic');
+    if (cosmic) {
+        if (cosmic.dataset.intervalId) {
+            clearInterval(parseInt(cosmic.dataset.intervalId));
+        }
+        cosmic.remove();
+    }
+    
+    const confetti = document.getElementById('persistent-confetti');
+    if (confetti) {
+        if (confetti.dataset.intervalId) {
+            clearInterval(parseInt(confetti.dataset.intervalId));
+        }
+        confetti.remove();
+    }
+    
+    const orbs = document.getElementById('floating-orbs');
+    if (orbs) {
+        if (orbs.dataset.intervalId) {
+            clearInterval(parseInt(orbs.dataset.intervalId));
+        }
+        orbs.remove();
+    }
+    
+    const backgroundPulse = document.getElementById('background-pulse');
+    if (backgroundPulse) {
+        backgroundPulse.remove();
+    }
+    
+    // Clear sparkle intervals from winner cards
+    const winnerCards = document.querySelectorAll('.persistent-winner-card');
+    winnerCards.forEach(card => {
+        if (card.dataset.sparkleIntervals) {
+            const intervals = card.dataset.sparkleIntervals.split(',').filter(id => id);
+            intervals.forEach(intervalId => {
+                clearInterval(parseInt(intervalId));
+            });
+        }
+    });
+    
+    // Clear styles
+    const styles = ['orb-styles', 'flash-styles', 'pulse-styles'];
+    styles.forEach(styleId => {
+        const style = document.getElementById(styleId);
+        if (style) style.remove();
+    });
+    
+    // Remove all persistent effect elements
+    document.querySelectorAll('.persistent-effects').forEach(el => el.remove());
+    
+    console.log('✅ All winner effects cleared');
+}
+
+// Add keyboard shortcut for admin to clear effects (Ctrl+Shift+C)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        clearWinnerEffects();
+        showMessage('🧹 Winner effects cleared by admin', 'success');
+    }
+});
+
+// Also clear effects when announcement is manually cleared
+function clearWinnerAnnouncementAndEffects() {
+    clearWinnerEffects();
+    const announcementDiv = document.getElementById('winner-announcement');
+    if (announcementDiv) {
+        announcementDiv.style.display = 'none';
+        announcementDiv.innerHTML = '';
+    }
+    console.log('🏆 Winner announcement and effects cleared');
 }
 
         // Keep the original display function for fallback

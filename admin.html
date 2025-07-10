@@ -1029,7 +1029,39 @@
                 container.innerHTML = '';
             }, 5000);
         }
+// In your admin.html JavaScript
+function clearAnnouncement() {
+  fetch('/.netlify/functions/set-winner-announcement', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'clearAnnouncement' })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.message);
+    if (data.success) location.reload();
+  });
+}
 
+function sealResults() {
+  fetch('/.netlify/functions/set-winner-announcement', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'sealResults' })
+  })
+  .then(response => response.json())
+  .then(data => alert(data.message));
+}
+
+function unsealResults() {
+  fetch('/.netlify/functions/set-winner-announcement', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'unsealResults' })
+  })
+  .then(response => response.json())
+  .then(data => alert(data.message));
+}
         // Confirmation modal functions
         function confirmAction(action, confirmed = false) {
             if (confirmed) {

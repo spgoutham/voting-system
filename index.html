@@ -354,6 +354,7 @@ b, .zoho-bold {
     font-weight: 700;
     line-height: 1;
     min-height: 2rem; /* Prevent content shift */
+    transition: none; /* Remove transitions to prevent blinking */
 }
 
 
@@ -486,6 +487,28 @@ b, .zoho-bold {
             border-radius: 15px;
             padding: 25px;
             border: 1px solid rgba(30, 144, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .position-section.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            background: rgba(100, 100, 100, 0.05);
+            border-color: rgba(100, 100, 100, 0.2);
+        }
+
+        .position-section.disabled::after {
+            content: '🔒 Voting selections will be available when the voting window opens';
+            display: block;
+            text-align: center;
+            color: #ffd700;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
         .position-title {
@@ -524,9 +547,9 @@ b, .zoho-bold {
         }
 
         .candidate-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(30, 144, 255, 0.3));
-            border-color: #8a2be2;
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+            border-color: #ffd700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
         }
 
         .candidate-name {
@@ -789,6 +812,47 @@ b, .zoho-bold {
             }
         }
 
+        /* Enhanced Winner Page Effects */
+        .winner-sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: sparkleFloat 2s ease-in-out infinite;
+            box-shadow: 0 0 6px #ffd700;
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% {
+                transform: translateY(0px) scale(0.8);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .winner-glow-pulse {
+            animation: winnerGlowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes winnerGlowPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 5px 20px rgba(138, 43, 226, 0.3), 
+                    0 0 20px rgba(255, 215, 0, 0.2),
+                    inset 0 0 30px rgba(255, 215, 0, 0.08);
+            }
+            50% {
+                box-shadow: 
+                    0 15px 40px rgba(138, 43, 226, 0.5), 
+                    0 0 40px rgba(255, 215, 0, 0.6),
+                    inset 0 0 60px rgba(255, 215, 0, 0.2);
+            }
+        }
+
         .confetti {
             position: absolute;
             width: 8px;
@@ -804,6 +868,41 @@ b, .zoho-bold {
             }
             100% {
                 transform: translateY(100vh) rotateZ(720deg);
+                opacity: 0;
+            }
+        }
+
+        .cosmic-rays {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .cosmic-ray {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #ffd700, transparent);
+            animation: cosmicRayfall 3s linear infinite;
+        }
+
+        @keyframes cosmicRayfall {
+            0% {
+                transform: translateY(-100px) rotateZ(45deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotateZ(45deg);
                 opacity: 0;
             }
         }
@@ -1933,12 +2032,18 @@ b, .zoho-bold {
                 votingForm.classList.remove('pre-voting');
             }
             
+            // Update candidate form based on voting status
+            if (Object.keys(currentCandidates).length > 0) {
+                displayCandidateForm(); // Refresh the candidate form with proper disabled states
+            }
+            
             updateSubmitButton();
         }
 
       function startCountdown() {
     // Store the initial time
     let remainingTime = electionStatus.timeUntilStart;
+    let lastDisplayedValues = { days: -1, hours: -1, minutes: -1, seconds: -1 };
     
     console.log('Starting countdown with:', remainingTime, 'ms');
     
@@ -1964,23 +2069,27 @@ b, .zoho-bold {
         
         console.log(`Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s (${totalSeconds}s total)`);
         
-        // Update DOM elements if they exist and only if values changed
+        // Only update DOM if values have actually changed to prevent blinking
         const daysEl = document.getElementById('days');
         const hoursEl = document.getElementById('hours');
         const minutesEl = document.getElementById('minutes');
         const secondsEl = document.getElementById('seconds');
         
-        if (daysEl && daysEl.textContent !== String(days).padStart(2, '0')) {
+        if (daysEl && lastDisplayedValues.days !== days) {
             daysEl.textContent = String(days).padStart(2, '0');
+            lastDisplayedValues.days = days;
         }
-        if (hoursEl && hoursEl.textContent !== String(hours).padStart(2, '0')) {
+        if (hoursEl && lastDisplayedValues.hours !== hours) {
             hoursEl.textContent = String(hours).padStart(2, '0');
+            lastDisplayedValues.hours = hours;
         }
-        if (minutesEl && minutesEl.textContent !== String(minutes).padStart(2, '0')) {
+        if (minutesEl && lastDisplayedValues.minutes !== minutes) {
             minutesEl.textContent = String(minutes).padStart(2, '0');
+            lastDisplayedValues.minutes = minutes;
         }
-        if (secondsEl && secondsEl.textContent !== String(seconds).padStart(2, '0')) {
+        if (secondsEl && lastDisplayedValues.seconds !== seconds) {
             secondsEl.textContent = String(seconds).padStart(2, '0');
+            lastDisplayedValues.seconds = seconds;
         }
         
         // Decrease remaining time
@@ -1997,6 +2106,7 @@ b, .zoho-bold {
             
             // Store the initial time
             let remainingTime = electionStatus.timeUntilEnd;
+            let lastDisplayedValues = { days: -1, hours: -1, minutes: -1, seconds: -1 };
             
             const updateCountdown = () => {
                 if (remainingTime <= 0) {
@@ -2011,16 +2121,28 @@ b, .zoho-bold {
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
                 
-                // Update DOM elements if they exist
+                // Only update DOM if values have actually changed to prevent blinking
                 const daysEl = document.getElementById('days');
                 const hoursEl = document.getElementById('hours');
                 const minutesEl = document.getElementById('minutes');
                 const secondsEl = document.getElementById('seconds');
                 
-                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                if (daysEl && lastDisplayedValues.days !== days) {
+                    daysEl.textContent = String(days).padStart(2, '0');
+                    lastDisplayedValues.days = days;
+                }
+                if (hoursEl && lastDisplayedValues.hours !== hours) {
+                    hoursEl.textContent = String(hours).padStart(2, '0');
+                    lastDisplayedValues.hours = hours;
+                }
+                if (minutesEl && lastDisplayedValues.minutes !== minutes) {
+                    minutesEl.textContent = String(minutes).padStart(2, '0');
+                    lastDisplayedValues.minutes = minutes;
+                }
+                if (secondsEl && lastDisplayedValues.seconds !== seconds) {
+                    secondsEl.textContent = String(seconds).padStart(2, '0');
+                    lastDisplayedValues.seconds = seconds;
+                }
                 
                 // Decrease remaining time
                 remainingTime -= 1000;
@@ -2165,8 +2287,11 @@ b, .zoho-bold {
                 const positionData = positions[position];
                 if (!positionData) return;
 
+                // Add disabled class if in pre-voting mode
+                const disabledClass = preVotingMode || electionStatus.status === 'PRE_VOTING' || electionStatus.isPreVotingTime ? 'disabled' : '';
+                
                 html += `
-                    <div class="position-section">
+                    <div class="position-section ${disabledClass}">
                         <h3 class="position-title">${positionData.title}</h3>
                 `;
 
@@ -2332,6 +2457,7 @@ b, .zoho-bold {
     let finalEffectsTriggered = false;
     let ultraFinalTriggered = false;
     let screenShakeTriggered = false;
+    let lastDisplayedValues = { days: -1, hours: -1, minutes: -1, seconds: -1 };
     
     console.log('Starting announcement countdown with:', remainingTime, 'ms');
     
@@ -2345,21 +2471,29 @@ b, .zoho-bold {
             if (timer) {
                 timer.classList.remove('countdown-final-seconds', 'countdown-ultra-final');
             }
-            // Trigger grand reveal
-            setTimeout(() => {
+            
+            // IMMEDIATE WINNER REVEAL - Use pre-fetched data if available
+            if (winnerDataPreFetched) {
+                console.log('Using pre-fetched winner data for instant reveal');
+                announcementStatus.isAnnounced = true;
+                announcementStatus.winners = winnerDataPreFetched;
+                displayWinnersWithGrandReveal();
+            } else {
+                // Fallback to API call
                 loadWinnerAnnouncement();
-            }, 1000);
+            }
             return;
         }
         
-        // Pre-fetch winner data 10 seconds before announcement
-        if (!preFetchTriggered && remainingTime <= 10000) { // 10 seconds = 10000ms
+        // Pre-fetch winner data 30 seconds before announcement (increased from 10)
+        if (!preFetchTriggered && remainingTime <= 30000) {
             preFetchTriggered = true;
             preFetchWinnerData();
+            console.log('Pre-fetching winner data at 30 seconds...');
         }
 
         // Add final countdown effects in last 30 seconds
-        if (!finalEffectsTriggered && remainingTime <= 30000) { // 30 seconds
+        if (!finalEffectsTriggered && remainingTime <= 30000) {
             finalEffectsTriggered = true;
             const countdownTimer = document.getElementById('announcement-countdown-timer');
             if (countdownTimer) {
@@ -2412,23 +2546,27 @@ b, .zoho-bold {
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
         
-        // Only update DOM if elements exist and values have changed
+        // Only update DOM if values have actually changed to prevent blinking
         const daysEl = document.getElementById('announce-days');
         const hoursEl = document.getElementById('announce-hours');
         const minutesEl = document.getElementById('announce-minutes');
         const secondsEl = document.getElementById('announce-seconds');
         
-        if (daysEl && daysEl.textContent !== String(days).padStart(2, '0')) {
+        if (daysEl && lastDisplayedValues.days !== days) {
             daysEl.textContent = String(days).padStart(2, '0');
+            lastDisplayedValues.days = days;
         }
-        if (hoursEl && hoursEl.textContent !== String(hours).padStart(2, '0')) {
+        if (hoursEl && lastDisplayedValues.hours !== hours) {
             hoursEl.textContent = String(hours).padStart(2, '0');
+            lastDisplayedValues.hours = hours;
         }
-        if (minutesEl && minutesEl.textContent !== String(minutes).padStart(2, '0')) {
+        if (minutesEl && lastDisplayedValues.minutes !== minutes) {
             minutesEl.textContent = String(minutes).padStart(2, '0');
+            lastDisplayedValues.minutes = minutes;
         }
-        if (secondsEl && secondsEl.textContent !== String(seconds).padStart(2, '0')) {
+        if (secondsEl && lastDisplayedValues.seconds !== seconds) {
             secondsEl.textContent = String(seconds).padStart(2, '0');
+            lastDisplayedValues.seconds = seconds;
         }
         
         // Decrease remaining time
@@ -2521,55 +2659,73 @@ b, .zoho-bold {
             // Only create effects if this is a fresh reveal (not a refresh)
             let shouldShowEffects = !announcementDiv.querySelector('.winner-announcement');
             
-            // Create fireworks effect
-            function createFireworks() {
+            // Create enhanced fireworks effect
+            function createEnhancedFireworks() {
                 const fireworksContainer = document.createElement('div');
                 fireworksContainer.className = 'fireworks-effect';
                 
-                for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 20; i++) {
                     setTimeout(() => {
-                        for (let j = 0; j < 6; j++) {
+                        for (let j = 0; j < 8; j++) {
                             const firework = document.createElement('div');
                             firework.className = 'firework';
                             firework.style.left = Math.random() * 100 + '%';
                             firework.style.top = Math.random() * 100 + '%';
-                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 150 + 'px');
-                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 150 + 'px');
-                            firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700'][Math.floor(Math.random() * 4)];
+                            firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+                            firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+                            firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700', '#ff69b4'][Math.floor(Math.random() * 5)];
+                            firework.style.width = (Math.random() * 6 + 3) + 'px';
+                            firework.style.height = firework.style.width;
                             fireworksContainer.appendChild(firework);
                             
-                            setTimeout(() => firework.remove(), 2000);
+                            setTimeout(() => firework.remove(), 2500);
                         }
-                    }, i * 150);
+                    }, i * 100);
                 }
                 
                 return fireworksContainer;
             }
 
-            // Create confetti effect
-            function createConfetti() {
-                const confettiContainer = document.createElement('div');
-                confettiContainer.className = 'fireworks-effect';
+            // Create cosmic rays effect
+            function createCosmicRays() {
+                const cosmicContainer = document.createElement('div');
+                cosmicContainer.className = 'cosmic-rays';
                 
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 15; i++) {
                     setTimeout(() => {
-                        const confetti = document.createElement('div');
-                        confetti.className = 'confetti';
-                        confetti.style.left = Math.random() * 100 + '%';
-                        confetti.style.animationDelay = Math.random() * 2 + 's';
-                        confetti.style.background = ['#8a2be2', '#1e90ff', '#ff6b6b', '#ffd700', '#00bfff'][Math.floor(Math.random() * 5)];
-                        confettiContainer.appendChild(confetti);
+                        const ray = document.createElement('div');
+                        ray.className = 'cosmic-ray';
+                        ray.style.left = Math.random() * 100 + '%';
+                        ray.style.animationDelay = Math.random() * 2 + 's';
+                        ray.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                        cosmicContainer.appendChild(ray);
                         
-                        setTimeout(() => confetti.remove(), 3000);
-                    }, i * 40);
+                        setTimeout(() => ray.remove(), 5000);
+                    }, i * 200);
                 }
                 
-                return confettiContainer;
+                return cosmicContainer;
+            }
+
+            // Create sparkles around winners
+            function createWinnerSparkles(card) {
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'winner-sparkle';
+                        sparkle.style.left = Math.random() * 100 + '%';
+                        sparkle.style.top = Math.random() * 100 + '%';
+                        sparkle.style.animationDelay = Math.random() * 2 + 's';
+                        card.appendChild(sparkle);
+                        
+                        setTimeout(() => sparkle.remove(), 4000);
+                    }, i * 300);
+                }
             }
             
             let winnersHtml = `
         <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
-          <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px;">
+          <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 30px #ffd700;">
     🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
 </h2>
             <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
@@ -2594,7 +2750,7 @@ b, .zoho-bold {
                 `${winner.votes} VOTES`;
             
             winnersHtml += `
-                <div class="winner-card winner-crown-glow" style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s;">
+                <div class="winner-card winner-glow-pulse" style="animation-delay: ${shouldShowEffects ? index * 0.6 : 0}s; position: relative; overflow: hidden;">
                     <div class="winner-position">
                         ${positionTitles[position]}
                     </div>
@@ -2624,16 +2780,56 @@ b, .zoho-bold {
     
     // Only add effects if this is a fresh reveal
     if (shouldShowEffects) {
-        // Add fireworks and confetti
+        // Add enhanced fireworks and cosmic effects
         setTimeout(() => {
-            announcementDiv.appendChild(createFireworks());
-            announcementDiv.appendChild(createConfetti());
-        }, 800);
+            announcementDiv.appendChild(createEnhancedFireworks());
+            announcementDiv.appendChild(createCosmicRays());
+        }, 500);
+        
+        // Add sparkles to winner cards
+        setTimeout(() => {
+            const winnerCards = document.querySelectorAll('.winner-card');
+            winnerCards.forEach(card => {
+                createWinnerSparkles(card);
+            });
+        }, 1000);
         
         // Add sound effect simulation (visual pulse)
         setTimeout(() => {
             document.body.style.animation = 'finalCountdownPulse 0.1s ease-in-out 3';
         }, 1200);
+        
+        // Create screen flash effect
+        setTimeout(() => {
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: 9999;
+                animation: flashEffect 1s ease-out forwards;
+            `;
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes flashEffect {
+                    0% { opacity: 0; }
+                    10% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(flash);
+            
+            setTimeout(() => {
+                flash.remove();
+                style.remove();
+            }, 1000);
+        }, 200);
     }
 }
 

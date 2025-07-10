@@ -2731,76 +2731,133 @@ b, .zoho-bold {
         }
 
         // FIXED: Load winner announcement with proper state management and cache busting
-        async function loadWinnerAnnouncement() {
-            console.log('Loading winner announcement with cache busting...');
-            
-            // Show loading immediately and clear any previous content
-            const resultsContainer = document.getElementById('results-container');
-            const announcementDiv = document.getElementById('winner-announcement');
-            
-            // Always show loading to prevent stale data display
-            announcementDiv.style.display = 'none';
-            announcementDiv.innerHTML = '';
-            
-            resultsContainer.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Checking Altruixx announcement status...</p>
-                </div>
-            `;
+        // Replace the loadWinnerAnnouncement function with this fixed version:
 
-            try {
-                // AGGRESSIVE CACHE BUSTING
-                const timestamp = Date.now();
-                const randomParam = Math.random().toString(36).substring(7);
-                const cacheBreaker = `${timestamp}_${randomParam}`;
-                
-                const response = await axios.get(`/.netlify/functions/get-winner-announcement?cb=${cacheBreaker}`, {
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0'
-                    }
-                });
-                
-                announcementStatus = response.data;
-                console.log('Fresh Announcement Status:', announcementStatus);
-                
-                // Clear any existing announcement countdown interval
-                if (announcementCountdownInterval) {
-                    clearInterval(announcementCountdownInterval);
-                    announcementCountdownInterval = null;
-                }
-                
-                // ENHANCED SEALING CHECK
-                if (announcementStatus.isSealed || announcementStatus.status === 'SEALED') {
-                    console.log('🔒 Results are SEALED - showing access denied');
-                    announcementDiv.style.display = 'none';
-                    resultsContainer.style.display = 'block';
-                    displayResultsAccessDenied();
-                    return;
-                }
-                
-                // Start countdown if needed
-                if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && announcementStatus.timeUntilAnnouncement > 0) {
-                    updateAnnouncementDisplay();
-                    startAnnouncementCountdown();
-                } else if (announcementStatus.isAnnounced && (announcementStatus.winners || announcementStatus.preFetchedWinners)) {
-                    displayWinnersWithGrandReveal();
-                } else if (announcementStatus.canViewResults && !announcementStatus.isSealed) {
-                    loadResults();
+async function loadWinnerAnnouncement() {
+    console.log('Loading winner announcement with cache busting...');
+    
+    // Show loading immediately and clear any previous content
+    const resultsContainer = document.getElementById('results-container');
+    const announcementDiv = document.getElementById('winner-announcement');
+    
+    // Always show loading to prevent stale data display
+    announcementDiv.style.display = 'none';
+    announcementDiv.innerHTML = '';
+    
+    resultsContainer.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Checking Altruixx announcement status...</p>
+        </div>
+    `;
+
+    try {
+        // AGGRESSIVE CACHE BUSTING
+        const timestamp = Date.now();
+        const randomParam = Math.random().toString(36).substring(7);
+        const cacheBreaker = `${timestamp}_${randomParam}`;
+        
+        const response = await axios.get(`/.netlify/functions/get-winner-announcement?cb=${cacheBreaker}`, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+        
+        announcementStatus = response.data;
+        console.log('Fresh Announcement Status:', announcementStatus);
+        
+        // Clear any existing announcement countdown interval
+        if (announcementCountdownInterval) {
+            clearInterval(announcementCountdownInterval);
+            announcementCountdownInterval = null;
+        }
+        
+        // ENHANCED SEALING CHECK
+        if (announcementStatus.isSealed || announcementStatus.status === 'SEALED') {
+            console.log('🔒 Results are SEALED - showing access denied');
+            announcementDiv.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            displayResultsAccessDenied();
+            return;
+        }
+        
+        // Check if winners are announced and available
+        if (announcementStatus.isAnnounced && announcementStatus.status === 'ANNOUNCED') {
+            console.log('🏆 Winners announced - displaying with grand reveal');
+            
+            // FIXED: Handle the nested winner data structure
+            let winnersToDisplay = null;
+            
+            if (announcementStatus.winners) {
+                // Check different possible data structures
+                if (announcementStatus.winners.winners) {
+                    // Case: response.winners.winners.president
+                    winnersToDisplay = announcementStatus.winners.winners;
+                } else if (announcementStatus.winners.president) {
+                    // Case: response.winners.president
+                    winnersToDisplay = announcementStatus.winners;
                 } else {
-                    console.log('🔒 Access denied or results sealed');
-                    displayResultsAccessDenied();
+                    console.warn('Unexpected winner data structure:', announcementStatus.winners);
                 }
+            }
+            
+            if (winnersToDisplay && Object.keys(winnersToDisplay).length > 0) {
+                console.log('✅ Winner data found:', winnersToDisplay);
                 
-            } catch (error) {
-                console.error('Error loading winner announcement:', error);
-                // On error, default to showing access denied (safer than showing results)
-                displayResultsAccessDenied();
+                // Set up the data structure for display function
+                const displayData = {
+                    winners: winnersToDisplay,
+                    fullResults: announcementStatus.winners.fullResults || {},
+                    margins: announcementStatus.winners.margins || {}
+                };
+                
+                // Store for the display function
+                winnerDataPreFetched = displayData;
+                announcementStatus.winners = displayData;
+                
+                displayWinnersWithGrandReveal();
+            } else {
+                console.error('❌ No valid winner data found in response');
+                resultsContainer.innerHTML = `
+                    <div class="message error">
+                        Winner data not available. Please try refreshing the page.
+                        <button onclick="loadWinnerAnnouncement()" style="margin-top: 10px; padding: 8px 16px; background: #8a2be2; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🔄 Retry
+                        </button>
+                    </div>
+                `;
             }
         }
-
+        // Start countdown if needed
+        else if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && announcementStatus.timeUntilAnnouncement > 0) {
+            console.log('⏰ Announcement scheduled - starting countdown');
+            updateAnnouncementDisplay();
+            startAnnouncementCountdown();
+        } 
+        else if (announcementStatus.canViewResults && !announcementStatus.isSealed) {
+            console.log('📊 Can view results - loading regular results');
+            loadResults();
+        } 
+        else {
+            console.log('🔒 Access denied or results sealed');
+            displayResultsAccessDenied();
+        }
+        
+    } catch (error) {
+        console.error('Error loading winner announcement:', error);
+        // On error, show retry option instead of just access denied
+        resultsContainer.innerHTML = `
+            <div class="message error">
+                Error loading announcement status. Please try again.
+                <button onclick="loadWinnerAnnouncement()" style="margin-top: 10px; padding: 8px 16px; background: #8a2be2; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 Retry
+                </button>
+            </div>
+        `;
+    }
+}
         // Update announcement display
         function updateAnnouncementDisplay() {
             const announcementDiv = document.getElementById('winner-announcement');
@@ -3126,290 +3183,74 @@ b, .zoho-bold {
         // Replace the displayWinnersWithGrandReveal function in your HTML with this version:
 
 function displayWinnersWithGrandReveal() {
-    const announcementDiv = document.getElementById('winner-announcement');
+    console.log('🎉 Starting displayWinnersWithGrandReveal');
     
-    // Use pre-fetched data if available, otherwise use the regular data
-    const winnersData = winnerDataPreFetched || announcementStatus.winners || announcementStatus.preFetchedWinners;
-    const winners = winnersData.winners;
+    const announcementDiv = document.getElementById('winner-announcement');
+    const resultsContainer = document.getElementById('results-container');
+    
+    // FIXED: Better data access with fallbacks
+    let winnersData, winners;
+    
+    if (winnerDataPreFetched) {
+        console.log('Using pre-fetched winner data:', winnerDataPreFetched);
+        winnersData = winnerDataPreFetched;
+        winners = winnerDataPreFetched.winners || winnerDataPreFetched;
+    } else if (announcementStatus.winners) {
+        console.log('Using announcement status winners:', announcementStatus.winners);
+        winnersData = announcementStatus.winners;
+        
+        // Handle nested structure
+        if (announcementStatus.winners.winners) {
+            winners = announcementStatus.winners.winners;
+        } else {
+            winners = announcementStatus.winners;
+        }
+    } else {
+        console.error('❌ No winner data available for display');
+        resultsContainer.innerHTML = `
+            <div class="message error">
+                No winner data available for display.
+                <button onclick="loadWinnerAnnouncement()" style="margin-top: 10px; padding: 8px 16px; background: #8a2be2; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 Reload
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log('Final winners data for display:', winners);
+    
+    // Validate that we have the required positions
+    const requiredPositions = ['president', 'secretary', 'treasurer'];
+    const availablePositions = requiredPositions.filter(pos => winners[pos] && winners[pos].name);
+    
+    if (availablePositions.length === 0) {
+        console.error('❌ No valid winner positions found');
+        resultsContainer.innerHTML = `
+            <div class="message error">
+                Winner data is incomplete. Missing position information.
+                <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                    Available data: ${Object.keys(winners).join(', ')}
+                </div>
+                <button onclick="loadWinnerAnnouncement()" style="margin-top: 10px; padding: 8px 16px; background: #8a2be2; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 Reload
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log(`✅ Found ${availablePositions.length} valid positions:`, availablePositions);
     
     // Check if this is a fresh reveal (not a refresh)
     let shouldShowEffects = !announcementDiv.querySelector('.winner-announcement');
     
-    // PERSISTENT EFFECTS - No auto-removal timeouts
-    function createPersistentFireworks() {
-        const fireworksContainer = document.createElement('div');
-        fireworksContainer.className = 'fireworks-effect persistent-effects';
-        fireworksContainer.id = 'persistent-fireworks';
-        
-        function addFireworkBurst() {
-            for (let j = 0; j < 8; j++) {
-                const firework = document.createElement('div');
-                firework.className = 'firework';
-                firework.style.left = Math.random() * 100 + '%';
-                firework.style.top = Math.random() * 100 + '%';
-                firework.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
-                firework.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
-                firework.style.background = ['#ff6b6b', '#8a2be2', '#1e90ff', '#ffd700', '#ff69b4', '#00ff00', '#ff4500'][Math.floor(Math.random() * 7)];
-                firework.style.width = (Math.random() * 8 + 4) + 'px';
-                firework.style.height = firework.style.width;
-                firework.style.boxShadow = `0 0 10px ${firework.style.background}`;
-                fireworksContainer.appendChild(firework);
-                
-                // Remove individual firework after animation, but keep container
-                setTimeout(() => {
-                    if (firework.parentNode) {
-                        firework.remove();
-                    }
-                }, 3000);
-            }
-        }
-        
-        // Initial burst
-        addFireworkBurst();
-        
-        // Continuous fireworks every 2-4 seconds
-        const fireworkInterval = setInterval(() => {
-            if (document.getElementById('persistent-fireworks')) {
-                addFireworkBurst();
-            } else {
-                clearInterval(fireworkInterval);
-            }
-        }, Math.random() * 2000 + 2000);
-        
-        // Store interval ID for cleanup
-        fireworksContainer.dataset.intervalId = fireworkInterval;
-        
-        return fireworksContainer;
-    }
-
-    function createPersistentCosmicRays() {
-        const cosmicContainer = document.createElement('div');
-        cosmicContainer.className = 'cosmic-rays persistent-effects';
-        cosmicContainer.id = 'persistent-cosmic';
-        
-        function addCosmicRay() {
-            const ray = document.createElement('div');
-            ray.className = 'cosmic-ray';
-            ray.style.left = Math.random() * 100 + '%';
-            ray.style.animationDelay = Math.random() * 2 + 's';
-            ray.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            ray.style.background = `linear-gradient(to bottom, transparent, ${['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00'][Math.floor(Math.random() * 5)]}, transparent)`;
-            ray.style.width = Math.random() * 3 + 2 + 'px';
-            ray.style.boxShadow = `0 0 15px ${ray.style.background}`;
-            cosmicContainer.appendChild(ray);
-            
-            setTimeout(() => {
-                if (ray.parentNode) {
-                    ray.remove();
-                }
-            }, 6000);
-        }
-        
-        // Initial rays
-        for (let i = 0; i < 10; i++) {
-            setTimeout(() => addCosmicRay(), i * 300);
-        }
-        
-        // Continuous cosmic rays
-        const cosmicInterval = setInterval(() => {
-            if (document.getElementById('persistent-cosmic')) {
-                addCosmicRay();
-                // Sometimes add multiple rays
-                if (Math.random() > 0.7) {
-                    setTimeout(() => addCosmicRay(), 200);
-                }
-            } else {
-                clearInterval(cosmicInterval);
-            }
-        }, Math.random() * 1500 + 1000);
-        
-        cosmicContainer.dataset.intervalId = cosmicInterval;
-        
-        return cosmicContainer;
-    }
-
-    function createPersistentSparkles(card) {
-        function addSparkle() {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'winner-sparkle';
-            sparkle.style.left = Math.random() * 100 + '%';
-            sparkle.style.top = Math.random() * 100 + '%';
-            sparkle.style.animationDelay = Math.random() * 2 + 's';
-            sparkle.style.background = ['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00', '#ff4500'][Math.floor(Math.random() * 6)];
-            sparkle.style.width = Math.random() * 6 + 3 + 'px';
-            sparkle.style.height = sparkle.style.width;
-            sparkle.style.boxShadow = `0 0 8px ${sparkle.style.background}`;
-            card.appendChild(sparkle);
-            
-            setTimeout(() => {
-                if (sparkle.parentNode) {
-                    sparkle.remove();
-                }
-            }, 5000);
-        }
-        
-        // Initial sparkles
-        for (let i = 0; i < 6; i++) {
-            setTimeout(() => addSparkle(), i * 500);
-        }
-        
-        // Continuous sparkles
-        const sparkleInterval = setInterval(() => {
-            if (card.parentNode && document.querySelector('.winner-announcement')) {
-                addSparkle();
-                // Sometimes add extra sparkles
-                if (Math.random() > 0.6) {
-                    setTimeout(() => addSparkle(), 300);
-                }
-            } else {
-                clearInterval(sparkleInterval);
-            }
-        }, Math.random() * 2000 + 1500);
-        
-        // Store interval for cleanup
-        if (!card.dataset.sparkleIntervals) {
-            card.dataset.sparkleIntervals = '';
-        }
-        card.dataset.sparkleIntervals += sparkleInterval + ',';
-    }
-
-    function createPersistentConfetti() {
-        const confettiContainer = document.createElement('div');
-        confettiContainer.className = 'persistent-confetti';
-        confettiContainer.id = 'persistent-confetti';
-        confettiContainer.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 5;
-        `;
-        
-        function addConfetti() {
-            for (let i = 0; i < 15; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.background = ['#8a2be2', '#1e90ff', '#ff6b6b', '#ffd700', '#00ff00', '#ff4500', '#ff69b4'][Math.floor(Math.random() * 7)];
-                    confetti.style.width = Math.random() * 10 + 6 + 'px';
-                    confetti.style.height = confetti.style.width;
-                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                    confettiContainer.appendChild(confetti);
-                    
-                    setTimeout(() => {
-                        if (confetti.parentNode) {
-                            confetti.remove();
-                        }
-                    }, 8000);
-                }, i * 100);
-            }
-        }
-        
-        // Initial confetti
-        addConfetti();
-        
-        // Continuous confetti every 5-8 seconds
-        const confettiInterval = setInterval(() => {
-            if (document.getElementById('persistent-confetti')) {
-                addConfetti();
-            } else {
-                clearInterval(confettiInterval);
-            }
-        }, Math.random() * 3000 + 5000);
-        
-        confettiContainer.dataset.intervalId = confettiInterval;
-        
-        return confettiContainer;
-    }
-
-    function createFloatingGlowOrbs() {
-        const orbContainer = document.createElement('div');
-        orbContainer.className = 'floating-orbs';
-        orbContainer.id = 'floating-orbs';
-        orbContainer.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        `;
-        
-        function addOrb() {
-            const orb = document.createElement('div');
-            orb.style.cssText = `
-                position: absolute;
-                width: ${Math.random() * 20 + 10}px;
-                height: ${Math.random() * 20 + 10}px;
-                background: ${['#ffd700', '#ff6b6b', '#8a2be2', '#1e90ff', '#00ff00'][Math.floor(Math.random() * 5)]};
-                border-radius: 50%;
-                left: ${Math.random() * 100}%;
-                top: ${Math.random() * 100}%;
-                animation: floatOrb ${Math.random() * 10 + 8}s ease-in-out infinite;
-                box-shadow: 0 0 20px currentColor;
-                opacity: 0.7;
-            `;
-            
-            orbContainer.appendChild(orb);
-            
-            setTimeout(() => {
-                if (orb.parentNode) {
-                    orb.remove();
-                }
-            }, 20000);
-        }
-        
-        // Add orb animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes floatOrb {
-                0%, 100% {
-                    transform: translate(0, 0) scale(0.8);
-                    opacity: 0.4;
-                }
-                25% {
-                    transform: translate(${(Math.random() - 0.5) * 200}px, ${(Math.random() - 0.5) * 200}px) scale(1.2);
-                    opacity: 0.8;
-                }
-                50% {
-                    transform: translate(${(Math.random() - 0.5) * 150}px, ${(Math.random() - 0.5) * 150}px) scale(0.9);
-                    opacity: 0.6;
-                }
-                75% {
-                    transform: translate(${(Math.random() - 0.5) * 180}px, ${(Math.random() - 0.5) * 180}px) scale(1.1);
-                    opacity: 0.7;
-                }
-            }
-        `;
-        if (!document.getElementById('orb-styles')) {
-            style.id = 'orb-styles';
-            document.head.appendChild(style);
-        }
-        
-        // Initial orbs
-        for (let i = 0; i < 8; i++) {
-            setTimeout(() => addOrb(), i * 1000);
-        }
-        
-        // Continuous orbs
-        const orbInterval = setInterval(() => {
-            if (document.getElementById('floating-orbs')) {
-                addOrb();
-            } else {
-                clearInterval(orbInterval);
-            }
-        }, 3000);
-        
-        orbContainer.dataset.intervalId = orbInterval;
-        
-        return orbContainer;
-    }
-            
-    // WINNER CONTENT - FIXED ORDER
+    // Clear results container and show announcement
+    resultsContainer.innerHTML = '';
+    resultsContainer.style.display = 'none';
+    announcementDiv.style.display = 'block';
+    
+    // WINNER CONTENT - FIXED ORDER with better error handling
     let winnersHtml = `
         <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}" id="main-winner-announcement">
             <!-- WINNERS FIRST -->
@@ -3425,11 +3266,20 @@ function displayWinnersWithGrandReveal() {
     };
 
     positionOrder.forEach((position, index) => {
-        if (winners[position]) {
+        if (winners[position] && winners[position].name) {
             const winner = winners[position];
-            const marginText = winner.victoryMargin > 0 ? 
-                `WON BY ${winner.victoryMargin} VOTES` : 
-                `${winner.votes} VOTES`;
+            
+            // FIXED: Better vote display with fallbacks
+            let marginText;
+            if (winner.victoryMargin && winner.victoryMargin > 0) {
+                marginText = `WON BY ${winner.victoryMargin} VOTES`;
+            } else if (winner.votes || winner.votes === 0) {
+                marginText = `${winner.votes} VOTES`;
+            } else {
+                marginText = 'CHAMPION';
+            }
+            
+            console.log(`✅ Adding ${position}: ${winner.name} - ${marginText}`);
             
             winnersHtml += `
                 <div class="winner-card winner-glow-pulse persistent-winner-card" 
@@ -3446,6 +3296,8 @@ function displayWinnersWithGrandReveal() {
                     </div>
                 </div>
             `;
+        } else {
+            console.warn(`⚠️ Missing or invalid data for ${position}:`, winners[position]);
         }
     });
 
@@ -3468,28 +3320,36 @@ function displayWinnersWithGrandReveal() {
 
     announcementDiv.innerHTML = winnersHtml;
     
-    // Add all persistent effects
+    // Add all persistent effects (keeping the existing effect functions)
     if (shouldShowEffects) {
         console.log('🎉 Adding persistent winner announcement effects...');
         
         // Add enhanced fireworks
         setTimeout(() => {
-            announcementDiv.appendChild(createPersistentFireworks());
+            if (document.getElementById('main-winner-announcement')) {
+                announcementDiv.appendChild(createPersistentFireworks());
+            }
         }, 500);
         
         // Add cosmic rays
         setTimeout(() => {
-            announcementDiv.appendChild(createPersistentCosmicRays());
+            if (document.getElementById('main-winner-announcement')) {
+                announcementDiv.appendChild(createPersistentCosmicRays());
+            }
         }, 800);
         
         // Add floating orbs
         setTimeout(() => {
-            announcementDiv.appendChild(createFloatingGlowOrbs());
+            if (document.getElementById('main-winner-announcement')) {
+                announcementDiv.appendChild(createFloatingGlowOrbs());
+            }
         }, 1200);
         
         // Add confetti overlay
         setTimeout(() => {
-            document.body.appendChild(createPersistentConfetti());
+            if (document.getElementById('main-winner-announcement')) {
+                document.body.appendChild(createPersistentConfetti());
+            }
         }, 1000);
         
         // Add sparkles to winner cards
@@ -3497,7 +3357,9 @@ function displayWinnersWithGrandReveal() {
             const winnerCards = document.querySelectorAll('.persistent-winner-card');
             winnerCards.forEach((card, index) => {
                 setTimeout(() => {
-                    createPersistentSparkles(card);
+                    if (card.parentNode) {
+                        createPersistentSparkles(card);
+                    }
                 }, index * 300);
             });
         }, 1500);
@@ -3537,50 +3399,36 @@ function displayWinnersWithGrandReveal() {
                 flash.remove();
             }, 2000);
         }, 300);
-        
-        // Continuous pulsing background effect
-        setTimeout(() => {
-            const backgroundPulse = document.createElement('div');
-            backgroundPulse.id = 'background-pulse';
-            backgroundPulse.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(circle at center, rgba(138,43,226,0.1) 0%, transparent 70%);
-                animation: backgroundPulse 4s ease-in-out infinite;
-                pointer-events: none;
-                z-index: 0;
-            `;
-            
-            const pulseStyle = document.createElement('style');
-            pulseStyle.textContent = `
-                @keyframes backgroundPulse {
-                    0%, 100% { 
-                        opacity: 0.3; 
-                        transform: scale(1); 
-                    }
-                    50% { 
-                        opacity: 0.6; 
-                        transform: scale(1.05); 
-                    }
-                }
-            `;
-            if (!document.getElementById('pulse-styles')) {
-                pulseStyle.id = 'pulse-styles';
-                document.head.appendChild(pulseStyle);
-            }
-            
-            const mainAnnouncement = document.getElementById('main-winner-announcement');
-            if (mainAnnouncement) {
-                mainAnnouncement.appendChild(backgroundPulse);
-            }
-        }, 2000);
     }
     
-    console.log('🏆 Winner announcement displayed with persistent effects');
+    console.log('🏆 Winner announcement displayed successfully with persistent effects');
 }
+
+// Add a debug function to inspect the data structure
+function debugWinnerData() {
+    console.log('=== WINNER DATA DEBUG ===');
+    console.log('announcementStatus:', announcementStatus);
+    console.log('winnerDataPreFetched:', winnerDataPreFetched);
+    
+    if (announcementStatus.winners) {
+        console.log('announcementStatus.winners:', announcementStatus.winners);
+        if (announcementStatus.winners.winners) {
+            console.log('announcementStatus.winners.winners:', announcementStatus.winners.winners);
+        }
+    }
+    
+    // Try to access winner data the way the function expects it
+    let winnersData = winnerDataPreFetched || announcementStatus.winners || announcementStatus.preFetchedWinners;
+    let winners = winnersData?.winners || winnersData;
+    
+    console.log('Processed winners data:', winners);
+    console.log('=== END DEBUG ===');
+    
+    return { winnersData, winners };
+}
+
+// Add this to help with debugging - call it from console if needed
+window.debugWinnerData = debugWinnerData;
 
 // Add function to clear all winner effects (for admin use)
 function clearWinnerEffects() {

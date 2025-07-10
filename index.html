@@ -1837,6 +1837,8 @@ b, .zoho-bold {
         let pendingVoteData = null;
         let resultsTabLoaded = false; // Track if results tab has been loaded
         let autoRefreshEnabled = false; // Track if auto-refresh should be enabled
+        let userIsVoting = false; // Track if user is actively making selections
+        let lastUserActivity = 0; // Track last user interaction
 
         // Tab switching
         function showTab(tabName) {
@@ -2036,6 +2038,9 @@ b, .zoho-bold {
             const preLoginBtn = document.getElementById('pre-login-btn');
             const votingForm = document.querySelector('.voting-form');
             
+            // PRESERVE USER SELECTIONS before any updates
+            const currentSelections = preserveUserSelections();
+            
             // Update banner class based on status
             banner.className = 'election-status-banner';
             if (electionStatus.status === 'SCHEDULED') {
@@ -2097,12 +2102,76 @@ b, .zoho-bold {
                 votingForm.classList.remove('pre-voting');
             }
             
-            // Update candidate form based on voting status
-            if (Object.keys(currentCandidates).length > 0) {
-                displayCandidateForm(); // Refresh the candidate form with proper disabled states
+            // Only refresh candidate form if it doesn't exist or status significantly changed
+            const candidatesContainer = document.getElementById('candidates-container');
+            const hasExistingForm = candidatesContainer && !candidatesContainer.querySelector('.loading');
+            
+            if (!hasExistingForm || Object.keys(currentCandidates).length > 0) {
+                displayCandidateForm();
+                // RESTORE USER SELECTIONS after form refresh
+                restoreUserSelections(currentSelections);
+            } else {
+                // Just update the disabled state without regenerating the form
+                updateFormDisabledState();
             }
             
             updateSubmitButton();
+        }
+
+        // Function to preserve user selections before form updates
+        function preserveUserSelections() {
+            const selections = {};
+            const positions = ['president', 'secretary', 'treasurer'];
+            
+            positions.forEach(position => {
+                const checkedInput = document.querySelector(`input[name="${position}"]:checked`);
+                if (checkedInput) {
+                    selections[position] = checkedInput.value;
+                }
+            });
+            
+            if (Object.keys(selections).length > 0) {
+                console.log('Preserving user selections:', selections);
+            }
+            
+            return selections;
+        }
+
+        // Function to restore user selections after form updates
+        function restoreUserSelections(selections) {
+            if (!selections || Object.keys(selections).length === 0) return;
+            
+            console.log('Restoring user selections:', selections);
+            
+            // Wait a brief moment for DOM to update
+            setTimeout(() => {
+                Object.keys(selections).forEach(position => {
+                    const value = selections[position];
+                    const input = document.querySelector(`input[name="${position}"][value="${value}"]`);
+                    if (input) {
+                        input.checked = true;
+                        // Trigger visual update
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log(`Restored selection: ${position} = ${value}`);
+                    } else {
+                        console.warn(`Could not restore selection: ${position} = ${value} (input not found)`);
+                    }
+                });
+            }, 50);
+        }
+
+        // Function to update form disabled state without regenerating
+        function updateFormDisabledState() {
+            const positionSections = document.querySelectorAll('.position-section');
+            const shouldDisable = preVotingMode || electionStatus.status === 'PRE_VOTING' || electionStatus.isPreVotingTime;
+            
+            positionSections.forEach(section => {
+                if (shouldDisable) {
+                    section.classList.add('disabled');
+                } else {
+                    section.classList.remove('disabled');
+                }
+            });
         }
 
       function startCountdown() {
@@ -2311,34 +2380,57 @@ b, .zoho-bold {
             }
         }
 
-        // Load candidates from backend
+        // Load candidates from backend with selection preservation
         async function loadCandidates() {
-            // Show loading immediately
-            document.getElementById('candidates-container').innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading Altruixx candidates...</p>
-                </div>
-            `;
+            // Preserve existing selections before loading
+            const currentSelections = preserveUserSelections();
+            
+            // Only show loading if there's no existing form
+            const candidatesContainer = document.getElementById('candidates-container');
+            const hasExistingCandidates = candidatesContainer && !candidatesContainer.querySelector('.loading');
+            
+            if (!hasExistingCandidates) {
+                candidatesContainer.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading Altruixx candidates...</p>
+                    </div>
+                `;
+            }
 
             try {
                 const response = await axios.get('/.netlify/functions/get-candidates?' + Date.now()); // Cache bust
-                currentCandidates = response.data;
-                displayCandidateForm();
+                const newCandidates = response.data;
+                
+                // Only update if candidates have actually changed
+                const candidatesChanged = JSON.stringify(currentCandidates) !== JSON.stringify(newCandidates);
+                
+                if (candidatesChanged || !hasExistingCandidates) {
+                    currentCandidates = newCandidates;
+                    displayCandidateForm();
+                    // Restore selections after form update
+                    restoreUserSelections(currentSelections);
+                }
             } catch (error) {
                 console.error('Error loading candidates:', error);
-                // Fallback to default candidates
-                currentCandidates = {
-                    president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
-                    secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
-                    treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
-                };
-                displayCandidateForm();
+                // Only fallback if no existing candidates
+                if (Object.keys(currentCandidates).length === 0) {
+                    currentCandidates = {
+                        president: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+                        secretary: ['David Wilson', 'Emma Brown', 'Frank Miller'],
+                        treasurer: ['Grace Lee', 'Henry Clark', 'Ivy Taylor']
+                    };
+                    displayCandidateForm();
+                    restoreUserSelections(currentSelections);
+                }
             }
         }
 
-        // Display candidate form sections
+        // Display candidate form sections with selection preservation
         function displayCandidateForm() {
+            // Preserve current selections before regenerating form
+            const currentSelections = preserveUserSelections();
+            
             const container = document.getElementById('candidates-container');
             const positions = {
                 president: { title: '👑 Altruixx President', popularTags: ['Alice Johnson', 'Bob Smith'] },
@@ -2385,6 +2477,11 @@ b, .zoho-bold {
             });
 
             container.innerHTML = html;
+            
+            // Restore selections after form regeneration
+            if (Object.keys(currentSelections).length > 0) {
+                restoreUserSelections(currentSelections);
+            }
         }
 
         // FIXED: Load winner announcement with proper state management
@@ -2983,7 +3080,7 @@ b, .zoho-bold {
             pendingVoteData = null;
         }
 
-        // Form submission
+        // Enhanced form submission with selection protection
         document.getElementById('voting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -3010,6 +3107,9 @@ b, .zoho-bold {
                 return;
             }
 
+            // Preserve selections during submission process
+            const currentSelections = preserveUserSelections();
+            
             const formData = new FormData(e.target);
             const voteData = {
                 registerNumber: formData.get('registerNumber'),
@@ -3030,6 +3130,8 @@ b, .zoho-bold {
             // Validate that all positions are voted for
             if (!voteData.votes.president || !voteData.votes.secretary || !voteData.votes.treasurer) {
                 showMessage('Please select candidates for all positions.', 'error');
+                // Restore selections if validation fails
+                restoreUserSelections(currentSelections);
                 return;
             }
 
@@ -3171,17 +3273,70 @@ b, .zoho-bold {
             await loadNominees(); // Load nominees first for default tab
             await loadElectionStatus(); // Load election status
             await loadCandidates(); // Load candidates
+            
+            // Add event listeners to track user voting activity
+            setupVotingActivityTrackers();
         });
 
-        // FIXED: Auto-refresh with proper state management
-        // Auto-refresh election status every 10 seconds
+        // Setup event listeners to track when user is actively voting
+        function setupVotingActivityTrackers() {
+            // Track radio button changes
+            document.addEventListener('change', function(e) {
+                if (e.target.type === 'radio' && e.target.name && ['president', 'secretary', 'treasurer'].includes(e.target.name)) {
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                    console.log('User made a selection:', e.target.name, '=', e.target.value);
+                    
+                    // Reset voting flag after 30 seconds of no activity
+                    setTimeout(() => {
+                        const timeSinceLastActivity = Date.now() - lastUserActivity;
+                        if (timeSinceLastActivity >= 30000) {
+                            userIsVoting = false;
+                        }
+                    }, 30000);
+                }
+            });
+            
+            // Track clicks on candidate options
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.candidate-option')) {
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                }
+            });
+            
+            // Track focus on form elements
+            document.addEventListener('focus', function(e) {
+                if (e.target.closest('.position-section')) {
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                }
+            }, true);
+        }
+
+        // Enhanced function to check if user has active selections
+        function hasActiveSelections() {
+            const checkedInputs = document.querySelectorAll('input[type="radio"]:checked');
+            return checkedInputs.length > 0;
+        }
+
+        // Enhanced auto-refresh logic
         setInterval(() => {
             if (document.getElementById('vote-tab').classList.contains('active')) {
-                loadElectionStatus();
+                const timeSinceLastActivity = Date.now() - lastUserActivity;
+                const userRecentlyActive = timeSinceLastActivity < 30000; // 30 seconds
+                
+                // Only refresh if no user selections AND not recently active
+                if (!hasActiveSelections() && !userRecentlyActive && !userIsVoting) {
+                    loadElectionStatus();
+                } else {
+                    // User has selections or is actively voting, only update status
+                    refreshStatusOnly();
+                }
             }
         }, 10000);
 
-        // FIXED: Auto-refresh winner announcement only when enabled and on results tab
+        // Auto-refresh winner announcement only when enabled and on results tab
         setInterval(() => {
             if (autoRefreshEnabled && 
                 document.getElementById('results-tab').classList.contains('active') && 
@@ -3197,6 +3352,55 @@ b, .zoho-bold {
                 loadNominees();
             }
         }, 60000);
+
+        // Function to refresh only status without affecting the form
+        async function refreshStatusOnly() {
+            try {
+                const response = await axios.get('/.netlify/functions/get-election-status?' + Date.now());
+                const newElectionStatus = response.data;
+                
+                // Only update if there's a significant change in status
+                if (newElectionStatus.status !== electionStatus.status) {
+                    electionStatus = newElectionStatus;
+                    updateElectionStatusDisplay();
+                } else {
+                    // Just update the message and countdown without touching the form
+                    electionStatus = newElectionStatus;
+                    document.getElementById('status-message').textContent = electionStatus.message;
+                    
+                    // Update countdown if it exists
+                    if (electionStatus.timeUntilStart && electionStatus.timeUntilStart > 0) {
+                        // Update countdown without restarting it
+                        updateCountdownDisplay();
+                    }
+                    
+                    updateSubmitButton();
+                }
+            } catch (error) {
+                console.error('Error refreshing status:', error);
+            }
+        }
+
+        // Helper function to update countdown display only
+        function updateCountdownDisplay() {
+            if (!electionStatus.timeUntilStart) return;
+            
+            const totalSeconds = Math.floor(electionStatus.timeUntilStart / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            
+            if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+            if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+            if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
 
         // Clean up intervals when page unloads
         window.addEventListener('beforeunload', function() {

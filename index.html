@@ -1754,10 +1754,10 @@ b, .zoho-bold {
                                 </div>
                             </div>
                         </div>
-                        <!-- Login Button for Pre-voting -->
-                        <button id="pre-login-btn" class="login-button" style="display: none;" onclick="handlePreLogin()">
+                        <!-- Login Button for Pre-voting - REMOVED -->
+                        <!-- <button id="pre-login-btn" class="login-button" style="display: none;" onclick="handlePreLogin()">
                             🚀 Prepare for Launch
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -2082,12 +2082,12 @@ b, .zoho-bold {
                 }
             }
             
-            // Show/hide pre-login button
-            if (preVotingMode && electionStatus.preVotingAllowed) {
-                preLoginBtn.style.display = 'block';
-            } else {
-                preLoginBtn.style.display = 'none';
-            }
+            // Show/hide pre-login button - DISABLED
+            // if (preVotingMode && electionStatus.preVotingAllowed) {
+            //     preLoginBtn.style.display = 'block';
+            // } else {
+            //     preLoginBtn.style.display = 'none';
+            // }
             
             // Enable/disable voting form
             if (electionStatus.preVotingAllowed || electionStatus.votingAllowed) {
@@ -2141,10 +2141,11 @@ b, .zoho-bold {
         function restoreUserSelections(selections) {
             if (!selections || Object.keys(selections).length === 0) return;
             
-            console.log('Restoring user selections:', selections);
+            console.log('🔄 Restoring user selections:', selections);
             
             // Wait a brief moment for DOM to update
             setTimeout(() => {
+                let restoredCount = 0;
                 Object.keys(selections).forEach(position => {
                     const value = selections[position];
                     const input = document.querySelector(`input[name="${position}"][value="${value}"]`);
@@ -2152,11 +2153,22 @@ b, .zoho-bold {
                         input.checked = true;
                         // Trigger visual update
                         input.dispatchEvent(new Event('change', { bubbles: true }));
-                        console.log(`Restored selection: ${position} = ${value}`);
+                        console.log(`✅ Restored selection: ${position} = ${value}`);
+                        restoredCount++;
                     } else {
-                        console.warn(`Could not restore selection: ${position} = ${value} (input not found)`);
+                        console.warn(`❌ Could not restore selection: ${position} = ${value} (input not found)`);
                     }
                 });
+                
+                // LAPTOP: If restoration failed, try backup recovery
+                if (restoredCount === 0 && Object.keys(selections).length > 0) {
+                    console.log('🔄 Primary restoration failed - attempting backup recovery');
+                    setTimeout(() => {
+                        recoverSelectionsFromBackup();
+                    }, 500);
+                }
+                
+                console.log(`📊 Restoration summary: ${restoredCount}/${Object.keys(selections).length} selections restored`);
             }, 50);
         }
 
@@ -2625,24 +2637,27 @@ b, .zoho-bold {
     
     const updateCountdown = () => {
         if (remainingTime <= 0) {
+            console.log('Countdown reached zero - triggering INSTANT reveal');
             clearInterval(announcementCountdownInterval);
             announcementCountdownInterval = null;
-            // Remove any final effects
+            
+            // Remove any final effects immediately
             document.body.classList.remove('screen-shake');
             const timer = document.getElementById('announcement-countdown-timer');
             if (timer) {
                 timer.classList.remove('countdown-final-seconds', 'countdown-ultra-final');
             }
             
-            // IMMEDIATE WINNER REVEAL - Use pre-fetched data if available
-            if (winnerDataPreFetched) {
-                console.log('Using pre-fetched winner data for instant reveal');
+            // INSTANT WINNER REVEAL - NO DELAY
+            if (winnerDataPreFetched && winnerDataPreFetched.winners) {
+                console.log('Using pre-fetched winner data for INSTANT reveal');
                 announcementStatus.isAnnounced = true;
                 announcementStatus.winners = winnerDataPreFetched;
                 displayWinnersWithGrandReveal();
             } else {
-                // Fallback to API call
-                loadWinnerAnnouncement();
+                console.log('No pre-fetched data - calling API for instant reveal');
+                // Fallback to immediate API call
+                loadWinnerAnnouncementInstant();
             }
             return;
         }
@@ -2738,6 +2753,33 @@ b, .zoho-bold {
     updateCountdown(); // Initial call
     announcementCountdownInterval = setInterval(updateCountdown, 1000);
 }
+
+        // Instant winner announcement loading without delay
+        async function loadWinnerAnnouncementInstant() {
+            console.log('Loading winner announcement INSTANTLY...');
+            try {
+                const response = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now());
+                announcementStatus = response.data;
+                
+                if (announcementStatus.isAnnounced && (announcementStatus.winners || announcementStatus.preFetchedWinners)) {
+                    displayWinnersWithGrandReveal();
+                } else {
+                    // Force the announcement to be marked as announced
+                    announcementStatus.isAnnounced = true;
+                    if (announcementStatus.preFetchedWinners) {
+                        announcementStatus.winners = announcementStatus.preFetchedWinners;
+                        displayWinnersWithGrandReveal();
+                    } else {
+                        // Last resort - call results directly
+                        loadResults();
+                    }
+                }
+            } catch (error) {
+                console.error('Error in instant winner announcement:', error);
+                // Fallback to results
+                loadResults();
+            }
+        }
 
         // Enhanced floating particles effect for final countdown
         function createFloatingParticles() {
@@ -2885,14 +2927,10 @@ b, .zoho-bold {
                 }
             }
             
+            // FIXED ORDER: Winners first, then title
             let winnersHtml = `
         <div class="winner-announcement ${shouldShowEffects ? 'winner-reveal-entrance' : ''}">
-          <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 30px #ffd700;">
-    🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
-</h2>
-            <div style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; margin: 20px 0; opacity: 0.9; animation: gradientShift 3s ease infinite; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
-                ✨ THE COSMIC BALLOT BOX HAS SPOKEN ✨
-            </div>
+            <!-- WINNERS FIRST -->
             <div class="winners-grid">
     `;
 
@@ -2929,7 +2967,13 @@ b, .zoho-bold {
 
     winnersHtml += `
             </div>
-            <div style="font-family: 'Poppins', sans-serif; margin-top: 50px; font-size: 1.6rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+            
+            <!-- TITLE AFTER WINNERS -->
+            <h2 style="font-family: 'Poppins', 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: #ffd700; text-transform: uppercase; letter-spacing: 3px; margin: 40px 0 30px 0; text-shadow: 0 0 30px #ffd700;">
+                🏆 ALTRUIXX CHAMPIONS REVEALED! 🏆
+            </h2>
+            
+            <div style="font-family: 'Poppins', sans-serif; margin-top: 30px; font-size: 1.6rem; opacity: 0.9; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
                 🌟 LONG LIVE THE ALTRUIXX CHAMPIONS! 🌟
             </div>
             <div style="font-family: 'Poppins', sans-serif; margin-top: 20px; font-size: 1.1rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
@@ -3139,7 +3183,7 @@ b, .zoho-bold {
             showVoteConfirmation(voteData);
         });
 
-        // Load results
+        // Load results with sealing check
         async function loadResults() {
             // Show loading immediately
             document.getElementById('results-container').innerHTML = `
@@ -3150,7 +3194,20 @@ b, .zoho-bold {
             `;
 
             try {
-                const response = await axios.get('/.netlify/functions/get-results?' + Date.now()); // Cache bust
+                // FIRST: Check if results are sealed via winner announcement endpoint
+                const announcementResponse = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now());
+                const announcementData = announcementResponse.data;
+                
+                console.log('Announcement data for results check:', announcementData);
+                
+                // If sealed or no permission to view results, show access denied
+                if (announcementData.isSealed || !announcementData.canViewResults) {
+                    displayResultsAccessDenied();
+                    return;
+                }
+                
+                // SECOND: If not sealed, get the actual results
+                const response = await axios.get('/.netlify/functions/get-results?' + Date.now());
                 const results = response.data;
                 
                 displayResults(results);
@@ -3276,7 +3333,30 @@ b, .zoho-bold {
             
             // Add event listeners to track user voting activity
             setupVotingActivityTrackers();
+            
+            // LAPTOP-SPECIFIC: Start periodic selection verification
+            startPeriodicSelectionVerification();
         });
+
+        // LAPTOP-SPECIFIC: Periodic selection verification
+        function startPeriodicSelectionVerification() {
+            setInterval(() => {
+                if (document.getElementById('vote-tab').classList.contains('active')) {
+                    const currentSelections = preserveUserSelections();
+                    
+                    // If we have backup but no current selections, something went wrong
+                    if (Object.keys(selectionBackup).length > 0 && Object.keys(currentSelections).length === 0) {
+                        console.log('🚨 Selection loss detected - attempting recovery');
+                        recoverSelectionsFromBackup();
+                    }
+                    
+                    // If user has selections, update backup
+                    if (Object.keys(currentSelections).length > 0) {
+                        selectionBackup = { ...currentSelections };
+                    }
+                }
+            }, 5000); // Check every 5 seconds
+        }
 
         // Setup event listeners to track when user is actively voting
         function setupVotingActivityTrackers() {
@@ -3285,15 +3365,16 @@ b, .zoho-bold {
                 if (e.target.type === 'radio' && e.target.name && ['president', 'secretary', 'treasurer'].includes(e.target.name)) {
                     userIsVoting = true;
                     lastUserActivity = Date.now();
-                    console.log('User made a selection:', e.target.name, '=', e.target.value);
+                    console.log('🎯 User made a selection:', e.target.name, '=', e.target.value);
                     
-                    // Reset voting flag after 30 seconds of no activity
+                    // LAPTOP: Extended protection period
                     setTimeout(() => {
                         const timeSinceLastActivity = Date.now() - lastUserActivity;
-                        if (timeSinceLastActivity >= 30000) {
+                        if (timeSinceLastActivity >= 60000) { // 60 seconds for laptop
                             userIsVoting = false;
+                            console.log('⏰ User voting session ended after 60 seconds');
                         }
-                    }, 30000);
+                    }, 60000);
                 }
             });
             
@@ -3302,6 +3383,7 @@ b, .zoho-bold {
                 if (e.target.closest('.candidate-option')) {
                     userIsVoting = true;
                     lastUserActivity = Date.now();
+                    console.log('👆 User clicked on candidate option');
                 }
             });
             
@@ -3310,31 +3392,116 @@ b, .zoho-bold {
                 if (e.target.closest('.position-section')) {
                     userIsVoting = true;
                     lastUserActivity = Date.now();
+                    console.log('🎯 User focused on voting section');
                 }
             }, true);
+            
+            // LAPTOP-SPECIFIC: Track form interactions more aggressively
+            document.addEventListener('input', function(e) {
+                if (e.target.closest('#voting-form')) {
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                    console.log('📝 User interacted with voting form');
+                }
+            });
+            
+            // LAPTOP-SPECIFIC: Prevent form refresh on page visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible' && hasActiveSelections()) {
+                    console.log('👁️ Page became visible - protecting user selections');
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                }
+            });
+            
+            // LAPTOP-SPECIFIC: Mouse movement over voting area
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.closest('.voting-form') && hasActiveSelections()) {
+                    userIsVoting = true;
+                    lastUserActivity = Date.now();
+                }
+            });
         }
 
         // Enhanced function to check if user has active selections
         function hasActiveSelections() {
             const checkedInputs = document.querySelectorAll('input[type="radio"]:checked');
-            return checkedInputs.length > 0;
+            const hasSelections = checkedInputs.length > 0;
+            
+            if (hasSelections) {
+                console.log('🔒 Active selections detected:', Array.from(checkedInputs).map(input => `${input.name}=${input.value}`));
+            }
+            
+            return hasSelections;
         }
 
-        // Enhanced auto-refresh logic
+        // LAPTOP-SPECIFIC: Aggressive selection monitoring
+        let selectionMonitorInterval = null;
+        let selectionBackup = {}; // In-memory backup instead of sessionStorage
+        
+        function startSelectionMonitoring() {
+            if (selectionMonitorInterval) return; // Already running
+            
+            console.log('🛡️ Starting aggressive selection monitoring for laptop');
+            selectionMonitorInterval = setInterval(() => {
+                const currentSelections = preserveUserSelections();
+                if (Object.keys(currentSelections).length > 0) {
+                    // Store selections in memory as backup
+                    selectionBackup = { ...currentSelections };
+                    console.log('💾 Backed up selections to memory:', selectionBackup);
+                }
+            }, 2000); // Monitor every 2 seconds
+        }
+
+        function stopSelectionMonitoring() {
+            if (selectionMonitorInterval) {
+                clearInterval(selectionMonitorInterval);
+                selectionMonitorInterval = null;
+                console.log('🛑 Stopped selection monitoring');
+            }
+        }
+
+        // LAPTOP: Recovery function to restore from backup
+        function recoverSelectionsFromBackup() {
+            if (selectionBackup && Object.keys(selectionBackup).length > 0) {
+                console.log('🔄 Recovering selections from memory backup:', selectionBackup);
+                restoreUserSelections(selectionBackup);
+                return true;
+            }
+            return false;
+        }
+
+        // LAPTOP-SPECIFIC: Enhanced auto-refresh logic with stronger protection
         setInterval(() => {
             if (document.getElementById('vote-tab').classList.contains('active')) {
                 const timeSinceLastActivity = Date.now() - lastUserActivity;
-                const userRecentlyActive = timeSinceLastActivity < 30000; // 30 seconds
+                const userRecentlyActive = timeSinceLastActivity < 60000; // Increased to 60 seconds for laptop
+                const hasSelections = hasActiveSelections();
                 
-                // Only refresh if no user selections AND not recently active
-                if (!hasActiveSelections() && !userRecentlyActive && !userIsVoting) {
-                    loadElectionStatus();
+                // EVEN STRONGER PROTECTION FOR LAPTOP
+                if (!hasSelections && !userRecentlyActive && !userIsVoting) {
+                    console.log('✅ Safe to refresh - no selections detected');
+                    
+                    // Double-check before refreshing
+                    setTimeout(() => {
+                        if (!hasActiveSelections()) {
+                            loadElectionStatus();
+                        } else {
+                            console.log('🛡️ Last-second protection - selections detected');
+                        }
+                    }, 100);
                 } else {
+                    console.log('🔒 Protecting user selections - status only update');
                     // User has selections or is actively voting, only update status
                     refreshStatusOnly();
+                    
+                    // Start monitoring if user has selections
+                    if (hasSelections) {
+                        startSelectionMonitoring();
+                    }
                 }
             }
-        }, 10000);
+        }, 15000); // Increased interval to 15 seconds for laptop compatibility
 
         // Auto-refresh winner announcement only when enabled and on results tab
         setInterval(() => {

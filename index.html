@@ -1150,7 +1150,250 @@ b, .zoho-bold {
             overflow: hidden;
             margin-bottom: 5px;
         }
+/* Add this CSS to your existing <style> section in the HTML */
 
+/* Persistent Effects Containers */
+.persistent-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 8;
+}
+
+/* Enhanced Confetti Animation */
+.persistent-confetti .confetti {
+    position: absolute;
+    animation: enhancedConfettiFall 8s linear forwards;
+}
+
+@keyframes enhancedConfettiFall {
+    0% {
+        transform: translateY(-100vh) rotateZ(0deg) scale(1);
+        opacity: 1;
+    }
+    25% {
+        transform: translateY(25vh) rotateZ(180deg) scale(1.2);
+        opacity: 0.9;
+    }
+    50% {
+        transform: translateY(50vh) rotateZ(360deg) scale(0.8);
+        opacity: 0.8;
+    }
+    75% {
+        transform: translateY(75vh) rotateZ(540deg) scale(1.1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(120vh) rotateZ(720deg) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Winner Card Glow - Persistent */
+.persistent-winner-card {
+    animation: persistentWinnerGlow 3s ease-in-out infinite !important;
+}
+
+@keyframes persistentWinnerGlow {
+    0%, 100% {
+        box-shadow: 
+            0 5px 20px rgba(138, 43, 226, 0.4), 
+            0 0 30px rgba(255, 215, 0, 0.3),
+            inset 0 0 40px rgba(255, 215, 0, 0.1);
+        transform: scale(1);
+    }
+    33% {
+        box-shadow: 
+            0 10px 30px rgba(138, 43, 226, 0.6), 
+            0 0 50px rgba(255, 215, 0, 0.5),
+            inset 0 0 60px rgba(255, 215, 0, 0.2);
+        transform: scale(1.02);
+    }
+    66% {
+        box-shadow: 
+            0 15px 40px rgba(138, 43, 226, 0.5), 
+            0 0 40px rgba(30, 144, 255, 0.4),
+            inset 0 0 50px rgba(30, 144, 255, 0.15);
+        transform: scale(1.01);
+    }
+}
+
+/* Enhanced Winner Sparkles */
+.persistent-winner-card .winner-sparkle {
+    position: absolute;
+    border-radius: 50%;
+    animation: enhancedSparkleFloat 5s ease-in-out infinite;
+    box-shadow: 0 0 10px currentColor;
+}
+
+@keyframes enhancedSparkleFloat {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px) scale(0.6) rotateZ(0deg);
+        opacity: 0.4;
+    }
+    25% {
+        transform: translateY(-30px) translateX(20px) scale(1.4) rotateZ(90deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-15px) translateX(-15px) scale(1) rotateZ(180deg);
+        opacity: 0.8;
+    }
+    75% {
+        transform: translateY(-25px) translateX(10px) scale(1.2) rotateZ(270deg);
+        opacity: 0.9;
+    }
+}
+
+/* Enhanced Fireworks */
+.persistent-effects .firework {
+    position: absolute;
+    border-radius: 50%;
+    animation: enhancedFireworkBurst 3s ease-out forwards;
+}
+
+@keyframes enhancedFireworkBurst {
+    0% {
+        transform: scale(0) translate(0, 0) rotateZ(0deg);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(1.5) translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) rotateZ(120deg);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(1) translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.8)) rotateZ(240deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0.2) translate(var(--dx), var(--dy)) rotateZ(360deg);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Cosmic Rays */
+.persistent-effects .cosmic-ray {
+    position: absolute;
+    animation: enhancedCosmicRayfall 6s linear infinite;
+    border-radius: 2px;
+}
+
+@keyframes enhancedCosmicRayfall {
+    0% {
+        transform: translateY(-120px) rotateZ(45deg) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(-100px) rotateZ(45deg) scale(1);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(10vh) rotateZ(45deg) scale(1.2);
+    }
+    40% {
+        opacity: 0.8;
+        transform: translateY(40vh) rotateZ(45deg) scale(1);
+    }
+    70% {
+        opacity: 0.6;
+        transform: translateY(70vh) rotateZ(45deg) scale(0.8);
+    }
+    90% {
+        opacity: 0.3;
+        transform: translateY(90vh) rotateZ(45deg) scale(0.6);
+    }
+    100% {
+        transform: translateY(calc(100vh + 120px)) rotateZ(45deg) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Floating Orbs Enhancement */
+.floating-orbs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Background Pulse Effect */
+#background-pulse {
+    border-radius: 20px;
+}
+
+/* Enhanced Mobile Support for Persistent Effects */
+@media (max-width: 768px) {
+    .persistent-effects .firework {
+        width: 3px !important;
+        height: 3px !important;
+    }
+    
+    .persistent-effects .cosmic-ray {
+        width: 2px !important;
+        height: 80px !important;
+    }
+    
+    .persistent-confetti .confetti {
+        width: 6px !important;
+        height: 6px !important;
+    }
+    
+    .persistent-winner-card .winner-sparkle {
+        width: 4px !important;
+        height: 4px !important;
+    }
+    
+    .floating-orbs div {
+        width: 8px !important;
+        height: 8px !important;
+    }
+    
+    /* Reduce animation intensity on mobile for performance */
+    .persistent-winner-card {
+        animation-duration: 4s !important;
+    }
+    
+    @keyframes enhancedSparkleFloat {
+        0%, 100% {
+            transform: translateY(0px) translateX(0px) scale(0.5);
+            opacity: 0.3;
+        }
+        50% {
+            transform: translateY(-20px) translateX(0px) scale(1);
+            opacity: 0.8;
+        }
+    }
+}
+
+/* Ultra small screens optimization */
+@media (max-width: 480px) {
+    .persistent-effects .firework {
+        width: 2px !important;
+        height: 2px !important;
+    }
+    
+    .persistent-effects .cosmic-ray {
+        width: 1px !important;
+        height: 60px !important;
+    }
+    
+    .persistent-confetti .confetti {
+        width: 4px !important;
+        height: 4px !important;
+    }
+    
+    /* Further reduce effects density on very small screens */
+    .floating-orbs div:nth-child(n+5) {
+        display: none;
+    }
+}
         .vote-progress {
             height: 100%;
             background: linear-gradient(90deg, #8a2be2, #1e90ff);

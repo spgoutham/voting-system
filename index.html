@@ -1840,7 +1840,7 @@ b, .zoho-bold {
         let userIsVoting = false; // Track if user is actively making selections
         let lastUserActivity = 0; // Track last user interaction
 
-        // Tab switching
+        // Tab switching with forced refresh for results
         function showTab(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -1860,14 +1860,14 @@ b, .zoho-bold {
 
             // Load appropriate content
             if (tabName === 'results') {
-                if (!resultsTabLoaded) {
-                    resultsTabLoaded = true;
-                    loadWinnerAnnouncement();
-                    // Enable auto-refresh only after first manual load
-                    setTimeout(() => {
-                        autoRefreshEnabled = true;
-                    }, 1000);
-                }
+                // ALWAYS refresh results tab to check latest sealing status
+                console.log('🔄 Results tab selected - forcing fresh load');
+                resultsTabLoaded = true;
+                loadWinnerAnnouncement(); // Always reload to get fresh status
+                // Enable auto-refresh after a delay
+                setTimeout(() => {
+                    autoRefreshEnabled = true;
+                }, 2000);
             } else if (tabName === 'vote') {
                 loadElectionStatus();
             } else if (tabName === 'nominees') {
@@ -2438,16 +2438,16 @@ b, .zoho-bold {
             }
         }
 
-        // Display candidate form sections with selection preservation
+        // Display candidate form sections with selection preservation - NO TAGS
         function displayCandidateForm() {
             // Preserve current selections before regenerating form
             const currentSelections = preserveUserSelections();
             
             const container = document.getElementById('candidates-container');
             const positions = {
-                president: { title: '👑 Altruixx President', popularTags: ['Alice Johnson', 'Bob Smith'] },
-                secretary: { title: '📜 Altruixx Secretary', popularTags: ['David Wilson'] },
-                treasurer: { title: '💎 Altruixx Treasurer', popularTags: ['Grace Lee'] }
+                president: { title: '👑 Altruixx President' },
+                secretary: { title: '📜 Altruixx Secretary' },
+                treasurer: { title: '💎 Altruixx Treasurer' }
             };
 
             let html = '';
@@ -2465,21 +2465,12 @@ b, .zoho-bold {
                 `;
 
                 currentCandidates[position].forEach((candidate, index) => {
-                    let tag = '';
-                    if (positionData.popularTags.includes(candidate)) {
-                        tag = '<span class="candidate-tag popular">Popular</span>';
-                    } else if (index === 1) {
-                        tag = '<span class="candidate-tag rising">Rising</span>';
-                    } else if (index === currentCandidates[position].length - 1) {
-                        tag = '<span class="candidate-tag new">New</span>';
-                    }
-
+                    // NO TAGS - All candidates are equal
                     html += `
                         <div class="candidate-option">
                             <input type="radio" id="${position}_${index}" name="${position}" value="${candidate}" required>
                             <label for="${position}_${index}">
                                 <span class="candidate-name">${candidate}</span>
-                                ${tag}
                             </label>
                         </div>
                     `;
@@ -2496,33 +2487,41 @@ b, .zoho-bold {
             }
         }
 
-        // FIXED: Load winner announcement with proper state management
+        // FIXED: Load winner announcement with proper state management and cache busting
         async function loadWinnerAnnouncement() {
-            console.log('Loading winner announcement...');
+            console.log('Loading winner announcement with cache busting...');
             
             // Show loading immediately and clear any previous content
             const resultsContainer = document.getElementById('results-container');
             const announcementDiv = document.getElementById('winner-announcement');
             
-            // Only show loading if not previously loaded
-            if (!resultsContainer.innerHTML || resultsContainer.innerHTML.includes('Scanning the Altruix')) {
-                announcementDiv.style.display = 'none';
-                announcementDiv.innerHTML = '';
-                
-                resultsContainer.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Checking Altruixx announcement status...</p>
-                    </div>
-                `;
-            }
+            // Always show loading to prevent stale data display
+            announcementDiv.style.display = 'none';
+            announcementDiv.innerHTML = '';
+            
+            resultsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Checking Altruixx announcement status...</p>
+                </div>
+            `;
 
             try {
-                const response = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now()); // Cache bust
-                announcementStatus = response.data;
-                console.log('Announcement Status:', announcementStatus);
+                // AGGRESSIVE CACHE BUSTING
+                const timestamp = Date.now();
+                const randomParam = Math.random().toString(36).substring(7);
+                const cacheBreaker = `${timestamp}_${randomParam}`;
                 
-                updateAnnouncementDisplay();
+                const response = await axios.get(`/.netlify/functions/get-winner-announcement?cb=${cacheBreaker}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                announcementStatus = response.data;
+                console.log('Fresh Announcement Status:', announcementStatus);
                 
                 // Clear any existing announcement countdown interval
                 if (announcementCountdownInterval) {
@@ -2530,21 +2529,32 @@ b, .zoho-bold {
                     announcementCountdownInterval = null;
                 }
                 
+                // ENHANCED SEALING CHECK
+                if (announcementStatus.isSealed || announcementStatus.status === 'SEALED') {
+                    console.log('🔒 Results are SEALED - showing access denied');
+                    announcementDiv.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+                    displayResultsAccessDenied();
+                    return;
+                }
+                
                 // Start countdown if needed
                 if ((announcementStatus.status === 'SCHEDULED' || announcementStatus.status === 'PRE_FETCH') && announcementStatus.timeUntilAnnouncement > 0) {
+                    updateAnnouncementDisplay();
                     startAnnouncementCountdown();
                 } else if (announcementStatus.isAnnounced && (announcementStatus.winners || announcementStatus.preFetchedWinners)) {
                     displayWinnersWithGrandReveal();
-                } else if (announcementStatus.canViewResults) {
+                } else if (announcementStatus.canViewResults && !announcementStatus.isSealed) {
                     loadResults();
                 } else {
+                    console.log('🔒 Access denied or results sealed');
                     displayResultsAccessDenied();
                 }
                 
             } catch (error) {
                 console.error('Error loading winner announcement:', error);
-                // Default to allowing results if can't check status
-                loadResults();
+                // On error, default to showing access denied (safer than showing results)
+                displayResultsAccessDenied();
             }
         }
 
@@ -2612,15 +2622,33 @@ b, .zoho-bold {
             }
         }
 
-        // Pre-fetch winner data 10 seconds before announcement
+        // Pre-fetch winner data with enhanced error handling
         async function preFetchWinnerData() {
-            console.log('Pre-fetching winner data...');
+            console.log('Pre-fetching winner data with cache busting...');
             try {
-                const response = await axios.get('/.netlify/functions/get-winner-data');
+                const timestamp = Date.now();
+                const randomParam = Math.random().toString(36).substring(7);
+                const response = await axios.get(`/.netlify/functions/get-winner-data?cb=${timestamp}_${randomParam}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
                 winnerDataPreFetched = response.data;
                 console.log('Winner data pre-fetched successfully');
             } catch (error) {
                 console.error('Error pre-fetching winner data:', error);
+                // Try fallback to get-winner-announcement
+                try {
+                    const fallbackResponse = await axios.get(`/.netlify/functions/get-winner-announcement?cb=${Date.now()}`);
+                    if (fallbackResponse.data.winners || fallbackResponse.data.preFetchedWinners) {
+                        winnerDataPreFetched = fallbackResponse.data.winners || fallbackResponse.data.preFetchedWinners;
+                        console.log('Winner data pre-fetched via fallback');
+                    }
+                } catch (fallbackError) {
+                    console.error('Fallback pre-fetch also failed:', fallbackError);
+                }
             }
         }
 
@@ -3044,14 +3072,32 @@ b, .zoho-bold {
             displayWinnersWithGrandReveal();
         }
 
-        // Display access denied message
+        // Display access denied message with enhanced sealing info
         function displayResultsAccessDenied() {
             const container = document.getElementById('results-container');
+            
+            // Enhanced message based on status
+            let title = '🔒 Results Sealed';
+            let message = 'The Altruixx ballot box is sealed until the official winner announcement.';
+            let subtitle = 'Stay tuned for the grand reveal! ✨';
+            
+            if (announcementStatus && announcementStatus.status === 'SEALED') {
+                title = '🔒 Results Officially Sealed';
+                message = 'Results have been sealed by the election administrator.';
+                subtitle = 'No results will be shown until unsealed. 🛡️';
+            } else if (announcementStatus && announcementStatus.message) {
+                message = announcementStatus.message;
+            }
+            
             container.innerHTML = `
                 <div class="results-denied">
-                    <h2>🔒 Results Sealed</h2>
-                    <p>The Altruixx ballot box is sealed until the official winner announcement.</p>
-                    <p>Stay tuned for the grand reveal! ✨</p>
+                    <h2>${title}</h2>
+                    <p>${message}</p>
+                    <p>${subtitle}</p>
+                    <div style="margin-top: 30px; padding: 15px; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 10px;">
+                        <strong>🛡️ Security Notice:</strong><br>
+                        This election's results are protected until the official announcement.
+                    </div>
                 </div>
             `;
         }
@@ -3183,7 +3229,7 @@ b, .zoho-bold {
             showVoteConfirmation(voteData);
         });
 
-        // Load results with sealing check
+        // Load results with enhanced sealing check and cache busting
         async function loadResults() {
             // Show loading immediately
             document.getElementById('results-container').innerHTML = `
@@ -3194,27 +3240,67 @@ b, .zoho-bold {
             `;
 
             try {
+                // AGGRESSIVE CACHE BUSTING
+                const timestamp = Date.now();
+                const randomParam = Math.random().toString(36).substring(7);
+                const cacheBreaker = `${timestamp}_${randomParam}`;
+                
                 // FIRST: Check if results are sealed via winner announcement endpoint
-                const announcementResponse = await axios.get('/.netlify/functions/get-winner-announcement?' + Date.now());
+                const announcementResponse = await axios.get(`/.netlify/functions/get-winner-announcement?cb=${cacheBreaker}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
                 const announcementData = announcementResponse.data;
                 
                 console.log('Announcement data for results check:', announcementData);
                 
                 // If sealed or no permission to view results, show access denied
-                if (announcementData.isSealed || !announcementData.canViewResults) {
+                if (announcementData.isSealed || announcementData.status === 'SEALED' || !announcementData.canViewResults) {
+                    console.log('🔒 Results access denied - sealed or not permitted');
                     displayResultsAccessDenied();
                     return;
                 }
                 
-                // SECOND: If not sealed, get the actual results
-                const response = await axios.get('/.netlify/functions/get-results?' + Date.now());
+                // SECOND: If not sealed, get the actual results with cache busting
+                const response = await axios.get(`/.netlify/functions/get-results?cb=${cacheBreaker}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                // Check if the results endpoint also indicates sealing
+                if (response.status === 403) {
+                    console.log('🔒 Results endpoint returned 403 - sealed');
+                    displayResultsAccessDenied();
+                    return;
+                }
+                
                 const results = response.data;
+                
+                // Final check - if results contain sealing info
+                if (results.isSealed || (results.meta && results.meta.isSealed)) {
+                    console.log('🔒 Results data indicates sealing');
+                    displayResultsAccessDenied();
+                    return;
+                }
                 
                 displayResults(results);
             } catch (error) {
                 console.error('Error loading results:', error);
-                document.getElementById('results-container').innerHTML = 
-                    '<div class="message error">Error scanning the Altruixx for results. Please try again.</div>';
+                
+                // If it's a 403 error, likely sealed
+                if (error.response && error.response.status === 403) {
+                    console.log('🔒 403 error - results are sealed');
+                    displayResultsAccessDenied();
+                } else {
+                    document.getElementById('results-container').innerHTML = 
+                        '<div class="message error">Error scanning the Altruixx for results. Please try again.</div>';
+                }
             }
         }
 
@@ -3307,15 +3393,70 @@ b, .zoho-bold {
             }
         }
 
-        // Show message
+        // Enhanced message display with better error info
         function showMessage(text, type) {
             const messageDiv = document.getElementById('vote-message');
-            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            const timestamp = new Date().toLocaleTimeString();
+            
+            messageDiv.innerHTML = `
+                <div class="message ${type}">
+                    ${text}
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">
+                        ${timestamp}
+                    </div>
+                </div>
+            `;
             
             setTimeout(() => {
                 messageDiv.innerHTML = '';
             }, 5000);
         }
+
+        // Force refresh function for debugging/admin use
+        function forceRefreshAllData() {
+            console.log('🔄 Force refreshing all data...');
+            
+            // Clear all cached data
+            winnerDataPreFetched = null;
+            announcementStatus = {};
+            electionStatus = {};
+            currentCandidates = {};
+            
+            // Clear intervals
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            if (announcementCountdownInterval) {
+                clearInterval(announcementCountdownInterval);
+                announcementCountdownInterval = null;
+            }
+            
+            // Reload current tab data
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const tabName = activeTab.textContent.toLowerCase();
+                if (tabName.includes('results')) {
+                    loadWinnerAnnouncement();
+                } else if (tabName.includes('vote')) {
+                    loadElectionStatus();
+                    loadCandidates();
+                } else if (tabName.includes('nominees')) {
+                    loadNominees();
+                }
+            }
+            
+            console.log('✅ Force refresh completed');
+        }
+
+        // Add keyboard shortcut for force refresh (Ctrl+Shift+R)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                forceRefreshAllData();
+                showMessage('🔄 All data forcefully refreshed', 'success');
+            }
+        });
 
         // Close modal when clicking outside
         window.addEventListener('click', function(e) {
@@ -3325,8 +3466,15 @@ b, .zoho-bold {
             }
         });
 
-        // Initialize on page load
+        // Initialize on page load with cache busting
         window.addEventListener('load', async () => {
+            console.log('🚀 Initializing Altruixx Election System...');
+            
+            // Clear any cached data from previous sessions
+            winnerDataPreFetched = null;
+            announcementStatus = {};
+            electionStatus = {};
+            
             await loadNominees(); // Load nominees first for default tab
             await loadElectionStatus(); // Load election status
             await loadCandidates(); // Load candidates
@@ -3336,6 +3484,8 @@ b, .zoho-bold {
             
             // LAPTOP-SPECIFIC: Start periodic selection verification
             startPeriodicSelectionVerification();
+            
+            console.log('✅ Altruixx Election System initialized successfully');
         });
 
         // LAPTOP-SPECIFIC: Periodic selection verification
@@ -3503,15 +3653,15 @@ b, .zoho-bold {
             }
         }, 15000); // Increased interval to 15 seconds for laptop compatibility
 
-        // Auto-refresh winner announcement only when enabled and on results tab
+        // Auto-refresh winner announcement with enhanced cache busting
         setInterval(() => {
             if (autoRefreshEnabled && 
                 document.getElementById('results-tab').classList.contains('active') && 
                 resultsTabLoaded) {
-                console.log('Auto-refreshing winner announcement...');
+                console.log('🔄 Auto-refreshing winner announcement with cache busting...');
                 loadWinnerAnnouncement();
             }
-        }, 30000);
+        }, 15000); // Reduced to 15 seconds for faster sealing updates
 
         // Auto-refresh nominees every 60 seconds when on nominees tab
         setInterval(() => {

@@ -7,7 +7,7 @@ const DB_NAME = 'voting_system';
 const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json'
 };
 
@@ -27,125 +27,160 @@ exports.handler = async (event, context) => {
   let client;
 
   try {
-    const requestBody = JSON.parse(event.body);
-    const { action, announcementTime, isSealed } = requestBody;
-
+    const { action, minutes } = JSON.parse(event.body);
+    
     client = new MongoClient(MONGODB_URI);
     await client.connect();
     
     const db = client.db(DB_NAME);
-    const collection = db.collection('winner_announcement');
+    const announcementCollection = db.collection('winner_announcement');
 
-    if (action === 'clearAnnouncement') {
-      // 🔒 FIXED: Properly handle clearing with sealing
-      
-      // Option 1: Remove announcement but set global seal
-      await collection.deleteOne({ _id: 'current_announcement' });
-      
-      // Set global seal status
-      await collection.replaceOne(
-        { _id: 'seal_status' },
-        { 
-          _id: 'seal_status',
-          isSealed: true,  // 🔒 ALWAYS SEAL when clearing
-          sealedAt: new Date(),
-          sealedBy: 'admin'
-        },
-        { upsert: true }
-      );
+    switch (action) {
+      case 'setTimer':
+        if (!minutes || minutes < 1) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ success: false, message: 'Invalid minutes provided' })
+          };
+        }
 
-      console.log('✅ Announcement cleared and results SEALED');
+        const announcementTime = new Date(Date.now() + (minutes * 60 * 1000));
+        
+        await announcementCollection.updateOne(
+          { _id: 'current_announcement' },
+          {
+            $set: {
+              announcementTime: announcementTime,
+              isAnnounced: false,
+              isSealed: false, // Unsealed when setting timer
+              setAt: new Date()
+            }
+          },
+          { upsert: true }
+        );
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          success: true, 
-          message: 'Announcement cleared and results sealed',
-          isSealed: true
-        })
-      };
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: `Winner announcement scheduled for ${minutes} minutes from now`
+          })
+        };
 
-    } else if (action === 'setAnnouncement') {
-      // Set new announcement
-      const announcementDoc = {
-        _id: 'current_announcement',
-        announcementTime: new Date(announcementTime),
-        isAnnounced: false,
-        isSealed: isSealed || false,
-        createdAt: new Date()
-      };
+      case 'announceNow':
+        await announcementCollection.updateOne(
+          { _id: 'current_announcement' },
+          {
+            $set: {
+              announcementTime: new Date(),
+              isAnnounced: true,
+              isSealed: false, // Unsealed when announcing
+              setAt: new Date()
+            }
+          },
+          { upsert: true }
+        );
 
-      await collection.replaceOne(
-        { _id: 'current_announcement' },
-        announcementDoc,
-        { upsert: true }
-      );
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Winners announced immediately!'
+          })
+        };
 
-      // Clear global seal if unsetting seal
-      if (!isSealed) {
-        await collection.deleteOne({ _id: 'seal_status' });
-      }
+      case 'clearAnnouncement':
+        // THIS IS THE KEY FIX - PROPERLY SEAL RESULTS
+        await announcementCollection.updateOne(
+          { _id: 'current_announcement' },
+          {
+            $set: {
+              isAnnounced: false,
+              isSealed: true, // 🔒 SEAL THE RESULTS
+              clearedAt: new Date(),
+              announcementTime: null
+            }
+          },
+          { upsert: true }
+        );
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          success: true, 
-          message: 'Announcement set successfully',
-          announcement: announcementDoc
-        })
-      };
+        // Also set global seal status for extra security
+        await announcementCollection.updateOne(
+          { _id: 'seal_status' },
+          {
+            $set: {
+              isSealed: true,
+              sealedAt: new Date(),
+              reason: 'Manual seal via admin panel'
+            }
+          },
+          { upsert: true }
+        );
 
-    } else if (action === 'sealResults') {
-      // 🔒 SEAL without announcement
-      await collection.replaceOne(
-        { _id: 'seal_status' },
-        { 
-          _id: 'seal_status',
-          isSealed: true,
-          sealedAt: new Date(),
-          sealedBy: 'admin'
-        },
-        { upsert: true }
-      );
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Winner announcement cleared and results sealed successfully'
+          })
+        };
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          success: true, 
-          message: 'Results sealed successfully',
-          isSealed: true
-        })
-      };
+      case 'sealResults':
+        // Explicit seal action
+        await announcementCollection.updateOne(
+          { _id: 'seal_status' },
+          {
+            $set: {
+              isSealed: true,
+              sealedAt: new Date(),
+              reason: 'Manual seal via admin panel'
+            }
+          },
+          { upsert: true }
+        );
 
-    } else if (action === 'unsealResults') {
-      // 🔓 UNSEAL results
-      await collection.deleteOne({ _id: 'seal_status' });
-      
-      // Also unseal any announcement
-      await collection.updateOne(
-        { _id: 'current_announcement' },
-        { $set: { isSealed: false } }
-      );
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Results sealed successfully'
+          })
+        };
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          success: true, 
-          message: 'Results unsealed successfully',
-          isSealed: false
-        })
-      };
+      case 'unsealResults':
+        // Explicit unseal action
+        await announcementCollection.updateOne(
+          { _id: 'seal_status' },
+          {
+            $set: {
+              isSealed: false,
+              unsealedAt: new Date(),
+              reason: 'Manual unseal via admin panel'
+            }
+          },
+          { upsert: true }
+        );
 
-    } else {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ success: false, message: 'Invalid action' })
-      };
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Results unsealed successfully'
+          })
+        };
+
+      default:
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, message: 'Invalid action' })
+        };
     }
 
   } catch (error) {
@@ -153,9 +188,9 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        success: false, 
-        message: 'Server error: ' + error.message 
+      body: JSON.stringify({
+        success: false,
+        message: 'Internal server error'
       })
     };
   } finally {

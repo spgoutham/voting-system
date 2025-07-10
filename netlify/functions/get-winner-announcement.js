@@ -53,6 +53,7 @@ exports.handler = async (event, context) => {
       currentTime: now,
       hasAnnouncement: false,
       isAnnounced: false,
+      isSealed: false,
       timeUntilAnnouncement: null,
       announcementTime: null,
       status: 'NO_ANNOUNCEMENT',
@@ -65,6 +66,7 @@ exports.handler = async (event, context) => {
     if (announcement) {
       announcementStatus.hasAnnouncement = true;
       announcementStatus.announcementTime = announcement.announcementTime;
+      announcementStatus.isSealed = announcement.isSealed || false; // Check if sealed
       
       const announcementTime = new Date(announcement.announcementTime);
       const timeUntilAnnouncement = announcementTime.getTime() - now.getTime();
@@ -72,7 +74,34 @@ exports.handler = async (event, context) => {
       // Pre-fetch results 30 seconds before announcement
       const preFetchTime = 30000; // 30 seconds
       
-      if (announcement.isAnnounced || now >= announcementTime) {
+      // 🔒 CHECK IF SEALED - If sealed, block all results
+      if (announcementStatus.isSealed) {
+        announcementStatus.isAnnounced = false;
+        announcementStatus.status = 'SEALED';
+        announcementStatus.message = 'Results are sealed until the official announcement';
+        announcementStatus.canViewResults = false;
+        announcementStatus.winners = null;
+        
+        // Still show countdown if announcement is scheduled
+        if (timeUntilAnnouncement > 0) {
+          announcementStatus.timeUntilAnnouncement = timeUntilAnnouncement;
+          
+          const totalSeconds = Math.floor(timeUntilAnnouncement / 1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          
+          announcementStatus.countdown = {
+            days,
+            hours,
+            minutes,
+            seconds,
+            totalSeconds
+          };
+        }
+        
+      } else if (announcement.isAnnounced || now >= announcementTime) {
         // Winners have been announced or time has passed
         announcementStatus.isAnnounced = true;
         announcementStatus.status = 'ANNOUNCED';
@@ -139,15 +168,31 @@ exports.handler = async (event, context) => {
       const scheduleCollection = db.collection('election_schedule');
       const schedule = await scheduleCollection.findOne({ _id: 'current_schedule' });
       
+      // 🔒 IMPORTANT: Only show results if NOT sealed and voting is closed
       if (schedule && schedule.endTime && now > new Date(schedule.endTime)) {
-        // Voting is closed but no announcement set - can view results
-        announcementStatus.canViewResults = true;
-        announcementStatus.status = 'NO_ANNOUNCEMENT';
-        announcementStatus.message = 'Voting closed - Results available';
+        // Check if there's a sealed flag in the schedule or announcement collection
+        const sealedStatus = await announcementCollection.findOne({ _id: 'seal_status' });
         
-        // Show results with victory margins
-        const results = await getWinnersWithMargins(votesCollection, candidatesCollection);
-        announcementStatus.winners = results;
+        if (sealedStatus && sealedStatus.isSealed) {
+          // Results are sealed
+          announcementStatus.canViewResults = false;
+          announcementStatus.status = 'SEALED';
+          announcementStatus.message = 'Results are sealed until the official announcement';
+          announcementStatus.isSealed = true;
+        } else {
+          // Voting is closed but no announcement set and not sealed - can view results
+          announcementStatus.canViewResults = true;
+          announcementStatus.status = 'NO_ANNOUNCEMENT';
+          announcementStatus.message = 'Voting closed - Results available';
+          
+          // Show results with victory margins
+          const results = await getWinnersWithMargins(votesCollection, candidatesCollection);
+          announcementStatus.winners = results;
+        }
+      } else {
+        // Voting still ongoing or no schedule
+        announcementStatus.status = 'VOTING_ONGOING';
+        announcementStatus.message = 'Voting is still ongoing';
       }
     }
 
@@ -166,6 +211,7 @@ exports.handler = async (event, context) => {
         currentTime: new Date(),
         hasAnnouncement: false,
         isAnnounced: false,
+        isSealed: false,
         timeUntilAnnouncement: null,
         announcementTime: null,
         status: 'ERROR',
@@ -243,8 +289,6 @@ async function getWinnersWithMargins(votesCollection, candidatesCollection) {
           votes: winner[1],
           position: position,
           victoryMargin: victoryMargin,
-          runnerUpName: runnerUp ? runnerUp[0] : 'No opponent',
-          runnerUpVotes: runnerUp ? runnerUp[1] : 0,
           winPercentage: Math.round(winPercentage * 10) / 10, // Round to 1 decimal
           totalVotes: totalVotes,
           isLandslide: victoryMargin > (totalVotes * 0.5), // More than 50% margin

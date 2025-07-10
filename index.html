@@ -4102,16 +4102,7 @@ function clearWinnerAnnouncementAndEffects() {
             }
         }, 15000); // Increased interval to 15 seconds for laptop compatibility
 
-        // Auto-refresh winner announcement with enhanced cache busting
-        setInterval(() => {
-            if (autoRefreshEnabled && 
-                document.getElementById('results-tab').classList.contains('active') && 
-                resultsTabLoaded) {
-                console.log('🔄 Auto-refreshing winner announcement with cache busting...');
-                loadWinnerAnnouncement();
-            }
-        }, 15000); // Reduced to 15 seconds for faster sealing updates
-
+        
         // Auto-refresh nominees every 60 seconds when on nominees tab
         setInterval(() => {
             if (document.getElementById('nominees-tab').classList.contains('active')) {

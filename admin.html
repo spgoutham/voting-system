@@ -756,7 +756,45 @@
                 <button class="action-btn btn-warning" onclick="exportResults()">📊 Export Results</button>
             </div>
         </div>
+<!-- Replace the action buttons section in your statistics tab with this: -->
 
+<div class="export-section">
+    <div class="position-header" style="background: transparent; padding: 10px 0;">
+        <span>📊 Export Voting Data</span>
+    </div>
+    <div class="export-buttons">
+        <button class="action-btn btn-primary" onclick="exportCandidateResults()">
+            📈 Export Candidate Results
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Vote counts & percentages by candidate</div>
+        </button>
+        <button class="action-btn btn-warning" onclick="exportIndividualVotes()">
+            🗳️ Export Individual Votes
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Who voted for whom (detailed records)</div>
+        </button>
+    </div>
+    <div style="text-align: center; margin-top: 15px;">
+        <button class="action-btn btn-success" onclick="exportResults()">
+            📊 Export Complete Statistics
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">All voting data & analytics</div>
+        </button>
+    </div>
+</div>
+
+<div class="action-buttons" style="margin-top: 20px;">
+    <a href="index.html" class="action-btn btn-primary">🗳️ View Voting Page</a>
+</div>
+
+<!-- Privacy Notice -->
+<div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
+    <h4 style="color: #856404; margin-bottom: 10px;">🔒 Privacy & Security Notice:</h4>
+    <ul style="color: #856404; line-height: 1.6;">
+        <li><strong>Individual Votes Export:</strong> Contains sensitive data showing who voted for whom</li>
+        <li><strong>Candidate Results:</strong> Shows vote counts without revealing voter identities</li>
+        <li><strong>Complete Statistics:</strong> Comprehensive data for analysis and reporting</li>
+        <li>Handle exported data responsibly and in accordance with privacy policies</li>
+        <li>Consider anonymizing data when sharing results publicly</li>
+    </ul>
+</div>
         <!-- Updated Credentials Management Tab -->
         <div id="credentials-tab" class="tab-content">
             <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">User Credentials Management</h2>
@@ -1163,9 +1201,111 @@ function unsealResults() {
             }
         }
 
-        function exportResults() {
-            showMessage('Results exported successfully!', 'success');
-        }
+       // Add these functions to your admin.html JavaScript section
+
+// Replace the existing exportResults() function with these enhanced versions:
+
+// Export detailed voting statistics
+async function exportResults() {
+    try {
+        showMessage('Preparing voting statistics export...', 'success');
+        
+        const response = await axios.get('/.netlify/functions/export-voting-stats', {
+            responseType: 'blob'
+        });
+        
+        const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+        
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+        link.download = `voting_statistics_${dateStr}_${timeStr}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        
+        showMessage('Voting statistics exported successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error exporting voting statistics:', error);
+        handleExportError(error, 'voting statistics');
+    }
+}
+
+// Export individual vote records (who voted for whom)
+async function exportIndividualVotes() {
+    try {
+        showMessage('Preparing individual vote records...', 'success');
+        
+        const response = await axios.get('/.netlify/functions/export-voting-stats?type=individual', {
+            responseType: 'blob'
+        });
+        
+        const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+        
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+        link.download = `individual_votes_${dateStr}_${timeStr}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        
+        showMessage('Individual vote records exported successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error exporting individual votes:', error);
+        handleExportError(error, 'individual vote records');
+    }
+}
+
+// Export vote summary by candidate
+async function exportCandidateResults() {
+    try {
+        showMessage('Preparing candidate results summary...', 'success');
+        
+        const response = await axios.get('/.netlify/functions/export-voting-stats?type=summary', {
+            responseType: 'blob'
+        });
+        
+        const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+        
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+        link.download = `candidate_results_${dateStr}_${timeStr}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        
+        showMessage('Candidate results exported successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error exporting candidate results:', error);
+        handleExportError(error, 'candidate results');
+    }
+}
 
         // Election Timer Functions
         async function loadElectionStatus() {

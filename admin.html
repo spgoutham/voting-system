@@ -756,7 +756,7 @@
                 <button class="action-btn btn-warning" onclick="exportResults()">📊 Export Results</button>
             </div>
         </div>
-<!-- Replace the action buttons section in your statistics tab with this: -->
+<!-- Replace the export section in your statistics tab with this corrected version: -->
 
 <div class="export-section">
     <div class="position-header" style="background: transparent; padding: 10px 0;">
@@ -768,14 +768,14 @@
             <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Vote counts & percentages by candidate</div>
         </button>
         <button class="action-btn btn-warning" onclick="exportIndividualVotes()">
-            🗳️ Export Individual Votes
-            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Who voted for whom (detailed records)</div>
+            👥 Export Voter List
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">Who voted & when (no vote choices)</div>
         </button>
     </div>
     <div style="text-align: center; margin-top: 15px;">
         <button class="action-btn btn-success" onclick="exportResults()">
-            📊 Export Complete Statistics
-            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">All voting data & analytics</div>
+            📊 Export Complete Report
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 3px;">All statistics & analysis</div>
         </button>
     </div>
 </div>
@@ -784,15 +784,27 @@
     <a href="index.html" class="action-btn btn-primary">🗳️ View Voting Page</a>
 </div>
 
-<!-- Privacy Notice -->
-<div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
-    <h4 style="color: #856404; margin-bottom: 10px;">🔒 Privacy & Security Notice:</h4>
+<!-- Updated Privacy Notice -->
+<div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 10px; border-left: 4px solid #3498db;">
+    <h4 style="color: #2980b9; margin-bottom: 10px;">🔒 Privacy & Data Information:</h4>
+    <ul style="color: #2c3e50; line-height: 1.6;">
+        <li><strong>Voter List Export:</strong> Shows who voted and when, but NOT their specific vote choices</li>
+        <li><strong>Candidate Results:</strong> Shows vote counts and percentages by candidate</li>
+        <li><strong>Complete Report:</strong> Comprehensive statistics and analysis</li>
+        <li><strong>Vote Privacy:</strong> Individual vote choices are NOT stored in your system for privacy protection</li>
+        <li><strong>Available Data:</strong> Voter registration, voting timestamps, and aggregated candidate vote counts</li>
+        <li>Your system protects voter privacy by only storing vote totals, not individual choices</li>
+    </ul>
+</div>
+
+<!-- System Info Notice -->
+<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
+    <h4 style="color: #856404; margin-bottom: 10px;">ℹ️ About Your Voting System:</h4>
     <ul style="color: #856404; line-height: 1.6;">
-        <li><strong>Individual Votes Export:</strong> Contains sensitive data showing who voted for whom</li>
-        <li><strong>Candidate Results:</strong> Shows vote counts without revealing voter identities</li>
-        <li><strong>Complete Statistics:</strong> Comprehensive data for analysis and reporting</li>
-        <li>Handle exported data responsibly and in accordance with privacy policies</li>
-        <li>Consider anonymizing data when sharing results publicly</li>
+        <li>Your system stores <strong>aggregated vote counts</strong> by candidate (e.g., "Alice: 15 votes")</li>
+        <li>It does <strong>NOT</strong> store individual vote records (e.g., "Student123 voted for Alice")</li>
+        <li>This design protects voter privacy but limits detailed vote tracking</li>
+        <li>You can see <strong>who voted</strong> and <strong>vote totals</strong>, but not <strong>who voted for whom</strong></li>
     </ul>
 </div>
         <!-- Updated Credentials Management Tab -->
